@@ -27,18 +27,17 @@ import os
 import re
 import rpm
 import platform
-import time
 import httplib
 
 package_name   = 'popcorn-client'
 popcorn_server = 'stats.opensuse.org'
-pathre = '^/(bin|sbin|usr/bin|usr/sbin|usr/games|opt/kde3/bin|opt/kde3/sbin|opt/gnome/bin|opt/gnome/sbin|lib|lib64|usr/lib|usr/lib64|include|boot)/'
+
+pathre = '^/(bin|boot|lib|lib64|opt/gnome/bin|opt/gnome/sbin|opt/kde3/bin|opt/kde3/sbin|sbin|usr/bin|usr/games|usr/include|usr/lib|usr/lib64|usr/libexec|usr/sbin|usr/share)/'
 
 class Statistics:
     package_ver  = 'unknown'
     arch = platform.machine()
     packages = []
-    now = int(time.time())
 
     def __init__(self):
         ts = rpm.TransactionSet()
@@ -64,13 +63,14 @@ class Statistics:
                         accessed = atime
                 except:
                     pass
-            self.packages.append( (max(self.now-installed, 0), '-' if accessed==0 else max(self.now-accessed, 0), name) )
+            self.packages.append( (installed, accessed, name) )
 
     def serialize(self):
         ret  = ''
-        ret += '%s\n%s\n%s\n' % (self.now, self.arch, self.package_ver)
+        ret += 'START %s %s\n' % (self.package_ver, self.arch)
         for pkg in self.packages:
             ret += '%s %s %s\n' % pkg
+        ret += 'END\n'
         return ret
 
 class Client:
@@ -88,4 +88,4 @@ stats.fill_packages()
 # client = Client()
 # client.submit( stats.serialize() )
 
-print stats.serialize()
+print stats.serialize(),

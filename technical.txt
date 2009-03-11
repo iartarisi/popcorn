@@ -1,0 +1,47 @@
+Submission format
+-----------------
+
+START <popcorn-client_version> <arch>
+<installed_time> <accessed_time> <package>
+...
+END
+
+where
+- installed_time is when the package installed
+- accessed_time is when the package was last used (any of its files touched)
+  (0 if none of the files from the package were used)
+- submission date could be calculated as max(accessed_time)
+
+Watched files
+-------------
+
+Only files in the following directories are watched:
+
+/bin
+/boot
+/lib
+/lib64
+/opt/gnome/bin
+/opt/gnome/sbin
+/opt/kde3/bin
+/opt/kde3/sbin
+/sbin
+/usr/bin
+/usr/games
+/usr/include
+/usr/lib
+/usr/lib64
+/usr/libexec
+/usr/sbin
+/usr/share
+
+Package categories
+------------------
+
+installed - package is in the list
+voted     - installed_time > 30 days, accessed_time < 30 days
+old       - installed_time > 30 days, accessed_time > 30 days
+recent    - installed_time < 30 days
+no-files  - accessed_time = 0
+
+note: voted + old + recent + no-files = installed
