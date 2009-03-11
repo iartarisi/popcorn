@@ -55,38 +55,37 @@ class Statistics:
             name = h['name']
             if name == 'gpg-pubkey': continue
             installed = h[rpm.RPMTAG_INSTALLTIME]
-            (accessed,atime) = (0,0)
-            mru = ''
-            for f in h[rpm.RPMTAG_FILENAMES]:
-                if not pathreprg.match(f): continue
+            (accessed, atime) = (0, 0)
+            for file in h[rpm.RPMTAG_FILENAMES]:
+                if not pathreprg.match(file): continue
                 try:
-                    (atime,) = os.stat(f)[7:8]
+                    (atime, ) = os.stat(file)[7:8]
                     if atime > accessed:
                         accessed = atime
                 except:
                     pass
-            self.packages.append( (max(self.now-installed,0), '-' if accessed==0 else max(self.now-accessed,0), name) )
+            self.packages.append( (max(self.now-installed, 0), '-' if accessed==0 else max(self.now-accessed, 0), name) )
 
     def serialize(self):
-        r  = ''
-        r += '%s\n%s\n%s\n' % (self.now,self.arch,self.package_ver)
-        for p in self.packages:
-            r += '%s %s %s\n' % p
-        return r
+        ret  = ''
+        ret += '%s\n%s\n%s\n' % (self.now, self.arch, self.package_ver)
+        for pkg in self.packages:
+            ret += '%s %s %s\n' % pkg
+        return ret
 
 class Client:
     def submit(self, body, compress = False):
-        h = httplib.HTTPConnection(popcorn_server)
-        h.putrequest('POST', '/popcorn')
-        h.putheader('content-type', 'application/octet-stream')
-        h.putheader('content-length', str(len(body)))
-        h.endheaders()
-        h.send(body)
+        conn = httplib.HTTPConnection(popcorn_server)
+        conn.putrequest('POST', '/popcorn')
+        conn.putheader('content-type', 'application/octet-stream')
+        conn.putheader('content-length', str(len(body)))
+        conn.endheaders()
+        conn.send(body)
 
-s = Statistics()
-s.fill_packages()
+stats = Statistics()
+stats.fill_packages()
 
-# c = Client()
-# c.submit( s.serialize() )
+# client = Client()
+# client.submit( stats.serialize() )
 
-print s.serialize()
+print stats.serialize()
