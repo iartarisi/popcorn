@@ -1,0 +1,92 @@
+#!/usr/bin/python
+
+# Copyright (c) 2009 Pavol Rusnak
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use,
+# copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following
+# conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+
+import os
+import re
+import rpm
+import platform
+import time
+import httplib
+
+package_name   = 'popcorn-client'
+popcorn_server = 'stats.opensuse.org'
+pathre = '^/(bin|sbin|usr/bin|usr/sbin|usr/games|opt/kde3/bin|opt/kde3/sbin|opt/gnome/bin|opt/gnome/sbin|lib|lib64|usr/lib|usr/lib64|include|boot)/'
+
+class Statistics:
+    package_ver  = 'unknown'
+    arch = platform.machine()
+    packages = []
+    now = int(time.time())
+
+    def __init__(self):
+        ts = rpm.TransactionSet()
+        mi = ts.dbMatch('name', package_name)
+        for h in mi:
+            self.package_ver = h['version']
+            break
+
+    def fill_packages(self):
+        pathreprg = re.compile(pathre)
+        ts = rpm.TransactionSet()
+        mi = ts.dbMatch()
+        for h in mi:
+            name = h['name']
+            if name == 'gpg-pubkey': continue
+            installed = h[rpm.RPMTAG_INSTALLTIME]
+            (accessed,atime) = (0,0)
+            mru = ''
+            for f in h[rpm.RPMTAG_FILENAMES]:
+                if not pathreprg.match(f): continue
+                try:
+                    (atime,) = os.stat(f)[7:8]
+                    if atime > accessed:
+                        accessed = atime
+                except:
+                    pass
+            self.packages.append( (max(self.now-installed,0), '-' if accessed==0 else max(self.now-accessed,0), name) )
+
+    def serialize(self):
+        r  = ''
+        r += '%s\n%s\n%s\n' % (self.now,self.arch,self.package_ver)
+        for p in self.packages:
+            r += '%s %s %s\n' % p
+        return r
+
+class Client:
+    def submit(self, body, compress = False):
+        h = httplib.HTTPConnection(popcorn_server)
+        h.putrequest('POST', '/popcorn')
+        h.putheader('content-type', 'application/octet-stream')
+        h.putheader('content-length', str(len(body)))
+        h.endheaders()
+        h.send(body)
+
+s = Statistics()
+s.fill_packages()
+
+# c = Client()
+# c.submit( s.serialize() )
+
+print s.serialize()
