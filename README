@@ -1,0 +1,78 @@
+POPCORN - Popularity Contest (for RPM)
+--------------------------------------
+
+http://repo.or.cz/w/popcorn.git
+
+Licensed under MIT License
+
+Files
+-----
+
+popcorn-client
+  * client-side written in Python
+  * gathers info about packages and sends to server (either via e-mail or HTTP POST)
+  * is called from cron every week (random time for each machine)
+
+popcorn-server
+  * server-side written in C and using SQLite3
+  * reads info from stdin and saves it to stats.tdb
+
+popcorn-rotate
+  * called every week on server
+  * move stats.tdb to stats-{year}-{week}.tdb and recreates stats.tdb
+
+Submission format
+-----------------
+
+POPCORN <popcorn-client_version> <arch>
+<category> <package>
+...
+<EOF>
+
+
+Package categories
+------------------
+
+(n) no-files  - no watched file present in the package (see below)
+(r) recent    - packages has been recently installed (less than 30 days)
+(v) voted     - package is older than 30 days and has been used recently (less than 30 days)
+(o) old       - package is older than 30 days and hasn't been used recently
+
+note: n + r + v + o = total number of installed packages
+
+Watched files
+-------------
+
+To find out whether the package has been used recently, access times of the files
+in the following directories are watched:
+
+/bin
+/boot
+/lib
+/lib64
+/opt/gnome/bin
+/opt/gnome/sbin
+/opt/kde3/bin
+/opt/kde3/sbin
+/sbin
+/usr/bin
+/usr/games
+/usr/include
+/usr/lib
+/usr/lib64
+/usr/libexec
+/usr/sbin
+/usr/share
+
+Database format
+---------------
+
+Format is produced by libtdb library (http://tdb.samba.org)
+
+It is simply a (key,value) storage.
+
+ key         | value                | meaning
+-------------+----------------------+----------------------------------------------------
+ arch/<arch> | <int>                | number of reports from arch <arch>
+ ver/<ver>   | <int>                | number of reports from ver <ver>
+ <name>      | <int><int><int><int> | package <name> was reported <int> times as n,r,v,o

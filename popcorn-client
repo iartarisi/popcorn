@@ -30,25 +30,17 @@ import platform
 import httplib
 import time
 
-package_name   = 'popcorn-client'
+version        = '0.1'
 popcorn_server = 'stats.opensuse.org'
 
 days_recent = 30
-days_unused = 30
+days_voted  = 30
 
 pathre = '^/(bin|boot|lib|lib64|opt/gnome/bin|opt/gnome/sbin|opt/kde3/bin|opt/kde3/sbin|sbin|usr/bin|usr/games|usr/include|usr/lib|usr/lib64|usr/libexec|usr/sbin|usr/share)/'
 
 class Statistics:
-    package_ver  = 'unknown'
     arch = platform.machine()
     packages = []
-
-    def __init__(self):
-        ts = rpm.TransactionSet()
-        mi = ts.dbMatch('name', package_name)
-        for h in mi:
-            self.package_ver = h['version']
-            break
 
     def fill_packages(self):
         pathreprg = re.compile(pathre)
@@ -69,23 +61,22 @@ class Statistics:
                 except:
                     pass
             if accessed == 0:
-                cat = 'nof' # no-files
+                cat = 'n' # no-files
             else:
-                if now - installed < 30 * 86400:
-                    cat = 'rec' # recent
+                if now - installed < days_recent * 86400:
+                    cat = 'r' # recent
                 else:
-                    if now - accessed < 30 * 86400:
-                        cat = 'vot' # voted
+                    if now - accessed < days_voted * 86400:
+                        cat = 'v' # voted
                     else:
-                        cat ='old' # old
+                        cat ='o' # old
             self.packages.append( (cat, name) )
 
     def serialize(self):
         ret  = ''
-        ret += 'START %s %s\n' % (self.package_ver, self.arch)
+        ret += 'POPCORN %s %s\n' % (version, self.arch)
         for pkg in self.packages:
             ret += '%s %s\n' % pkg
-        ret += 'END\n'
         return ret
 
 class Client:

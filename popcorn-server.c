@@ -23,9 +23,116 @@
   OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include <sqlite3.h>
+#include <stdio.h>
+#include <string.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <tdb.h>
+
+#define STATSDIR  "/var/cache/popcorn/"
+#define STATSFILE "stats.tdb"
+
+#define QUIET 1
+
+#define BUFSIZE 1024
+
+#define is_sane(c) ( ((c)>='A'&&(c)<='Z') || ((c)>='a'&&(c)<='z') || ((c)>='0'&&(c)<='9') || ((c)=='.') || ((c)=='-') || ((c)=='_') )
+
+typedef struct {
+    unsigned int n; /* no-files */
+    unsigned int r; /* recent */
+    unsigned int v; /* voted */
+    unsigned int o; /* old */
+} TUPLE;
+
+void sanitize(char *str)
+{
+    char *c = str;
+    while (*c)
+    {
+        if (!is_sane(*c))
+        {
+            str[0]='\0'; break;
+        }
+        ++c;
+    }
+    if (str[0]=='\0') strcpy(str,"unknown");
+}
 
 int main()
 {
+    int l;
+    unsigned int cnt;
+    char buf[BUFSIZE], ver[BUFSIZE], arch[BUFSIZE], cat, *pkg, *c;
+    TDB_CONTEXT *db;
+    TDB_DATA key, val;
+    TUPLE tuple;
+
+    if (! fgets(buf, BUFSIZE, stdin) )
+        return 1;
+    sscanf(buf, "POPCORN %s %s", ver, arch);
+
+    sanitize(ver);
+    sanitize(arch);
+
+    /* open database */
+    db = tdb_open(STATSDIR STATSFILE, 0, 0, O_CREAT | O_RDWR, 0644);
+    if ( !db ) {
+#ifndef QUIET
+        fprintf(stderr, "Can't open database: %s\n", STATSDIR STATSFILE);
+#endif
+        return 1;
+    }
+
+    // update arch
+    key.dsize = strlen(arch) + 5;
+    sprintf(buf, "arch/%s", arch);
+    key.dptr = (unsigned char *)buf;
+    val = tdb_fetch(db, key);
+    cnt = val.dptr ? *((unsigned int *)val.dptr) + 1 : 1;
+    val.dptr = (unsigned char *)&cnt;
+    val.dsize = sizeof(cnt);
+    tdb_store(db, key, val, TDB_REPLACE);
+
+    // update ver
+    key.dsize = strlen(ver) + 4;
+    sprintf(buf, "ver/%s", ver);
+    key.dptr = (unsigned char *)buf;
+    val = tdb_fetch(db, key);
+    cnt = val.dptr ? *((unsigned int *)val.dptr) + 1 : 1;
+    val.dptr = (unsigned char *)&cnt;
+    val.dsize = sizeof(cnt);
+    tdb_store(db, key, val, TDB_REPLACE);
+
+    // update packages
+    while (fgets(buf, BUFSIZE, stdin)) {
+        l = strlen(buf);
+        if (l<3) continue;
+        cat = buf[0];
+        c = strpbrk(buf + 2, " \n\r\t");
+        *c = '\0';
+        pkg = buf + 2;
+
+        key.dsize = strlen(pkg);
+        key.dptr = (unsigned char *)pkg;
+        val = tdb_fetch(db, key);
+        if (!val.dptr) {
+            tuple.n = 0;
+            tuple.r = 0;
+            tuple.v = 0;
+            tuple.o = 0;
+        } else {
+            tuple = *((TUPLE *)val.dptr);
+        }
+        switch (cat) {
+            case 'n': ++tuple.n; break;
+            case 'r': ++tuple.r; break;
+            case 'v': ++tuple.v; break;
+            case 'o': ++tuple.o; break;
+        }
+        tdb_store(db, key, val, TDB_REPLACE);
+    }
+
+    tdb_close(db);
     return 0;
 }

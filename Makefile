@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall
-LDFLAGS = -lsqlite3
+LDFLAGS = -ltdb
 
 all: popcorn-server
 
