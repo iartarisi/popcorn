@@ -22,6 +22,9 @@ popcorn-rotate
   * called every week on server
   * move stats.tdb to stats-{year}-{week}.tdb and recreates stats.tdb
 
+popcorn-dump
+  * dumps stats.tdb to stdout
+
 Submission format
 -----------------
 

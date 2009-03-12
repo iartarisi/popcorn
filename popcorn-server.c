@@ -32,7 +32,7 @@
 #define STATSDIR  "/var/cache/popcorn/"
 #define STATSFILE "stats.tdb"
 
-#define QUIET 1
+#define SILENT 0
 
 #define BUFSIZE 1024
 
@@ -68,23 +68,32 @@ int main()
     TDB_DATA key, val;
     TUPLE tuple;
 
-    if (! fgets(buf, BUFSIZE, stdin) )
+    /* read from stdin until line starting with "POPCORN " comes */
+    while (fgets(buf, BUFSIZE, stdin)) {
+        if (!strncmp(buf, "POPCORN ", 8)) break;
+    }
+    /* if not present then exit */
+    if (strncmp(buf, "POPCORN ", 8)) {
+#if !SILENT
+        fprintf(stderr, "Popcorn header not found\n");
+#endif
         return 1;
+    }
+    /* read and sanitize version and architecture */
     sscanf(buf, "POPCORN %s %s", ver, arch);
-
     sanitize(ver);
     sanitize(arch);
 
     /* open database */
     db = tdb_open(STATSDIR STATSFILE, 0, 0, O_CREAT | O_RDWR, 0644);
     if ( !db ) {
-#ifndef QUIET
+#if !SILENT
         fprintf(stderr, "Can't open database: %s\n", STATSDIR STATSFILE);
 #endif
         return 1;
     }
 
-    // update arch
+    // update architecture field
     key.dsize = strlen(arch) + 5;
     sprintf(buf, "arch/%s", arch);
     key.dptr = (unsigned char *)buf;
@@ -94,7 +103,7 @@ int main()
     val.dsize = sizeof(cnt);
     tdb_store(db, key, val, TDB_REPLACE);
 
-    // update ver
+    // update version field
     key.dsize = strlen(ver) + 4;
     sprintf(buf, "ver/%s", ver);
     key.dptr = (unsigned char *)buf;
@@ -130,6 +139,8 @@ int main()
             case 'v': ++tuple.v; break;
             case 'o': ++tuple.o; break;
         }
+        val.dptr = (unsigned char *)&tuple;
+        val.dsize = sizeof(tuple);
         tdb_store(db, key, val, TDB_REPLACE);
     }
 
