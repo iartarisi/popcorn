@@ -78,9 +78,9 @@ class Statistics:
                 for file in h[rpm.RPMTAG_FILENAMES]:
                     # skip non-watched files
                     if not pathreprg.match(file): continue
-                    # if file is mounted from noatime/relatime mounpoint, skip it
-                    if len( [i for i in atime_mounts if file.startswith(i)] ) <= 0: continue
-                    if len( [i for i in noatime_mounts if file.startswith(i)] ) > 0: continue
+                    # if the file is mounted from noatime/relatime mountpoint, skip it
+                    if len( [i for i in noatime_mounts if file.startswith(i)] ) >  0 and \
+                       len( [i for i in   atime_mounts if file.startswith(i)] ) <= 0: continue
                     try:
                         (atime, ) = os.stat(file)[7:8]
                         if atime > accessed:
@@ -115,7 +115,7 @@ class Client:
     def post(self, compress = False):
         conn = httplib.HTTPConnection(popcorn_uri_server)
         conn.putrequest('POST', popcorn_post_uri)
-        conn.putheader('content-type', 'application/octet-stream')
+        conn.putheader('content-type', 'text/plain')
         conn.putheader('content-length', str(len(self.data)))
         conn.endheaders()
         conn.send(self.data)
