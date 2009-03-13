@@ -74,18 +74,19 @@ class Statistics:
             if name == 'gpg-pubkey': continue
             installed = h[rpm.RPMTAG_INSTALLTIME]
             (accessed, atime) = (0, 0)
-            for file in h[rpm.RPMTAG_FILENAMES]:
-                # skip non-watched files
-                if not pathreprg.match(file): continue
-                # if file is mounted from noatime/relatime mounpoint, skip it
-                if len( [i for i in atime_mounts if file.startswith(i)] ) <= 0: continue
-                if len( [i for i in noatime_mounts if file.startswith(i)] ) > 0: continue
-                try:
-                    (atime, ) = os.stat(file)[7:8]
-                    if atime > accessed:
-                        accessed = atime
-                except:
-                    pass
+            if len(atime_mounts) > 0:
+                for file in h[rpm.RPMTAG_FILENAMES]:
+                    # skip non-watched files
+                    if not pathreprg.match(file): continue
+                    # if file is mounted from noatime/relatime mounpoint, skip it
+                    if len( [i for i in atime_mounts if file.startswith(i)] ) <= 0: continue
+                    if len( [i for i in noatime_mounts if file.startswith(i)] ) > 0: continue
+                    try:
+                        (atime, ) = os.stat(file)[7:8]
+                        if atime > accessed:
+                            accessed = atime
+                    except:
+                        pass
             if accessed == 0:
                 cat = 'n' # no-files
             else:
