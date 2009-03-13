@@ -41,6 +41,8 @@ days_voted  = 30
 
 pathre = '^/(bin|boot|lib|lib64|opt/gnome/bin|opt/gnome/sbin|opt/kde3/bin|opt/kde3/sbin|sbin|usr/bin|usr/games|usr/include|usr/lib|usr/lib64|usr/libexec|usr/sbin|usr/share)/'
 
+system_mounts = ['binfmt_misc', 'debugfs', 'devpts', 'fuse.gvfs-fuse-daemon', 'fusectl', 'nfs', 'nfs4', 'proc', 'rootfs', 'rpc_pipefs', 'securityfs', 'sysfs']
+
 class Statistics:
     arch = platform.machine()
     packages = []
@@ -48,6 +50,23 @@ class Statistics:
     def fill_packages(self):
         pathreprg = re.compile(pathre)
         now = int(time.time())
+
+        # detect mountpoints that are atime and noatime/relatime
+        atime_mounts = []
+        noatime_mounts = []
+        try:
+            f = open('/proc/mounts', 'r')
+            for line in f:
+                mount = line.split(' ', 4)
+                if not mount[2] in system_mounts:
+                    if mount[3].find('noatime') < 0 and mount[3].find('relatime') < 0:
+                       atime_mounts.append(mount[1])
+                    else:
+                       noatime_mounts.append(mount[1])
+            f.close()
+        except:
+            pass
+
         ts = rpm.TransactionSet()
         mi = ts.dbMatch()
         for h in mi:
@@ -56,7 +75,11 @@ class Statistics:
             installed = h[rpm.RPMTAG_INSTALLTIME]
             (accessed, atime) = (0, 0)
             for file in h[rpm.RPMTAG_FILENAMES]:
+                # skip non-watched files
                 if not pathreprg.match(file): continue
+                # if file is mounted from noatime/relatime mounpoint, skip it
+                if len( [i for i in atime_mounts if file.startswith(i)] ) <= 0: continue
+                if len( [i for i in noatime_mounts if file.startswith(i)] ) > 0: continue
                 try:
                     (atime, ) = os.stat(file)[7:8]
                     if atime > accessed:

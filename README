@@ -68,6 +68,9 @@ in the following directories are watched:
 /usr/sbin
 /usr/share
 
+Rem: if some of the filesystems are mounted with noatime/relatime, the packages from
+     this filesystem are always in category 'no-files'
+
 Database format
 ---------------
 
