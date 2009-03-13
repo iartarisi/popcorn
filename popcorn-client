@@ -28,10 +28,13 @@ import re
 import rpm
 import platform
 import httplib
+import smtplib
 import time
 
-version        = '0.1'
-popcorn_server = 'stats.opensuse.org'
+version             = '0.1'
+popcorn_post_server = 'stats.opensuse.org'
+popcorn_post_uri    = '/popcorn'
+popcorn_email       = 'popcorn@stats.opensuse.org'
 
 days_recent = 30
 days_voted  = 30
@@ -48,7 +51,7 @@ class Statistics:
         ts = rpm.TransactionSet()
         mi = ts.dbMatch()
         for h in mi:
-            name = h['name']
+            name = h[rpm.RPMTAG_NAME]
             if name == 'gpg-pubkey': continue
             installed = h[rpm.RPMTAG_INSTALLTIME]
             (accessed, atime) = (0, 0)
@@ -80,18 +83,28 @@ class Statistics:
         return ret
 
 class Client:
-    def submit(self, body, compress = False):
-        conn = httplib.HTTPConnection(popcorn_server)
-        conn.putrequest('POST', '/popcorn')
+    def __init__(self):
+        stats = Statistics()
+        stats.fill_packages()
+        self.data = stats.serialize()
+
+    def post(self, compress = False):
+        conn = httplib.HTTPConnection(popcorn_uri_server)
+        conn.putrequest('POST', popcorn_post_uri)
         conn.putheader('content-type', 'application/octet-stream')
-        conn.putheader('content-length', str(len(body)))
+        conn.putheader('content-length', str(len(self.data)))
         conn.endheaders()
-        conn.send(body)
+        conn.send(self.data)
 
-stats = Statistics()
-stats.fill_packages()
+    def email(self):
+        smtp = smtplib.SMTP()
+        smtp.sendmail('', popcorn_email, self.data)
+        smtp.quit()
 
-# client = Client()
-# client.submit( stats.serialize() )
+    def write(self):
+        print self.data,
 
-print stats.serialize(),
+client = Client()
+# client.post()
+# client.email()
+client.write()

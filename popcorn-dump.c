@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <unistd.h>
 #include <tdb.h>
 
 #define STATSDIR  "/var/cache/popcorn/"
@@ -35,7 +34,7 @@
 int cb(TDB_CONTEXT *db, TDB_DATA key, TDB_DATA val, void *dummy)
 {
     int i, *vals;
-    printf("%.*s", (int)key.dsize, key.dptr);
+    printf("%.*s", (int)key.dsize, (char *)key.dptr);
     vals = (int *)val.dptr;
     for (i=0; i<val.dsize/sizeof(int); i++)
         printf(" %d", vals[i]);
@@ -48,6 +47,8 @@ int main()
     TDB_CONTEXT *db;
 
     db = tdb_open(STATSDIR STATSFILE, 0, 0, O_RDONLY, 0644);
+
+    if (!db) return 1;
 
     tdb_traverse(db, cb, NULL);
 

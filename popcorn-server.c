@@ -45,14 +45,13 @@ typedef struct {
     unsigned int o; /* old */
 } TUPLE;
 
-void sanitize(char *str)
+inline void sanitize(char *str)
 {
     char *c = str;
-    while (*c)
-    {
-        if (!is_sane(*c))
-        {
-            str[0]='\0'; break;
+    while (*c) {
+        if (!is_sane(*c)) {
+            str[0]='\0';
+            break;
         }
         ++c;
     }
@@ -95,7 +94,7 @@ int main()
 
     // update architecture field
     key.dsize = strlen(arch) + 5;
-    sprintf(buf, "arch/%s", arch);
+    snprintf(buf, BUFSIZE, "arch/%s", arch);
     key.dptr = (unsigned char *)buf;
     val = tdb_fetch(db, key);
     cnt = val.dptr ? *((unsigned int *)val.dptr) + 1 : 1;
@@ -105,7 +104,7 @@ int main()
 
     // update version field
     key.dsize = strlen(ver) + 4;
-    sprintf(buf, "ver/%s", ver);
+    snprintf(buf, BUFSIZE, "ver/%s", ver);
     key.dptr = (unsigned char *)buf;
     val = tdb_fetch(db, key);
     cnt = val.dptr ? *((unsigned int *)val.dptr) + 1 : 1;
