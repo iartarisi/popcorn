@@ -9,8 +9,7 @@ Source0:       popcorn-client
 Source1:       popcorn.conf
 Source2:       popcorn.cron
 BuildRoot:     %{_tmppath}/%{name}-%{version}-build
-BuildRequires: python rpm-python
-Requires:      python
+Requires:      rpm-python cron
 
 %description
 Popularity Contest (for RPM)
