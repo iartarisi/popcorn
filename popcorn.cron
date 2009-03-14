@@ -1,0 +1,6 @@
+#!/bin/sh
+
+if [ -x /usr/bin/popcorn-client -a -f /etc/popcorn.conf ]; then
+    . /etc/popcorn.conf
+    /usr/bin/popcorn-client
+fi

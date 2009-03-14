@@ -128,7 +128,13 @@ class Client:
     def write(self):
         print self.data,
 
-client = Client()
-# client.post()
-# client.email()
-client.write()
+enabled = os.environ['POPCORN_ENABLED'] if os.environ.has_key('POPCORN_ENABLED') else None
+if enabled and enabled != '0':
+    method = os.environ['POPCORN_METHOD'] if os.environ.has_key('POPCORN_METHOD') else None
+    client = Client()
+    if method == '0':
+        client.email()
+    elif method == '1':
+        client.post()
+    else:
+        client.write()
