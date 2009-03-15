@@ -17,4 +17,8 @@ example:
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f *.o popcorn-server popcorn-dump example.txt
+	rm -f *.o popcorn-server popcorn-dump example.txt popcorn.tar.bz2
+
+dist:
+	rm -f popcorn.tar.bz2
+	tar cfj popcorn.tar.bz2 Makefile README popcorn-client popcorn-dump.c popcorn-rotate popcorn-server.c popcorn.conf popcorn.cron

@@ -5,29 +5,49 @@ Url:           http://en.opensuse.org/Popcorn
 License:       X11/MIT
 Group:         System/Packages
 Summary:       Popularity Contest (for RPM)
-Source0:       popcorn-client
-Source1:       popcorn.conf
-Source2:       popcorn.cron
+Source:        %{name}.tar.bz2
 BuildRoot:     %{_tmppath}/%{name}-%{version}-build
+BuildRequires: libtdb-devel
 Requires:      rpm-python cron
 
 %description
 Popularity Contest (for RPM)
 
+%package server
+Group:         System/Packages
+Summary:       Popularity Contest (for RPM) - server
+
+%description server
+Popularity Contest (for RPM) - server
+
 %prep
-cp %{SOURCE0} %{SOURCE1} %{SOURCE2} .
+%setup -q
 
 %build
+make
 
 %install
-install -D -m 0755 popcorn-client $RPM_BUILD_ROOT%{_bindir}/popcorn-client
+# client
+install -D -m 0755 popcorn-client $RPM_BUILD_ROOT%{_bindir}/popcorn
 install -D -m 0644 popcorn.conf   $RPM_BUILD_ROOT%{_sysconfdir}/popcorn.conf
 install -D -m 0755 popcorn.cron   $RPM_BUILD_ROOT%{_sysconfdir}/cron.weekly/popcorn
+# server
+install -D -m 0755 popcorn-dump   $RPM_BUILD_ROOT%{_bindir}/popcorn-dump
+install -D -m 0755 popcorn-rotate $RPM_BUILD_ROOT%{_bindir}/popcorn-rotate
+install -D -m 0755 popcorn-server $RPM_BUILD_ROOT%{_bindir}/popcorn-server
+mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/popcorn
+# /srv/www/cgi-bin/
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
-%{_bindir}/popcorn-client
+%{_bindir}/popcorn
 %{_sysconfdir}/popcorn.conf
 %{_sysconfdir}/cron.weekly/popcorn
+
+%files server
+%{_bindir}/popcorn-dump
+%{_bindir}/popcorn-rotate
+%{_bindir}/popcorn-server
+%{_localstatedir}/cache/popcorn
