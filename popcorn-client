@@ -32,9 +32,9 @@ import smtplib
 import time
 
 version             = '0.1'
-popcorn_post_server = 'stats.opensuse.org'
+popcorn_post_server = 'popcorn.opensuse.org'
 popcorn_post_uri    = '/popcorn'
-popcorn_email       = 'popcorn@stats.opensuse.org'
+popcorn_email       = 'popcorn@popcorn.opensuse.org'
 
 days_recent = 30
 days_voted  = 30
