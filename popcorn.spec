@@ -21,7 +21,7 @@ Summary:       Popularity Contest (for RPM) - server
 Popularity Contest (for RPM) - server
 
 %prep
-%setup -q
+%setup -q -n %{name}
 
 %build
 make
@@ -42,12 +42,16 @@ mkdir -p $RPM_BUILD_ROOT%{_localstatedir}/cache/popcorn
 rm -rf $RPM_BUILD_ROOT
 
 %files
+%defattr(-,root,root)
 %{_bindir}/popcorn
-%{_sysconfdir}/popcorn.conf
+%config(noreplace) %{_sysconfdir}/popcorn.conf
 %{_sysconfdir}/cron.weekly/popcorn
 
 %files server
+%defattr(-,root,root)
 %{_bindir}/popcorn-dump
 %{_bindir}/popcorn-rotate
 %{_bindir}/popcorn-server
 %{_localstatedir}/cache/popcorn
+
+%changelog

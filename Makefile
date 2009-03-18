@@ -18,7 +18,9 @@ example:
 
 clean:
 	rm -f *.o popcorn-server popcorn-dump example.txt popcorn.tar.bz2
+	rm -rf dist
 
 dist:
-	rm -f popcorn.tar.bz2
-	tar cfj popcorn.tar.bz2 Makefile README popcorn-client popcorn-dump.c popcorn-rotate popcorn-server.c popcorn.conf popcorn.cron
+	mkdir dist
+	tar --transform 's:^:popcorn/:' -j -c -f dist/popcorn.tar.bz2 [^d]*
+	cp -a *spec dist
