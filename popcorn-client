@@ -39,7 +39,7 @@ popcorn_email       = 'popcorn@popcorn.opensuse.org'
 days_recent = 30
 days_voted  = 30
 
-pathre = '^/(bin|boot|lib|lib64|opt/gnome/bin|opt/gnome/sbin|opt/kde3/bin|opt/kde3/sbin|sbin|usr/bin|usr/games|usr/include|usr/lib|usr/lib64|usr/libexec|usr/sbin|usr/share)/'
+pathre = '^/(bin|boot|lib|lib64|opt/gnome/bin|opt/gnome/sbin|opt/kde3/bin|opt/kde3/sbin|sbin|usr/bin|usr/games|usr/include|usr/lib|usr/lib64|usr/libexec|usr/sbin)/'
 
 system_mounts = ['binfmt_misc', 'debugfs', 'devpts', 'fuse.gvfs-fuse-daemon', 'fusectl', 'nfs', 'nfs4', 'proc', 'rootfs', 'rpc_pipefs', 'securityfs', 'sysfs']
 
