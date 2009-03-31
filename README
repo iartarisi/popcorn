@@ -6,45 +6,33 @@ http://repo.or.cz/w/popcorn.git
 Licensed under MIT License
 Copyright (c) 2009 Pavol Rusnak <stick@gk2.sk>
 
-Files
------
+Introduction
+------------
 
-popcorn-client
-  * client-side written in Python
-  * gathers info about packages and sends to server (either via e-mail or HTTP POST)
-  * is called from cron every week (random time for each machine)
+Popcorn lists system packages and for each package it reads access time of its
+"watched" files (see section Watched Files below). The most recent fileaccess
+time is considered as the "package access time". The packages are then split into
+four categories depending on the package install time and package access time:
 
-popcorn-server
-  * server-side written in C and using SQLite3
-  * reads info from stdin and saves it to stats.tdb
+* (r) recent
+  - package has been recently installed (less than 30 days)
+  - ( now - install_time < 30 days )
+* (v) voted
+  - package is older than 30 days and has been used in the last 30 days
+  - ( now - install_time > 30 days ) and ( now - access_time < 30 days)
+* (o) old
+  - package is older than 30 days and hasn't been used recently
+  - ( now - install_time > 30 days ) and ( now - access_time > 30 days)
+* (n) no-files
+  - there are no watched files present in the package
+  - access_time = 0
 
-popcorn-rotate
-  * called every week on server
-  * move stats.tdb to stats-{year}-{week}.tdb and recreates stats.tdb
+Each package falls exactly into one category, so (n + r + v + o) is the total
+number of the installed packages.
 
-popcorn-dump
-  * dumps stats.tdb to stdout
+Popcorn is inspired by Debian Popcon available from http://popcon.debian.org/
 
-Submission format
------------------
-
-POPCORN <popcorn-client_version> <arch>
-<category> <package>
-...
-<EOF>
-
-
-Package categories
-------------------
-
-(n) no-files  - no watched file present in the package (see below)
-(r) recent    - packages has been recently installed (less than 30 days)
-(v) voted     - package is older than 30 days and has been used recently (less than 30 days)
-(o) old       - package is older than 30 days and hasn't been used recently
-
-note: n + r + v + o = total number of installed packages
-
-Watched files
+Watched Files
 -------------
 
 To find out whether the package has been used recently, access times of the files
@@ -66,20 +54,68 @@ in the following directories are watched:
 /usr/lib64
 /usr/libexec
 /usr/sbin
-/usr/share
 
-Rem: if some of the filesystems are mounted with noatime/relatime, the packages from
-     this filesystem are always in category 'no-files'
+Note: The files mounted from the noatime/relatime filesystems are not taken into
+      consideration, because they would skew the results. If package contains
+      only such files, it appears in 'no-files' category.
+
+Files
+-----
+
+popcorn-client
+  * client-side written in Python
+  * gathers info about packages and sends to server (either via e-mail or HTTP POST)
+  * is called from cron every week (random time for each machine)
+
+popcorn-server
+  * server-side written in C and using libtdb library (http://tdb.samba.org)
+  * reads info from stdin and saves it to stats.tdb
+
+popcorn-rotate
+  * called every week on server
+  * move stats.tdb to stats-{year}-{week}.tdb and recreates stats.tdb
+
+popcorn-dump
+  * dumps stats.tdb to stdout
+
+Submission format
+-----------------
+
+Format is simple plaintext. First line contains string POPCORN followed by the
+popcorn version and architecture. Then the list of packages follows. Each package
+is prepended with one character describing the category (see Introduction) and
+the space. Plaintext size is around 30 KiB on casual machine, which could be
+later compressed to 10-15 KiB using HTTP gzip compression.
+
+Format:
+
+POPCORN <popcorn-client_version> <arch>
+<category> <package>
+...
+<EOF>
+
+Example:
+
+POPCORN 0.1 x86_64
+o twolame
+r sxtopdf
+v mozilla-nspr
+v libsensors4
+n snmp-mibs
+n branding-openSUSE
+v utempter
+v libdrm
 
 Database format
 ---------------
 
 Format is produced by libtdb library (http://tdb.samba.org)
 
-It is simply a (key,value) storage.
-
  key         | value                | meaning
 -------------+----------------------+----------------------------------------------------
  arch/<arch> | <int>                | number of reports from arch <arch>
  ver/<ver>   | <int>                | number of reports from ver <ver>
  <name>      | <int><int><int><int> | package <name> was reported <int> times as n,r,v,o
+
+Use popcorn-dump to dump the contents of the database.
+
