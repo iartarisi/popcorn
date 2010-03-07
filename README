@@ -32,33 +32,6 @@ number of the installed packages.
 
 Popcorn is inspired by Debian Popcon available from http://popcon.debian.org/
 
-Watched Files
--------------
-
-To find out whether the package has been used recently, access times of the files
-in the following directories are watched:
-
-/bin
-/boot
-/lib
-/lib64
-/opt/gnome/bin
-/opt/gnome/sbin
-/opt/kde3/bin
-/opt/kde3/sbin
-/sbin
-/usr/bin
-/usr/games
-/usr/include
-/usr/lib
-/usr/lib64
-/usr/libexec
-/usr/sbin
-
-Note: The files mounted from the noatime/relatime filesystems are not taken into
-      consideration, because they would skew the results. If package contains
-      only such files, it appears in 'no-files' category.
-
 Files
 -----
 
@@ -106,6 +79,32 @@ n branding-openSUSE
 v utempter
 v libdrm
 
+Watched files
+-------------
+
+To find out whether the package has been used recently, access times of the files
+in the following directories are watched:
+
+/bin
+/boot
+/lib
+/lib64
+/opt/gnome/bin
+/opt/gnome/sbin
+/opt/kde3/bin
+/opt/kde3/sbin
+/sbin
+/usr/bin
+/usr/games
+/usr/include
+/usr/lib
+/usr/lib64
+/usr/libexec
+/usr/sbin
+
+Note: if some of the filesystems are mounted with noatime, the packages
+      from this filesystem are always in category 'no-files'
+
 Database format
 ---------------
 
@@ -118,4 +117,3 @@ Format is produced by libtdb library (http://tdb.samba.org)
  <name>      | <int><int><int><int> | package <name> was reported <int> times as n,r,v,o
 
 Use popcorn-dump to dump the contents of the database.
-

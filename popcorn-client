@@ -51,7 +51,7 @@ class Statistics:
         pathreprg = re.compile(pathre)
         now = int(time.time())
 
-        # detect mountpoints that are atime and noatime/relatime
+        # detect mountpoints that are atime and noatime
         atime_mounts = []
         noatime_mounts = []
         try:
@@ -59,7 +59,7 @@ class Statistics:
             for line in f:
                 mount = line.split(' ', 4)
                 if not mount[2] in system_mounts:
-                    if mount[3].find('noatime') < 0 and mount[3].find('relatime') < 0:
+                    if mount[3].find('noatime') < 0:
                        atime_mounts.append(mount[1])
                     else:
                        noatime_mounts.append(mount[1])
@@ -78,7 +78,7 @@ class Statistics:
                 for file in h[rpm.RPMTAG_FILENAMES]:
                     # skip non-watched files
                     if not pathreprg.match(file): continue
-                    # if the file is mounted from noatime/relatime mountpoint, skip it
+                    # if the file is mounted from noatime mountpoint, skip it
                     if len( [i for i in noatime_mounts if file.startswith(i)] ) >  0 and \
                        len( [i for i in   atime_mounts if file.startswith(i)] ) <= 0: continue
                     try:
