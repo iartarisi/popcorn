@@ -28,13 +28,11 @@ import re
 import rpm
 import platform
 import httplib
-import smtplib
 import time
 
 version             = '0.1'
 popcorn_post_server = 'popcorn.opensuse.org'
 popcorn_post_uri    = '/popcorn'
-popcorn_email       = 'popcorn@popcorn.opensuse.org'
 
 days_recent = 30
 days_voted  = 30
@@ -120,21 +118,11 @@ class Client:
         conn.endheaders()
         conn.send(self.data)
 
-    def email(self):
-        smtp = smtplib.SMTP()
-        smtp.sendmail('', popcorn_email, self.data)
-        smtp.quit()
-
     def write(self):
         print self.data,
 
-enabled = os.environ['POPCORN_ENABLED'] if os.environ.has_key('POPCORN_ENABLED') else None
-if enabled and enabled != '0':
-    method = os.environ['POPCORN_METHOD'] if os.environ.has_key('POPCORN_METHOD') else None
+enabled = os.environ.has_key('POPCORN_ENABLED') and os.environ['POPCORN_ENABLED'] if os.environ.has_key('POPCORN_ENABLED') else None
+if enabled:
     client = Client()
-    if method == '0':
-        client.email()
-    elif method == '1':
-        client.post()
-    else:
-        client.write()
+#    client.post()
+    client.write()

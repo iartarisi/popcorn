@@ -4,7 +4,7 @@ POPCORN - Popularity Contest (for RPM)
 http://gitorious.org/opensuse/popcorn
 
 Licensed under MIT License
-Copyright (c) 2009 Pavol Rusnak <stick@gk2.sk>
+Copyright (c) 2010 Pavol Rusnak <stick@gk2.sk>
 
 Introduction
 ------------
@@ -39,17 +39,6 @@ popcorn-client
   * client-side written in Python
   * gathers info about packages and sends to server (either via e-mail or HTTP POST)
   * is called from cron every week (random time for each machine)
-
-popcorn-server
-  * server-side written in C and using libtdb library (http://tdb.samba.org)
-  * reads info from stdin and saves it to stats.tdb
-
-popcorn-rotate
-  * called every week on server
-  * move stats.tdb to stats-{year}-{week}.tdb and recreates stats.tdb
-
-popcorn-dump
-  * dumps stats.tdb to stdout
 
 Submission format
 -----------------
@@ -104,16 +93,3 @@ in the following directories are watched:
 
 Note: if some of the filesystems are mounted with noatime, the packages
       from this filesystem are always in category 'no-files'
-
-Database format
----------------
-
-Format is produced by libtdb library (http://tdb.samba.org)
-
- key         | value                | meaning
--------------+----------------------+----------------------------------------------------
- arch/<arch> | <int>                | number of reports from arch <arch>
- ver/<ver>   | <int>                | number of reports from ver <ver>
- <name>      | <int><int><int><int> | package <name> was reported <int> times as n,r,v,o
-
-Use popcorn-dump to dump the contents of the database.
