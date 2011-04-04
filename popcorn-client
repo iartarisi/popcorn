@@ -1,6 +1,7 @@
-#!/usr/bin/python
-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Copyright (c) 2009 Pavol Rusnak <stick@gk2.sk>
+# Copyright (c) 2011 Ionuț Arțăriși <mapleoin@lavabit.com>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -23,13 +24,14 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
+import httplib
 import os
+import platform
 import re
 import rpm
-import platform
-import httplib
 import smtplib
 import time
+import urllib
 
 version             = '0.1'
 popcorn_post_server = 'popcorn.opensuse.org'
@@ -106,19 +108,22 @@ class Statistics:
             ret += '%s %s\n' % pkg
         return ret
 
+
 class Client:
     def __init__(self):
         stats = Statistics()
         stats.fill_packages()
         self.data = stats.serialize()
 
-    def post(self, compress = False):
-        conn = httplib.HTTPConnection(popcorn_uri_server)
-        conn.putrequest('POST', popcorn_post_uri)
-        conn.putheader('content-type', 'text/plain')
-        conn.putheader('content-length', str(len(self.data)))
-        conn.endheaders()
-        conn.send(self.data)
+    def post(self, compress=False):
+        """Send a POST request to the default server
+
+        """
+        (content_type, body) = multipart(self.data)
+        headers = {"Content-Type": content_type,}
+        conn = httplib.HTTPConnection(popcorn_post_server)
+        conn.request("POST", popcorn_post_uri, body, headers)
+        response = conn.getresponse()
 
     def email(self):
         smtp = smtplib.SMTP()
@@ -128,6 +133,29 @@ class Client:
     def write(self):
         print self.data,
 
+
+def multipart(data):
+    """Return multipart content (rfc1341) as one file from data"""
+    # we will hopefully not need this anymore in the future:
+    # http://bugs.python.org/issue3244
+    BOUNDARY = 'gc0p4Jq0M2Yt08jU534c0p'
+    CRLF = '\r\n'
+    L = []
+
+    L.append('--' + BOUNDARY)
+    L.append('Content-Disposition: form-data; '
+             'name="popcorn"; filename="popcorn"')
+    L.append('Content-Type: text/plain')
+    L.append('')
+    L.append(data)
+    L.append('--'+BOUNDARY+'--')
+    L.append('')
+
+    body = CRLF.join(L)
+    content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
+    return (content_type, body)
+
+        
 enabled = os.environ['POPCORN_ENABLED'] if os.environ.has_key('POPCORN_ENABLED') else None
 if enabled and enabled != '0':
     method = os.environ['POPCORN_METHOD'] if os.environ.has_key('POPCORN_METHOD') else None
@@ -138,3 +166,4 @@ if enabled and enabled != '0':
         client.post()
     else:
         client.write()
+
