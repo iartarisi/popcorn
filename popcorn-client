@@ -31,12 +31,12 @@ import re
 import rpm
 import smtplib
 import time
-import urllib
 
 version             = '0.1'
 popcorn_post_server = 'popcorn.opensuse.org'
 popcorn_post_uri    = '/popcorn'
 popcorn_email       = 'popcorn@popcorn.opensuse.org'
+HWUUID_FILE = '/etc/smolt/hw-uuid'
 
 days_recent = 30
 days_voted  = 30
@@ -103,11 +103,14 @@ class Statistics:
 
     def serialize(self):
         ret  = ''
-        ret += 'POPCORN %s %s\n' % (version, self.arch)
+        ret += 'POPCORN %s %s %s\n' % (version, self.arch, get_system_id())
         for pkg in self.packages:
             ret += '%s %s\n' % pkg
         return ret
 
+def get_system_id():
+    with open(HWUUID_FILE) as f:
+        return f.read().strip()
 
 class Client:
     def __init__(self):
@@ -124,6 +127,7 @@ class Client:
         conn = httplib.HTTPConnection(popcorn_post_server)
         conn.request("POST", popcorn_post_uri, body, headers)
         response = conn.getresponse()
+        print response.read()
 
     def email(self):
         smtp = smtplib.SMTP()
