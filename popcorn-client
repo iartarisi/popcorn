@@ -99,13 +99,16 @@ class Statistics:
                         cat = 'v' # voted
                     else:
                         cat ='o' # old
-            self.packages.append( (cat, name) )
+            version = h[rpm.RPMTAG_VERSION] or 'None'
+            release = h[rpm.RPMTAG_RELEASE] or 'None'
+            arch = h[rpm.RPMTAG_ARCH]
+            vendor = h[rpm.RPMTAG_VENDOR] or 'None'
+            self.packages.append((cat, name, version, release, arch, vendor))
 
     def serialize(self):
-        ret  = ''
-        ret += 'POPCORN %s %s %s\n' % (version, self.arch, get_system_id())
+        ret = 'POPCORN %s %s %s\n' % (version, self.arch, get_system_id())
         for pkg in self.packages:
-            ret += '%s %s\n' % pkg
+            ret += ' '.join(pkg)+'\n'
         return ret
 
 def get_system_id():

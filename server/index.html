@@ -12,6 +12,12 @@
       {% end %}
     </ul>
 
+    <h2>Vendors</h2>
+    <ul>
+      {% for (vendor, id) in zip(vendors, vendor_ids) %}
+      <li><a href="/vendor/{{ id }}">{{ vendor }}</a></li>
+      {% end %}
+    </ul>
     <h2>{{ total_packages }} packages</h2>
     <table>
       <tr>
