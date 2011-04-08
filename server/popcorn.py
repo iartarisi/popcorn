@@ -104,7 +104,7 @@ def parse_popcorn(data):
         elif status == 'n':
             rdb.incr('package:%s:nofiles' % package_id)
         # add package to the submission
-        rdb.lpush('submission:%s:packages', package_id)
+        rdb.lpush('submission:%s:packages' % sub, package_id)
         
 application = tornado.web.Application([
     (r"/", MainHandler),
