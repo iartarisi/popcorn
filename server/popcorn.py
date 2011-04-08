@@ -8,26 +8,15 @@ import tornado.web
 rdb = redis.Redis(host='localhost', port=6379, db=0)
 
 class MainHandler(tornado.web.RequestHandler):
-
     def get(self):
-        total_packages = int(rdb.get('global:nextPackageId'))
+        hw_uuids = rdb.lrange('hw-uuids', 0, -1)
 
-        self.write('Packages: %s\n' % total_packages)
-        # this is proof that I either don't understand redis yet, or I'm
-        # just optimizing too early, or both
-        name_keys = ['package:%s:name' % i for i in range(total_packages) if i]
-        vote_keys = ['package:%s:voted' % i for i in range(total_packages) if i]
-        rec_keys = ['package:%s:recent' % i for i in range(total_packages) if i]
-        old_keys = ['package:%s:old' % i for i in range(total_packages) if i]
-        nof_keys = ['package:%s:nofiles' % i for i in range(total_packages) if i]
+        total_packages = rdb.get('global:nextPackageId')
 
-        names = rdb.mget(name_keys)
-        voted = rdb.mget(vote_keys)
-        recent = rdb.mget(rec_keys)
-        old = rdb.mget(old_keys)
-        nofiles = rdb.mget(nof_keys)
-        
+        names, voted, recent, old, nofiles = get_sorted_packages()
         self.render('index.html',
+                    systems=hw_uuids,
+                    total_packages=total_packages,
                     names=names,
                     voted=voted,
                     recent=recent,
@@ -41,7 +30,52 @@ class MainHandler(tornado.web.RequestHandler):
                 'content_type'] == 'text/plain', tornado.web.HTTPError(415)
         except KeyError:
             raise Exception("nothing uploaded")
+
         parse_popcorn(self.request.files['popcorn'][0]['body'])
+
+        self.write('Submission received. Thank you!')
+
+class SystemHandler(tornado.web.RequestHandler):
+    def get(self, hw_uuid):
+        try:
+            system_id = rdb['hw-uuid:%s' % hw_uuid]
+        except KeyError:
+            raise tornado.web.HTTPError(
+                404, "Could not find system with hw-uuid %s", hw_uuid)
+
+        arch = rdb.get('system:%s:arch' % system_id)
+        self.write("<h2>System: %s - %s</h2>" % (hw_uuid, arch))
+        self.write("<p>Submissions: \n</p>")
+        subs = rdb.lrange('system:%s:submissions' % system_id, 0, -1)
+        for sub in subs:
+            self.write("<a href='/submission/%s'>submission %s</a>" % (sub, sub))
+
+class SubmissionHandler(tornado.web.RequestHandler):
+    def get(self, sub_id):
+        package_ids = rdb.lrange('submission:%s:packages' % sub_id, 0, -1)
+        name_keys = ['package:%s:name' % i for i in package_ids]
+        package_names = rdb.mget(name_keys)
+        self.write('<p>Submission packages:</p>')
+        self.write('<ul>')
+        for name in package_names:
+            self.write('<li>%s</li>' % name)
+        self.write('</ul>')
+def get_sorted_packages(key='voted'):
+    """Get a lists of package attributes sorted by `key`
+
+    The list returned is made of [names, voted, recent, old, nofiles]
+
+    """
+    if key not in ['name', 'voted', 'recent', 'old', 'nofiles']:
+        raise Exception("Unrecognized key")
+
+    packages_tuples = []
+    for attr in ['name', 'voted', 'recent', 'old', 'nofiles']:
+        packages_tuples.append(rdb.sort('packageIds',
+                                        by='package:*:%s' % key,
+                                        desc=True,
+                                        get='package:*:%s' % attr))
+    return packages_tuples
 
 def get_system_id(hw_uuid):
     """Check if the system is in our database and create it if it isn't
@@ -56,6 +90,7 @@ def get_system_id(hw_uuid):
         system_id = rdb[key]
     except KeyError:
         system_id = str(rdb.incr('global:nextSystemId'))
+        rdb.lpush('hw-uuids', hw_uuid)
         rdb[key] = system_id
     return system_id
 
@@ -67,6 +102,7 @@ def get_package_id(package_name):
     except KeyError:
         package_id = str(rdb.incr('global:nextPackageId'))
         rdb[key] = package_id
+        rdb.lpush('packageIds', package_id)
     return package_id
 
 def get_submission(system_id):
@@ -107,7 +143,9 @@ def parse_popcorn(data):
         rdb.lpush('submission:%s:packages' % sub, package_id)
         
 application = tornado.web.Application([
-    (r"/", MainHandler),
+    (r"/post", MainHandler),
+    (r"/system/([a-f0-9\-]+)", SystemHandler),
+    (r"/submission/([0-9]+)", SubmissionHandler),
 ])
 
 if __name__ == "__main__":
