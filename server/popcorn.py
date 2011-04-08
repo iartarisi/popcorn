@@ -23,6 +23,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
+from ConfigParser import RawConfigParser
 from datetime import date
 
 import redis
@@ -30,7 +31,11 @@ import redis
 import tornado.ioloop
 import tornado.web
 
-rdb = redis.Redis(host='localhost', port=6379, db=0)
+config = RawConfigParser()
+config.read('server.cfg')
+rdb = redis.Redis(config.get('redis', 'hostname'),
+                  config.get('redis', 'port'),
+                  config.get('redis', 'db'))
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
