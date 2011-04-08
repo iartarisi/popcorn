@@ -103,6 +103,7 @@ def get_package_id(package_name):
         package_id = str(rdb.incr('global:nextPackageId'))
         rdb[key] = package_id
         rdb.lpush('packageIds', package_id)
+        rdb.set('package:%s:name' % package_id, package_name)
     return package_id
 
 def get_submission(system_id):
@@ -129,8 +130,6 @@ def parse_popcorn(data):
     for line in datalines[1:]:
         (status, package_name) = line.split()
         package_id = get_package_id(package_name)
-        # create package
-        rdb.setnx('package:%s:name' % package_id, package_name)
         if status == 'v':
             rdb.incr('package:%s:voted' % package_id)
         elif status == 'r':
