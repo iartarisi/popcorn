@@ -34,8 +34,8 @@ import tornado.web
 config = RawConfigParser()
 config.read('server.cfg')
 rdb = redis.Redis(config.get('redis', 'hostname'),
-                  config.get('redis', 'port'),
-                  config.get('redis', 'db'))
+                  int(config.get('redis', 'port')),
+                  int(config.get('redis', 'db')))
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
