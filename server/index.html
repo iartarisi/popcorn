@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <title>Popcorn!</title>
+  </head>
+  <body>
+    <h1>Popcorn!</h1>
+
+    <h2>Systems</h2>
+    <ul>
+      {% for system_id in systems %}
+      <li><a href="/system/{{ system_id }}">{{ system_id }}</a></li>
+      {% end %}
+    </ul>
+
+    <h2>Vendors</h2>
+    <ul>
+      {% for (vendor, id) in zip(vendors, vendor_ids) %}
+      <li><a href="/vendor/{{ id }}">{{ vendor }}</a></li>
+      {% end %}
+    </ul>
+    <h2>{{ total_packages }} packages</h2>
+    <table>
+      <tr>
+        <th>Package Name</th>
+        <th>Voted</th>
+        <th>Recent</th>
+        <th>Old</th>
+        <th>Nofiles</th>
+      </tr>
+      {% for (name, v, r, o, n)  in zip(names, voted, recent, old, nofiles) %}
+      <tr>
+        <td>{{ name }}</td>
+        <td>{{ v }}</td>
+        <td>{{ r }}</td>
+        <td>{{ o }}</td>
+        <td>{{ n }}</td>
+      </tr>
+      {% end %}
+    </table>
+  </body>
+</html>
