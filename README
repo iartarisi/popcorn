@@ -4,7 +4,7 @@ POPCORN - Popularity Contest (for RPM)
 http://gitorious.org/opensuse/popcorn
 
 Licensed under MIT License
-Copyright (c) 2010 Pavol Rusnak <stick@gk2.sk>
+Copyright (c) 2009-2011 Pavol Rusnak <stick@gk2.sk>
 Copyright (c) 2011 Ionuț Arțăriși <iartarisi@suse.cz>
 
 Introduction
@@ -45,29 +45,30 @@ Submission format
 -----------------
 
 Format is simple plaintext. First line contains string POPCORN followed by the
-popcorn version and architecture. Then the list of packages follows. Each package
-is prepended with one character describing the category (see Introduction) and
-the space. Plaintext size is around 30 KiB on casual machine, which could be
-later compressed to 10-15 KiB using HTTP gzip compression.
+popcorn version, machine architecture and uuid. Then the list of packages follows.
+Each line represents one package, values are separated by space. First value is
+one character describing the category (see Introduction), second value is the
+package name, third and fourth are version and release, fifth and sixth
+are architecture and repository of the package.
+
+Plaintext size is around 100 KiB on casual machine, which could be later compressed
+to around 20 KiB using HTTP gzip compression.
 
 Format:
 
-POPCORN <popcorn-client_version> <arch>
-<category> <package>
+POPCORN <popcorn-client_version> <arch> <hw_uuid>
+<category> <package> <version> <release> <arch> <repository>
 ...
 <EOF>
 
 Example:
 
-POPCORN 0.1 x86_64
-o twolame
-r sxtopdf
-v mozilla-nspr
-v libsensors4
-n snmp-mibs
-n branding-openSUSE
-v utempter
-v libdrm
+POPCORN 0.1 i686 7f3a469b-c052-4c9a-aa97-bffdb55e9878
+o libgmp3 4.3.2 1.13 i586 openSUSE
+o libfolks0 0.2.0 1.2 i586 obs://build.opensuse.org/GNOME
+v enchant 1.6.0 2.3 i586 openSUSE
+o libx264-112 0.112svn20110115 1.pm.2.6 i586 http://packman.links2linux.de
+n myspell-british 20100316 16.1 noarch openSUSE
 
 Watched files
 -------------
