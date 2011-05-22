@@ -24,4 +24,3 @@ class TestPopcorn(unittest.TestCase):
     @classmethod
     def tearDownAll(self):
         rdb.flushdb()
-    

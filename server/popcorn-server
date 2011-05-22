@@ -23,6 +23,9 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
+CONFIG_FILE = 'server.cfg'
+INDEX_FILE  = 'index.html'
+
 from ConfigParser import RawConfigParser
 from datetime import date
 
@@ -32,7 +35,7 @@ import tornado.ioloop
 import tornado.web
 
 config = RawConfigParser()
-config.read('server.cfg')
+config.read(CONFIG_FILE)
 rdb = redis.Redis(config.get('redis', 'hostname'),
                   int(config.get('redis', 'port')),
                   int(config.get('redis', 'db')))
@@ -48,7 +51,7 @@ class MainHandler(tornado.web.RequestHandler):
         vendors = rdb.smembers('vendors')
         vendor_keys = ['vendor:%s' % i for i in vendors]
         vendor_ids = rdb.mget(vendor_keys)
-        self.render('index.html',
+        self.render(INDEX_FILE,
                     vendors=vendors,
                     vendor_ids=vendor_ids,
                     systems=hw_uuids,
@@ -192,7 +195,7 @@ def get_vendor_id(name):
         rdb.set('vendor:%s' % vendor_id, name)
         rdb.sadd('vendors', name)
     return vendor_id
-    
+
 def parse_popcorn(data):
     datalines = data.splitlines()
     (popcorn, version, arch, hw_uuid) = datalines[0].split()

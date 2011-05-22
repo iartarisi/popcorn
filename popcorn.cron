@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ -x /usr/bin/popcorn-client -a -r /etc/popcorn.conf ]; then
+if [ -x /usr/bin/popcorn -a -r /etc/popcorn.conf ]; then
     . /etc/popcorn.conf
-    /usr/bin/popcorn-client
+    /usr/bin/popcorn
 fi
