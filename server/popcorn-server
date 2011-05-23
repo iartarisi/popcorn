@@ -23,7 +23,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-CONFIG_FILE = 'server.cfg'
+CONFIG_FILE = 'server.conf'
 INDEX_FILE  = 'index.html'
 
 from ConfigParser import RawConfigParser
