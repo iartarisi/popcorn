@@ -80,10 +80,6 @@ in the following directories are watched:
 /boot
 /lib
 /lib64
-/opt/gnome/bin
-/opt/gnome/sbin
-/opt/kde3/bin
-/opt/kde3/sbin
 /sbin
 /usr/bin
 /usr/games
