@@ -52,7 +52,7 @@ rm -rf %{buildroot}
 
 %pre server
 /usr/sbin/groupadd -r popcorn &>/dev/null || :
-/usr/sbin/useradd -o -g popcorn -s /bin/false -r -c "User for Popcorn server" -d /var/lib/empty popcorn-server &>/dev/null || :
+/usr/sbin/useradd -o -g popcorn -s /bin/false -r -c "User for Popcorn server" -d /var/lib/empty popcorn &>/dev/null || :
 
 %post server
 %fillup_and_insserv -y popcorn-server
