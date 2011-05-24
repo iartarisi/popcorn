@@ -62,6 +62,19 @@ class MainHandler(tornado.web.RequestHandler):
                     old=old,
                     nofiles=nofiles)
 
+    def post(self):
+        """Accepts submissions from popcorn clients in plain text"""
+        self.set_header("Content-Type", "text/plain")
+        try:
+            assert self.request.files['popcorn'][0][
+                'content_type'] == 'text/plain', tornado.web.HTTPError(415)
+        except KeyError:
+            raise Exception("nothing uploaded")
+
+        parse_popcorn(self.request.files['popcorn'][0]['body'])
+
+        self.write('Submission received. Thank you!')
+
 
 class SystemHandler(tornado.web.RequestHandler):
     def get(self, hw_uuid):
@@ -91,19 +104,6 @@ class SubmissionHandler(tornado.web.RequestHandler):
         for name in package_names:
             self.write('<li>%s</li>' % name)
         self.write('</ul>')
-
-    def post(self):
-        """Accepts submissions from popcorn clients in plain text"""
-        self.set_header("Content-Type", "text/plain")
-        try:
-            assert self.request.files['popcorn'][0][
-                'content_type'] == 'text/plain', tornado.web.HTTPError(415)
-        except KeyError:
-            raise Exception("nothing uploaded")
-
-        parse_popcorn(self.request.files['popcorn'][0]['body'])
-
-        self.write('Submission received. Thank you!')
 
 
 class VendorHandler(tornado.web.RequestHandler):

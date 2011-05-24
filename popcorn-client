@@ -34,7 +34,7 @@ import time
 
 version             = '0.1'
 popcorn_post_server = 'popcorn.opensuse.org'
-popcorn_post_uri    = '/popcorn'
+popcorn_post_uri    = '/'
 popcorn_email       = 'popcorn@popcorn.opensuse.org'
 HWUUID_FILE         = '/etc/smolt/hw-uuid'
 
