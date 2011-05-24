@@ -1,4 +1,4 @@
-FILES=README popcorn-client popcorn.conf popcorn.cron server/index.html server/popcorn-server server/server.conf
+FILES=README popcorn-client popcorn.conf popcorn.cron server/index.html server/popcorn-server server/popcorn-server.init server/server.conf
 
 all: release
 
