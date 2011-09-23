@@ -29,6 +29,9 @@ import tornado.ioloop
 import tornado.web
 
 from configs import rdb
+from model import System
+
+INDEX_FILE  = 'index.html'
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
@@ -128,22 +131,6 @@ def get_sorted_packages(key='voted'):
                                         get='package:*:%s' % attr))
     return packages_tuples
 
-def get_system_id(hw_uuid):
-    """Check if the system is in our database and create it if it isn't
-
-    :arg hw-uuid: smolt hw-uuid to uniquely indentify each system
-
-    Returns the internal system_id of this system.
-
-    """
-    key = 'hw-uuid:%s' % hw_uuid
-    try:
-        system_id = rdb[key]
-    except KeyError:
-        system_id = str(rdb.incr('global:nextSystemId'))
-        rdb.lpush('hw-uuids', hw_uuid)
-        rdb[key] = system_id
-    return system_id
 
 def get_package_id(name, ver, rel, arch, vendor):
     """Get or create a package for this name, ver, rel, arch, vendor combo"""
@@ -158,47 +145,17 @@ def get_package_id(name, ver, rel, arch, vendor):
         rdb.sadd('vendor:%s:packages' % vendor, package_id)
     return package_id
 
-def get_submission(system_id):
-    """Get a new submission for this system_id"""
-    # create new submission
-    sub_id = str(rdb.incr('global:nextSubmissionId'))
-    sub_date = date.today().strftime('%y-%m-%d')
-    rdb.set('submission:%s:date', sub_date)
-
-    # attach submission to system
-    rdb.lpush('system:%s:submissions' % system_id, sub_id)
-
-    return sub_id
-
-def normalize_vendor(vendor_name):
-    # redis keys cannot contain spaces
-    return vendor_name.replace(' ', '_')
-
-def get_vendor_id(name):
-    """Get or create a new vendor"""
-    name = normalize_vendor(name)
-    try:
-        vendor_id = rdb['vendor:%s' % name]
-    except KeyError:
-        vendor_id = str(rdb.incr('global:nextVendorId'))
-        rdb.set('vendor:%s' % name, vendor_id)
-        rdb.set('vendor:%s' % vendor_id, name)
-        rdb.sadd('vendors', name)
-    return vendor_id
-
 def parse_popcorn(data):
     datalines = data.splitlines()
     (popcorn, version, arch, hw_uuid) = datalines[0].split()
 
-    system_id = get_system_id(hw_uuid)
-    rdb.set('system:%s:arch' % system_id, arch)
+    system = System(hw_uuid, arch)
     # TODO check if system can submit based on date
-    sub = get_submission(system_id)
-    rdb.set('submission:%s:popcorn' % sub, version)
+    sub = Submission(system_id, version)
     for line in datalines[1:]:
         (status, name, version, release, arch, vendor) = line.split(None, 5)
-        vendor_id = get_vendor_id(vendor)
-        package_id = get_package_id(name, version, release, arch, vendor_id)
+        vendor = Vendor(vendor)
+        package = Package(name, version, release, arch, vendor)
         if status == 'v':
             rdb.incr('package:%s:voted' % package_id)
         elif status == 'r':
@@ -207,8 +164,7 @@ def parse_popcorn(data):
             rdb.incr('package:%s:old' % package_id)
         elif status == 'n':
             rdb.incr('package:%s:nofiles' % package_id)
-        # add package to the submission
-        rdb.lpush('submission:%s:packages' % sub, package_id)
+        sub.add_package(package)
 
 application = tornado.web.Application([
         (r"/", MainHandler),
