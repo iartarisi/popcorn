@@ -1,4 +1,4 @@
-from configs import rdb
+from popcorn.configs import rdb
 
 class System(object):
     """A system is a user machine that we want to track."""

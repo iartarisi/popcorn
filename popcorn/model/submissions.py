@@ -1,6 +1,6 @@
 from datetime import date
 
-from configs import rdb
+from popcorn.configs import rdb
 
 class Submission(object):
     """A set of data from a system captured at a specific time."""
@@ -21,14 +21,14 @@ class Submission(object):
         # create new submission
         self.id = str(rdb.incr('global:nextSubmissionId'))
         self.date = date.today().strftime('%y-%m-%d')
-        rdb.set('submission:%s:date', self.id, self.date)
+        rdb.set('submission:%s:date' % system.id, self.date)
 
         # attach submission to system
-        rdb.lpush('system:%s:submissions' % system.id, self.id)
+        rdb.lpush('system:%s:submissions' % self.id, self.id)
 
         # record version
-        rdb.set('submission:%s:popcorn' % , self.id, version)
+        rdb.set('submission:%s:popcorn' % self.id, version)
 
     def add_package(self, package):
         """Add a Package to this submission"""
-        rdb.lpush("submission:%s:packages", self.id, package.id)
+        rdb.lpush("submission:%s:packages" % self.id, package.id)

@@ -2,7 +2,7 @@ import redis
 
 from ConfigParser import RawConfigParser
 
-CONFIG_FILE = 'server.conf'
+CONFIG_FILE = '/etc/popcorn.conf'
 
 _config = RawConfigParser()
 _config.read(CONFIG_FILE)

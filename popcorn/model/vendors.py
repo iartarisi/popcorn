@@ -1,4 +1,4 @@
-from configs import rdb
+from popcorn.configs import rdb
 
 class Vendor(object):
     """A vendor is the provider of a repository"""
@@ -15,7 +15,7 @@ class Vendor(object):
             rdb['vendor:%s' % self.key]
         except KeyError:
             self.id = str(rdb.incr('global:nextVendorId'))
-            rdb.set('vendor:%s', self.key, name)
+            rdb.set('vendor:%s' % self.key, name)
             rdb.sadd('vendors', self.key)
 
 def _normalize_vendor(vendor_name):
