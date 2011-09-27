@@ -24,6 +24,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 from popcorn.configs import rdb
+from popcorn.exceptions import FormatError
 
 class Package(object):
     """A package object
@@ -32,13 +33,17 @@ class Package(object):
     ``package:%(name)s:%(version)s:%(release)s:%(epoch)s:%(arch)s:%(vendor)s``
     
     Ids are stored in the key above and incremented in
-    'global:nextPackageId'.
+    ``global:nextPackageId``.
 
     Packages belong to a vendor and their ids are stored in the set
-    'vendor:%(vendor_id)s:packages'
+    ``vendor:%(vendor_id)s:packages``.
+
+    A list of package statuses are stored in
+    ``package:%(package_id)s:status`` as a hash with these keys:
+    'voted', 'recent', 'old' and 'nofiles'. The values are integers.
 
     """
-    def __init__(self, name, version, release, arch, vendor, epoch=None):
+    def __init__(self, name, version, release, epoch, arch, vendor, status):
         """Get or create a package object"""
         self.name = name
         self.version = version
@@ -46,6 +51,15 @@ class Package(object):
         self.arch = arch
         self.vendor = vendor
         self.epoch = epoch
+
+        status_table = {'v': 'voted',
+                        'r': 'recent',
+                        'o': 'old',
+                        'n': 'nofiles'}
+        try:
+            self.status = status_table[status]
+        except KeyError:
+            raise FormatError("The package's status is invalid.")
 
         key = ('package:%(name)s:%(version)s:%(release)s:%(epoch)s:'
                '%(arch)s:%(vendor)s' % locals())
@@ -55,3 +69,4 @@ class Package(object):
             self.id = str(rdb.incr('global:nextPackageId'))
             rdb[key] = self.id
             rdb.sadd("vendor:%s:packages" % vendor, self.id)
+        rdb.hincrby('package:%s:status' % self.id, self.status, 1)

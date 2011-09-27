@@ -158,15 +158,7 @@ def parse_popcorn(data):
         (status, name, version, release,
          arch, epoch, vendor) = line.split(None, 6)
         vendor = Vendor(vendor)
-        package = Package(name, version, release, arch, vendor)
-        if status == 'v':
-            rdb.incr('package:%s:voted' % package.id)
-        elif status == 'r':
-            rdb.incr('package:%s:recent' % package.id)
-        elif status == 'o':
-            rdb.incr('package:%s:old' % package.id)
-        elif status == 'n':
-            rdb.incr('package:%s:nofiles' % package.id)
+        package = Package(name, version, release, epoch, arch, vendor, status)
         sub.add_package(package)
     rdb.save()
 
