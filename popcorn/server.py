@@ -155,7 +155,8 @@ def parse_popcorn(data):
     # TODO check if system can submit based on date
     sub = Submission(system, version)
     for line in datalines[1:]:
-        (status, name, version, release, arch, vendor) = line.split(None, 5)
+        (status, name, version, release,
+         arch, epoch, vendor) = line.split(None, 6)
         vendor = Vendor(vendor)
         package = Package(name, version, release, arch, vendor)
         if status == 'v':
