@@ -28,8 +28,8 @@ from popcorn.configs import rdb
 class Package(object):
     """A package object
 
-    A package is identified by its NVREA in under 'packageId:' like so:
-    packageId:%(name)s:%(version)s:%(release)s:%(epoch)s:%(arch)s:%(vendor)s'
+    A package is identified by its NVREA in under ``package:`` like so:
+    ``package:%(name)s:%(version)s:%(release)s:%(epoch)s:%(arch)s:%(vendor)s``
     
     Ids are stored in the key above and incremented in
     'global:nextPackageId'.
@@ -47,7 +47,7 @@ class Package(object):
         self.vendor = vendor
         self.epoch = epoch
 
-        key = ('packageId:%(name)s:%(version)s:%(release)s:%(epoch)s:'
+        key = ('package:%(name)s:%(version)s:%(release)s:%(epoch)s:'
                '%(arch)s:%(vendor)s' % locals())
         try:
             self.id = rdb[key]
