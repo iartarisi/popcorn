@@ -28,21 +28,20 @@ from popcorn.configs import rdb
 class Vendor(object):
     """A vendor is the provider of a repository.
 
-    It is identified by a normalized url of the target repository.
+    It is identified by a normalized name of the target repository.
 
     The key 'vendor:%(vendor)s' holds a hash with the keys:
      - name - the name of this repository
-     - url - the full URL of the repository
 
     The key 'vendor:%(vendor)s:packages' holds a set of all the package
     ids belonging to this vendor.
 
     """
-    def __init__(self, url):
+    def __init__(self, name):
         """
         Retrieves or creates a Vendor object.
 
-        :url: the url string of this Vendor
+        :name: the name string of this Vendor
 
         """
         self.name = name
