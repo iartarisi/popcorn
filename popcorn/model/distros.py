@@ -25,35 +25,17 @@
 
 from popcorn.configs import rdb
 
-class Vendor(object):
-    """A vendor is the provider of a repository.
+class Distro(object):
+    """A Distro is a versioned distribution e.g. openSUSE 11.4, Fedora 15
 
-    It is identified by a normalized url of the target repository.
+    It is identified by its name and version.
 
-    The key 'vendor:%(vendor)s' holds a hash with the keys:
-     - name - the name of this repository
-     - url - the full URL of the repository
+    Systems belong to a distro and their ids are stored in the list
+    distro:%(distro)s:%systems
 
-    The key 'vendor:%(vendor)s:packages' holds a set of all the package
-    ids belonging to this vendor.
+    The hash distro:%(distro) holds information about a distro:
+     - name - the distro name
+     - version - the version of the distribution
 
     """
-    def __init__(self, url):
-        """
-        Retrieves or creates a Vendor object.
-
-        :url: the url string of this Vendor
-
-        """
-        self.name = name
-        self.key = _normalize_vendor(name)
-        try:
-            rdb['vendor:%s' % self.key]
-        except KeyError:
-            self.id = str(rdb.incr('global:nextVendorId'))
-            rdb.set('vendor:%s' % self.key, name)
-            rdb.sadd('vendors', self.key)
-
-def _normalize_vendor(vendor_name):
-    # redis keys cannot contain spaces
-    return vendor_name.replace(' ', '_')
+    pass
