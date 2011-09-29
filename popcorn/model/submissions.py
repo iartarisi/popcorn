@@ -43,7 +43,7 @@ class Submission(object):
        - date - when this submission was created
        - popcorn - the name/version of the client application.
 
-    Submissions belong to a system and their ids are stored in the list
+    Submissions belong to a system and their ids are stored in the set
     at 'system:%s:submissions'.
 
     """
@@ -68,7 +68,7 @@ class Submission(object):
         rdb.hmset('submission:%s' % self.id, {'date': self.date,
                                               'popcorn': version})
         # attach submission to system
-        rdb.lpush('system:%s:submissions' % self.id, self.id)
+        rdb.sadd('system:%s:submissions' % self.system, self.id)
 
     def add_package(self, package):
         """Add a Package to this submission"""

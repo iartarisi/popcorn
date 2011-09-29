@@ -38,13 +38,13 @@ class System(object):
      - arch - the architecture of the system
 
     """
-
     # XXX think about memoizing the objects in this class, so they don't
     # get created every time we need to look for one
     def __init__(self, hw_uuid, arch):
         """Check if the system is in our database and create it if it isn't
 
         :arg hw-uuid: smolt hw-uuid to uniquely indentify each system
+
         """
         key = 'system:%s' % hw_uuid
         try:
@@ -53,10 +53,13 @@ class System(object):
             self.id = str(rdb.incr('global:nextSystemId'))
 
             # TODO - distros
-            rdb.lpush('systems', hw_uuid)
+            rdb.sadd('systems', hw_uuid)
             rdb[key] = self.id
 
             # XXX see if this constraint can go in the database,
             # otherwise just make it prettier
             assert arch in ARCHES
             rdb.hset('system:%s' % self.id, 'arch', arch)
+
+    def __repr__(self):
+        return self.id
