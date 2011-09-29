@@ -36,6 +36,11 @@ class Vendor(object):
     ids belonging to this vendor.
 
     """
+    @classmethod
+    def get_all_ids(cls):
+        """Return a set of all the vendor ids we currently have"""
+        return rdb.smembers('vendors')
+
     def __init__(self, name):
         """
         Retrieves or creates a Vendor object.

@@ -37,6 +37,11 @@ class System(object):
      - arch - the architecture of the system
 
     """
+    @classmethod
+    def get_all_ids(cls):
+        """Return a set of the ids of all the System objects"""
+        return rdb.smembers('systems')
+
     # XXX think about memoizing the objects in this class, so they don't
     # get created every time we need to look for one
     def __init__(self, hw_uuid, arch):
@@ -45,6 +50,8 @@ class System(object):
         :arg hw-uuid: smolt hw-uuid to uniquely indentify each system
 
         """
+        self.hw_uuid = hw_uuid
+
         key = 'system:%s' % hw_uuid
         try:
             self.id = rdb[key]

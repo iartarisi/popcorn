@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block body %}
+<div id="systems">
+  <h2>Systems</h2>
+  <ul>
+    {% for system_id in systems %}
+    <li><a href="/system/{{system_id}}">{{ system_id }}</a></li>
+    {% endfor %}
+  </ul>
+</div>
+<div id="vendors">
+  <h2>Vendors</h2>
+  <ul>
+    {% for vendor_id in vendors %}
+    <li><a href="/vendor/{{vendor_id}}">{{vendor_id}}</a></li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}
