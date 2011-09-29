@@ -76,6 +76,9 @@ class Package(object):
             rdb.sadd("vendor:%s:packages" % vendor, self.id)
         rdb.hincrby('package:%s:status' % self.id, self.status, 1)
 
+    def __repr__(self):
+        return self.full_name
+
     @property
     def old(self):
         return rdb.hget('package:%s:status' % self.id, 'old')

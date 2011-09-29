@@ -52,6 +52,9 @@ class Vendor(object):
             rdb.set('vendor:%s' % self.key, name)
             rdb.sadd('vendors', self.key)
 
+    def __repr__(self):
+        return self.key
+
 def _normalize_vendor(vendor_name):
     # redis keys cannot contain spaces
     return vendor_name.replace(' ', '_')
