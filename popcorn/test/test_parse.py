@@ -28,15 +28,15 @@ import redis
 
 from popcorn import configs
 configs.rdb = rdb = redis.Redis('localhost', db='13')
-from popcorn import server
+from popcorn.parse import parse_text
 
 
-class TestPopcorn(unittest.TestCase):
-    def test_submit_success(self):
+class TestParsePopcorn(unittest.TestCase):
+    def test_parse_popcorn_success(self):
         submission = ("POPCORN 0.1 x86_64 TEST_HW_UUID\n"
                       "v python 2.5 1.1 None x86_64 openSUSE-11.4\n"
                       "o python-lint 1.1 1 None noarch openSUSE-11.4\n")
-        server.parse_popcorn(submission)
+        parse_text(submission)
         self.assertEqual(rdb.get('global:nextSubmissionId'), '1')
         self.assertEqual(rdb.get('global:nextSystemId'), '1')
         self.assertEqual(rdb.get('global:nextPackageId'), '2')

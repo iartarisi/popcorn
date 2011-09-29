@@ -28,8 +28,9 @@ import sys
 import tornado.ioloop
 import tornado.web
 
+
 from popcorn.configs import rdb
-from popcorn.model import Package, System, Submission, Vendor
+from popcorn.parse import parse_text
 
 INDEX_FILE  = 'index.html'
 
@@ -66,7 +67,7 @@ class MainHandler(tornado.web.RequestHandler):
         except KeyError:
             raise Exception("nothing uploaded")
 
-        parse_popcorn(self.request.files['popcorn'][0]['body'])
+        parse_text(self.request.files['popcorn'][0]['body'])
 
         self.write('Submission received. Thank you!')
 
@@ -146,21 +147,6 @@ def get_package_id(name, ver, rel, arch, vendor):
         rdb.set('package:%s:name' % package_id, name)
         rdb.sadd('vendor:%s:packages' % vendor, package_id)
     return package_id
-
-def parse_popcorn(data):
-    datalines = data.splitlines()
-    (popcorn, version, arch, hw_uuid) = datalines[0].split()
-
-    system = System(hw_uuid, arch)
-    # TODO check if system can submit based on date
-    sub = Submission(system, version)
-    for line in datalines[1:]:
-        (status, name, version, release,
-         epoch, arch, vendor) = line.split(None, 6)
-        vendor = Vendor(vendor)
-        package = Package(name, version, release, epoch, arch, vendor, status)
-        sub.add_package(package)
-    rdb.save()
 
 application = tornado.web.Application([
         (r"/", MainHandler),
