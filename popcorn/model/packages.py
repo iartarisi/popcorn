@@ -52,15 +52,7 @@ class Package(object):
         self.arch = arch
         self.vendor = vendor
         self.epoch = epoch
-
-        status_map = {'v': 'voted',
-                      'r': 'recent',
-                      'o': 'old',
-                      'n': 'nofiles'}
-        try:
-            self.status = status_map[status]
-        except KeyError:
-            raise FormatError("the package's status could not be recognized.")
+        self.status = _get_status(status)
 
         sepoch = ":"+epoch if epoch != 'None' else ''
         self.full_name = ("%(name)s-%(version)s-%(release)s%(sepoch)s.%(arch)s"
@@ -79,6 +71,7 @@ class Package(object):
     def __repr__(self):
         return self.full_name
 
+
     @property
     def old(self):
         return rdb.hget('package:%s:status' % self.id, 'old')
@@ -94,3 +87,14 @@ class Package(object):
     @property
     def voted(self):
         return rdb.hget('package:%s:status' % self.id, 'voted')
+
+def _get_status(s):
+    status_map = {'v': 'voted',
+                  'r': 'recent',
+                  'o': 'old',
+                  'n': 'nofiles'}
+    try:
+        status = status_map[s]
+    except KeyError:
+        raise FormatError("the package's status could not be recognized.")
+    return status
