@@ -31,7 +31,7 @@ class Package(object):
 
     A package is identified by its NVREA in under ``package:`` like so:
     ``package:%(name)s:%(version)s:%(release)s:%(epoch)s:%(arch)s:%(vendor)s``
-    
+
     Ids are stored in the key above and incremented in
     ``global:nextPackageId``.
 
@@ -52,12 +52,12 @@ class Package(object):
         self.vendor = vendor
         self.epoch = epoch
 
-        status_table = {'v': 'voted',
-                        'r': 'recent',
-                        'o': 'old',
-                        'n': 'nofiles'}
+        status_map = {'v': 'voted',
+                      'r': 'recent',
+                      'o': 'old',
+                      'n': 'nofiles'}
         try:
-            self.status = status_table[status]
+            self.status = status_map[status]
         except KeyError:
             raise FormatError("The package's status is invalid.")
 
@@ -70,3 +70,19 @@ class Package(object):
             rdb[key] = self.id
             rdb.sadd("vendor:%s:packages" % vendor, self.id)
         rdb.hincrby('package:%s:status' % self.id, self.status, 1)
+
+    @property
+    def old(self):
+        return rdb.hget('package:%s:status' % self.id, 'old')
+
+    @property
+    def recent(self):
+        return rdb.hget('package:%s:status' % self.id, 'recent')
+
+    @property
+    def nofiles(self):
+        return rdb.hget('package:%s:status' % self.id, 'nofiles')
+
+    @property
+    def voted(self):
+        return rdb.hget('package:%s:status' % self.id, 'voted')
