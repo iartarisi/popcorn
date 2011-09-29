@@ -59,7 +59,7 @@ class Package(object):
         try:
             self.status = status_map[status]
         except KeyError:
-            raise FormatError("The package's status is invalid.")
+            raise FormatError("the package's status could not be recognized.")
 
         key = ('package:%(name)s:%(version)s:%(release)s:%(epoch)s:'
                '%(arch)s:%(vendor)s' % locals())
