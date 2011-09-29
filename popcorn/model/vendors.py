@@ -49,7 +49,6 @@ class Vendor(object):
         try:
             rdb['vendor:%s' % self.key]
         except KeyError:
-            self.id = str(rdb.incr('global:nextVendorId'))
             rdb.set('vendor:%s' % self.key, name)
             rdb.sadd('vendors', self.key)
 
