@@ -156,7 +156,7 @@ def parse_popcorn(data):
     sub = Submission(system, version)
     for line in datalines[1:]:
         (status, name, version, release,
-         arch, epoch, vendor) = line.split(None, 6)
+         epoch, arch, vendor) = line.split(None, 6)
         vendor = Vendor(vendor)
         package = Package(name, version, release, epoch, arch, vendor, status)
         sub.add_package(package)
