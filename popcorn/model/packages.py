@@ -29,8 +29,9 @@ from popcorn.exceptions import FormatError
 class Package(object):
     """A package object
 
-    A package is identified by its NVREA in under ``package:`` like so:
-    ``package:%(name)s:%(version)s:%(release)s:%(epoch)s:%(arch)s:%(vendor)s``
+    A package is identified by its NVREA and vendor in the normal NVREA
+    form and stored under ``vendor:%(vendor)s:package`` like so:
+    ``vendor:%(vendor)s:package:%(name)s-%(version)s-%(release)s[:%(epoch)s]?:%(arch)s``.
 
     Ids are stored in the key above and incremented in
     ``global:nextPackageId``.
@@ -61,8 +62,12 @@ class Package(object):
         except KeyError:
             raise FormatError("the package's status could not be recognized.")
 
-        key = ('package:%(name)s:%(version)s:%(release)s:%(epoch)s:'
-               '%(arch)s:%(vendor)s' % locals())
+        sepoch = ":"+epoch if epoch != 'None' else ''
+        self.full_name = ("%(name)s-%(version)s-%(release)s%(sepoch)s.%(arch)s"
+                          % locals())
+
+        key = ('vendor:%(vendor)s:package:%(full_name)s' % self.__dict__)
+
         try:
             self.id = rdb[key]
         except KeyError:

@@ -17,9 +17,9 @@ class TestPopcorn(unittest.TestCase):
         self.assertEqual(rdb.get('global:nextSystemId'), '1')
         self.assertEqual(rdb.get('global:nextPackageId'), '2')
         self.assertEqual(rdb.get(
-            'package:python:2.5:1.1:None:x86_64:openSUSE-11.4'), '1')
+            'vendor:openSUSE-11.4:package:python-2.5-1.1.x86_64'), '1')
         self.assertEqual(rdb.get(
-            'package:python-lint:1.1:1:None:noarch:openSUSE-11.4'), '2')
+            'vendor:openSUSE-11.4:package:python-lint-1.1-1.noarch'), '2')
         self.assertEqual(rdb.hget('package:1:status', 'voted'), '1')
         self.assertEqual(rdb.hget('package:2:status', 'old'), '1')
 
