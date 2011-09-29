@@ -28,8 +28,8 @@ import sys
 import tornado.ioloop
 import tornado.web
 
-from configs import rdb
-from model import Package, System, Submission, Vendor
+from popcorn.configs import rdb
+from popcorn.model import Package, System, Submission, Vendor
 
 INDEX_FILE  = 'index.html'
 
