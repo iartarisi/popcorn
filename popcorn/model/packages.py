@@ -41,10 +41,13 @@ class Package(object):
 
     A list of package statuses are stored in
     ``package:%(package_id)s:status`` as a hash with these keys:
-    'voted', 'recent', 'old' and 'nofiles'. The values are integers.
+    'voted', 'recent', 'old' and 'nofiles'. The values are integers. The
+    status of a package in one submission on the system that it was sent
+    from is stored in 'package:%s:status'.
 
     """
-    def __init__(self, name, version, release, epoch, arch, vendor, status):
+    def __init__(self, name, version, release, epoch,
+                 arch, vendor, status, system):
         """Get or create a package object"""
         self.name = name
         self.version = version
@@ -53,6 +56,7 @@ class Package(object):
         self.vendor = vendor
         self.epoch = epoch
         self.status = _get_status(status)
+        self.system = system
 
         sepoch = ":"+epoch if epoch != 'None' else ''
         self.full_name = ("%(name)s-%(version)s-%(release)s%(sepoch)s.%(arch)s"
@@ -65,13 +69,17 @@ class Package(object):
         except KeyError:
             self.id = str(rdb.incr('global:nextPackageId'))
             rdb[key] = self.id
+            # status on system
+            rdb['system:%s:package:%s:status'] = self.status
             rdb.sadd("vendor:%s:packages" % vendor, self.id)
         rdb.hincrby('package:%s:status' % self.id, self.status, 1)
 
     def __repr__(self):
         return self.full_name
 
-
+    def status_on_system(self, system):
+        """Return a string with this Package's status on System ``system``"""
+        
     @property
     def old(self):
         return rdb.hget('package:%s:status' % self.id, 'old')

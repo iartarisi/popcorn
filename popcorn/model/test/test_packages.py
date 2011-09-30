@@ -28,40 +28,45 @@ import redis
 
 from popcorn import configs
 configs.rdb = rdb = redis.Redis('localhost', db='13')
-from popcorn.model import Package, Vendor
+from popcorn.model import Package, Vendor, System
 
 
 class TestPackages(unittest.TestCase):
 
     def test_init_package_attributes(self):
         ven = Vendor('v')
-        p = Package('name', 'ver', 'rel', 'ep', 'arch', ven, 'o')
+        sys = System('sysid', 'i586')
+        p = Package('name', 'ver', 'rel', 'ep', 'arch', ven, 'o', sys)
         self.assertTupleEqual(
-            (p.name, p.version, p.release, p.epoch, p.arch, p.vendor, p.status),
-            ('name', 'ver', 'rel', 'ep', 'arch', ven, 'old'))
+            (p.name, p.version, p.release, p.epoch, p.arch, p.vendor, p.status, p.system),
+            ('name', 'ver', 'rel', 'ep', 'arch', ven, 'old', 'sysid'))
 
     def test_init_package_status_old(self):
         vendor = Vendor('v')
-        Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'o')
-        p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'o')
+        sys = System('sysid')
+        Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v', sys)
+        p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v', sys)
         self.assertEqual(p.old, '2')
 
     def test_init_package_status_recent(self):
         vendor = Vendor('v')
-        Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'r')
-        p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'r')
+        sys = System('sysid')
+        Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v', sys)
+        p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v', sys)
         self.assertEqual(p.recent, '2')
 
     def test_init_package_status_nofiles(self):
         vendor = Vendor('v')
-        Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'n')
-        p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'n')
+        sys = System('sysid')
+        Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v', sys)
+        p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v', sys)
         self.assertEqual(p.nofiles, '2')
 
     def test_init_package_status_voted(self):
         vendor = Vendor('v')
-        Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v')
-        p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v')
+        sys = System('sysid', 'i586')
+        Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v', sys)
+        p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v', sys)
         self.assertEqual(p.voted, '2')
 
     def tearDown(self):
