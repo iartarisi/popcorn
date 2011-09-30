@@ -76,7 +76,9 @@ def system(hw_uuid):
         system = System(hw_uuid)
     except DoesNotExist:
         abort(404)
-    return render_template('system.html', system=system)
+    name_statuses = system.get_packages_with_status()
+    return render_template('system.html', system=system,
+                           name_statuses=name_statuses)
 
 def get_sorted_packages(key='voted'):
     """Get a lists of package attributes sorted by `key`

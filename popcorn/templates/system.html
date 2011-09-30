@@ -3,4 +3,9 @@
 <h2>System {{system.hw_uuid}}</h2>
 <p>Id: {{ system.id }}</p>
 <p>Arch: {{system.arch}}</p>
+<ul>
+  {% for pname, pstatus in name_statuses %}
+  <li>{{ pname }} - {{ pstatus }}</li>
+  {% endfor %}
+</ul>
 {% endblock %}

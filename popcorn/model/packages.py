@@ -37,7 +37,8 @@ class Package(object):
     ``global:nextPackageId``.
 
     Packages belong to a vendor and their ids are stored in the set
-    ``vendor:%(vendor_id)s:packages``.
+    ``vendor:%(vendor_id)s:packages``. Their ids are also stored in the
+    set ``system:%(system_id)s:packages``.
 
     A list of package statuses are stored in
     ``package:%(package_id)s:status`` as a hash with these keys:
@@ -69,9 +70,18 @@ class Package(object):
         except KeyError:
             self.id = str(rdb.incr('global:nextPackageId'))
             rdb[key] = self.id
-            # status on system
-            rdb['system:%s:package:%s:status'] = self.status
+            rdb.hmset('package:'+self.id, dict(name=name,
+                                               version=version,
+                                               release=release,
+                                               arch=arch,
+                                               epoch=epoch,
+                                               vendor=vendor.id))
+            rdb['package:%s:nvrea' % self.id] = self.full_name
             rdb.sadd("vendor:%s:packages" % vendor, self.id)
+
+        rdb['system:%s:package:%s:status' % (system, self.id)] = self.status
+        rdb.sadd('system:%s:packages' % vendor, self.id)
+
         rdb.hincrby('package:%s:status' % self.id, self.status, 1)
 
     def __repr__(self):
@@ -79,7 +89,7 @@ class Package(object):
 
     def status_on_system(self, system):
         """Return a string with this Package's status on System ``system``"""
-        
+
     @property
     def old(self):
         return rdb.hget('package:%s:status' % self.id, 'old')
