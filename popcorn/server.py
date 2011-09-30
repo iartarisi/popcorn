@@ -53,14 +53,17 @@ def receive_submission():
     
 @app.route('/vendor/<vendor_id>')
 def vendor(vendor_id):
-    """Return some information about a specific vendor"""
+    """Return a Vendor object
+
+    :vendor_id: the id of the Vendor
+
+    """
     try:
-        vendqor = Vendor.find(vendor_id)
+        vendor = Vendor.find(vendor_id)
     except DoesNotExist:
         abort(404)
-    return render_template('vendor.html',
-                           vendor=vendor)
-    
+    return render_template('vendor.html', vendor=vendor)
+
 @app.route('/system/<hw_uuid>')
 def system(hw_uuid):
     """Return a System object
