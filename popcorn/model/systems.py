@@ -23,6 +23,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 from popcorn.configs import rdb
+from popcorn.model.error import DoesNotExist
 
 ARCHES = ['i586', 'x86_64']
 
@@ -42,12 +43,19 @@ class System(object):
         """Return a set of the ids of all the System objects"""
         return rdb.smembers('systems')
 
+    @classmethod
+    def find(cls, hw_uuid):
+        return System(hw_uuid)
+
     # XXX think about memoizing the objects in this class, so they don't
     # get created every time we need to look for one
-    def __init__(self, hw_uuid, arch):
+    def __init__(self, hw_uuid, arch=None):
         """Check if the system is in our database and create it if it isn't
 
-        :arg hw-uuid: smolt hw-uuid to uniquely indentify each system
+        :hw-uuid: smolt hw-uuid to uniquely indentify each system
+        :arch: the architecture of the system. If this isn't given, then
+        a new object can't be created and if the System with the given
+        hw_uuid is not found a DoesNotExist exception is raised instead.
 
         """
         self.hw_uuid = hw_uuid
@@ -56,6 +64,8 @@ class System(object):
         try:
             self.id = rdb[key]
         except KeyError:
+            if not arch:
+                raise DoesNotExist('System', hw_uuid)
             self.id = str(rdb.incr('global:nextSystemId'))
 
             # TODO - distros
@@ -66,6 +76,8 @@ class System(object):
             # otherwise just make it prettier
             assert arch in ARCHES
             rdb.hset('system:%s' % self.id, 'arch', arch)
+        else:
+            self.arch = rdb.hget('system:%s' % self.id, 'arch')
 
     def __repr__(self):
         return self.id
