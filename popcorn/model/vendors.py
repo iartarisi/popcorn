@@ -25,6 +25,7 @@
 import urlparse
 
 from popcorn.configs import rdb
+from popcorn.model.error import DoesNotExist
 
 class Vendor(object):
     """A Vendor is the provider of a repository.
@@ -45,23 +46,31 @@ class Vendor(object):
         """Return a set of all the vendor ids we currently have"""
         return rdb.smembers('vendors')
 
-    def __init__(self, url):
-        """
-        Retrieves or creates a Vendor object.
+    def __init__(self, url, existing=False):
+        """Retrieves or creates a Vendor object
+
+        A new Vendor object is created only if ``existing`` is set to
+        False (the default), otherwise a DoesNotExist error is raised
+        when trying to initialize a Vendor object with a new url.
 
         :url: a vanilla url string which identifies the Vendor
+        :existing: True if we expect the Vendor object to already exist
 
         """
-        self.url = url
         self.key = _normalize_url(url)
         try:
             self.id = rdb['vendor:%s' % self.key]
         except KeyError:
+            if existing:
+                raise DoesNotExist('Vendor', self.key)
             self.id = str(rdb.incr('global:nextVendorId'))
             rdb.set('vendor:%s' % self.key, self.id)
             rdb.set('vendor:%s:key' % self.id, self.key)
             rdb.hset('vendor:%s' % self.id, 'url', url)
             rdb.sadd('vendors', self.id)
+            self.url = url
+        else:
+            self.url = rdb.hget('vendor:%s' % self.id, 'url')
 
     def __repr__(self):
         return self.id
