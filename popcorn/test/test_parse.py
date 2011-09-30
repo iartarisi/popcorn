@@ -34,21 +34,21 @@ from popcorn.parse import parse_text
 class TestParsePopcorn(unittest.TestCase):
     def test_parse_popcorn_success(self):
         submission = ("POPCORN 0.1 x86_64 TEST_HW_UUID\n"
-                      "v python 2.5 1.1 None x86_64 openSUSE-11.4\n"
-                      "o python-lint 1.1 1 None noarch openSUSE-11.4\n")
+                      "v python 2.5 1.1 None x86_64 http://repo.url\n"
+                      "o python-lint 1.1 1 None noarch http://repo.url\n")
         parse_text(submission)
         self.assertEqual(rdb.get('global:nextSubmissionId'), '1')
         self.assertEqual(rdb.get('global:nextSystemId'), '1')
         self.assertEqual(rdb.get('global:nextPackageId'), '2')
         self.assertEqual(rdb.get(
-            'vendor:openSUSE-11.4:package:python-2.5-1.1.x86_64'), '1')
+            'vendor:1:package:python-2.5-1.1.x86_64'), '1')
         self.assertEqual(rdb.get(
-            'vendor:openSUSE-11.4:package:python-lint-1.1-1.noarch'), '2')
+            'vendor:1:package:python-lint-1.1-1.noarch'), '2')
         self.assertEqual(rdb.hget('package:1:status', 'voted'), '1')
         self.assertEqual(rdb.hget('package:2:status', 'old'), '1')
 
-        self.assertEqual(rdb.smembers('vendors'), set(['openSUSE-11.4']))
-        self.assertEqual(rdb.smembers('vendor:openSUSE-11.4:packages'),
+        self.assertEqual(rdb.smembers('vendors'), set(['1']))
+        self.assertEqual(rdb.smembers('vendor:1:packages'),
                          set(['1', '2']))
         self.assertEqual(rdb.smembers('systems'), set(['TEST_HW_UUID']))
         self.assertEqual(rdb.smembers('system:1:submissions'), set(['1']))

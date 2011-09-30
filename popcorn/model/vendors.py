@@ -22,15 +22,17 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
+from urllib import quote_plus
+
 from popcorn.configs import rdb
 
 class Vendor(object):
     """A vendor is the provider of a repository.
 
-    It is identified by a normalized name of the target repository.
-
-    The key 'vendor:%(vendor)s' holds a hash with the keys:
-     - name - the name of this repository
+    It is identified by a quoted url of the target repository.  The key
+    'global:nextVendorId' is incremented to generate a new id which is
+    stored in 'vendor:%(url)s'. All the ids are stored in the set
+    'vendors'.
 
     The key 'vendor:%(vendor)s:packages' holds a set of all the package
     ids belonging to this vendor.
@@ -41,24 +43,21 @@ class Vendor(object):
         """Return a set of all the vendor ids we currently have"""
         return rdb.smembers('vendors')
 
-    def __init__(self, name):
+    def __init__(self, url):
         """
         Retrieves or creates a Vendor object.
 
-        :name: the name string of this Vendor
+        :url: the url string of this Vendor
 
         """
-        self.name = name
-        self.key = _normalize_vendor(name)
+        self.url = url
+        self.key = quote_plus(url)
         try:
-            rdb['vendor:%s' % self.key]
+            self.id = rdb['vendor:%s' % self.key]
         except KeyError:
-            rdb.set('vendor:%s' % self.key, name)
-            rdb.sadd('vendors', self.key)
+            self.id = str(rdb.incr('global:nextVendorId'))
+            rdb.set('vendor:%s' % self.key, self.id)
+            rdb.sadd('vendors', self.id)
 
     def __repr__(self):
-        return self.key
-
-def _normalize_vendor(vendor_name):
-    # redis keys cannot contain spaces
-    return vendor_name.replace(' ', '_')
+        return self.id
