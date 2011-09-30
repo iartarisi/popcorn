@@ -25,15 +25,16 @@
 
 import sys
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 app = Flask("popcorn")
 
 from popcorn.configs import rdb
 from popcorn.model import System, Vendor
+from popcorn.parse import parse_text
 
 sys.path.append("/home/mapleoin/popcorn/")
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def index():
     systems = System.get_all_ids()
     vendors = Vendor.get_all_ids()
@@ -41,6 +42,13 @@ def index():
                            systems = systems,
                            vendors = vendors)
 
+@app.route('/', methods=['POST'])
+def receive_submission():
+    f = request.files['popcorn']
+    # TODO exception handling
+    parse_text(f.read())
+    return 'Submission received. Thanks!'
+    
 def get_sorted_packages(key='voted'):
     """Get a lists of package attributes sorted by `key`
 
