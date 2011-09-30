@@ -22,18 +22,20 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-from urllib import quote_plus
+import urlparse
 
 from popcorn.configs import rdb
 
 class Vendor(object):
-    """A vendor is the provider of a repository.
+    """A Vendor is the provider of a repository.
 
-    It is identified by a quoted url of the target repository.  The key
-    'global:nextVendorId' is incremented to generate a new id which is
-    stored in 'vendor:%(url)s'. All the ids are stored in the set
-    'vendors'.
-
+    It is identified by a normalized url of the target repository.  The
+    key 'global:nextVendorId' is incremented to generate a new id which
+    is stored in 'vendor:%(n_url)s'. All the ids are stored in the set
+    'vendors'. The key/n_url can be found in 'vendor:%(vendor_id)s:key'.
+    The vendor object's attributes (for now just the original ``url``)
+    can be found in the hash at 'vendor:%(vendor_id)s'.
+    
     The key 'vendor:%(vendor)s:packages' holds a set of all the package
     ids belonging to this vendor.
 
@@ -47,17 +49,25 @@ class Vendor(object):
         """
         Retrieves or creates a Vendor object.
 
-        :url: the url string of this Vendor
+        :url: a vanilla url string which identifies the Vendor
 
         """
         self.url = url
-        self.key = quote_plus(url)
+        self.key = _normalize_url(url)
         try:
             self.id = rdb['vendor:%s' % self.key]
         except KeyError:
             self.id = str(rdb.incr('global:nextVendorId'))
             rdb.set('vendor:%s' % self.key, self.id)
+            rdb.set('vendor:%s:key' % self.id, self.key)
+            rdb.hset('vendor:%s' % self.id, 'url', url)
             rdb.sadd('vendors', self.id)
 
     def __repr__(self):
         return self.id
+
+def _normalize_url(url):
+    """Normalize a URL so we can use it as a redis key"""
+    r = urlparse.urlsplit(url.replace(' ', ''))
+    return r.geturl()
+    
