@@ -25,11 +25,13 @@
 
 import sys
 
-from flask import Flask, render_template, request
+from flask import Flask, abort, render_template, request
 app = Flask("popcorn")
 
 from popcorn.configs import rdb
 from popcorn.model import System, Vendor
+from popcorn.model.error import DoesNotExist
+
 from popcorn.parse import parse_text
 
 sys.path.append("/home/mapleoin/popcorn/")
@@ -52,7 +54,10 @@ def receive_submission():
 @app.route('/vendor/<vendor_id>')
 def vendor(vendor_id):
     """Return some information about a specific vendor"""
-    vendor = Vendor.find(vendor_id)
+    try:
+        vendqor = Vendor.find(vendor_id)
+    except DoesNotExist:
+        abort(404)
     return render_template('vendor.html',
                            vendor=vendor)
     
