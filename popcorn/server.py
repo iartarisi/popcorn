@@ -49,6 +49,13 @@ def receive_submission():
     parse_text(f.read())
     return 'Submission received. Thanks!'
     
+@app.route('/vendor/<vendor_id>')
+def vendor(vendor_id):
+    """Return some information about a specific vendor"""
+    vendor = Vendor.find(vendor_id)
+    return render_template('vendor.html',
+                           vendor=vendor)
+    
 def get_sorted_packages(key='voted'):
     """Get a lists of package attributes sorted by `key`
 

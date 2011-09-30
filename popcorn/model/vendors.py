@@ -46,6 +46,15 @@ class Vendor(object):
         """Return a set of all the vendor ids we currently have"""
         return rdb.smembers('vendors')
 
+    @classmethod
+    def find(cls, vendor_id):
+        """Return the Vendor object with the given ``vendor_id``"""
+        try:
+            key = rdb['vendor:%s:key' % vendor_id]
+        except KeyError:
+            raise DoesNotExist('Vendor', vendor_id)
+        return Vendor(key, existing=True)
+
     def __init__(self, url, existing=False):
         """Retrieves or creates a Vendor object
 
