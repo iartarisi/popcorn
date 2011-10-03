@@ -28,7 +28,7 @@ import sys
 from flask import Flask, abort, render_template, request
 app = Flask("popcorn")
 
-from popcorn.model import System, Vendor, Submission
+from popcorn.model import Package, System, Vendor, Submission
 from popcorn.model.error import DoesNotExist
 
 from popcorn.parse import parse_text
@@ -80,6 +80,15 @@ def system(hw_uuid):
     except DoesNotExist:
         abort(404)
     return render_template('system.html', system=sys)
+
+@app.route('/package/<pkg_id>')
+def package(pkg_id):
+    """Return a Package object"""
+    try:
+        pkg = Package.find(pkg_id)
+    except DoesNotExist:
+        abort(404)
+    return render_template('package.html', package=pkg)
 
 if __name__ == "__main__":
     app.debug = True

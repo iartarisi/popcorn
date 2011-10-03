@@ -4,7 +4,7 @@
 <p>Packages:</p>
 <ul>
   {% for pid, pname, pstatus in submission.get_package_names_with_status() %}
-  <li><a href="package/{{pid}}">{{ pname }} - {{ pstatus }}</a></li>
+  <li><a href="/package/{{pid}}">{{ pname }} - {{ pstatus }}</a></li>
   {% endfor %}
 </ul>
 {% endblock %}

@@ -24,6 +24,8 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 from popcorn.configs import rdb
+from popcorn.model.error import DoesNotExist
+from vendors import Vendor
 
 class Package(object):
     """A package object
@@ -46,6 +48,23 @@ class Package(object):
     from is stored in 'package:%s:status'.
 
     """
+    @classmethod
+    def find(cls, pkg_id):
+        """Return a Package object by its id"""
+        n, v, r, e, a, vendor_id = rdb.hmget('package:%s' % pkg_id,
+            ['name', 'version', 'release', 'epoch', 'arch', 'vendor'])
+        if None in [n, v, r, a, vendor_id]:
+            raise DoesNotExist('Package', pkg_id)
+
+        obj = cls.__new__(cls)
+        obj.__dict__.update(name=n, version=v, release=r, epoch=e,
+                            arch=a, vendor=Vendor.find(vendor_id))
+        sepoch = ":"+e if e != 'None' else ''
+        obj.full_name = ("%(n)s-%(v)s-%(r)s%(sepoch)s.%(a)s"
+                         % locals())
+
+        return obj
+        
     def __init__(self, name, version, release, epoch,
                  arch, vendor, status, sub):
         """Get or create a package object"""

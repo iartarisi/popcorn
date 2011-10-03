@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block body %}
+<h2>Package {{package}}</h2>
+<p>Name: {{ package.name }}</p>
+<p>Version: {{ package.version }}</p>
+<p>Release: {{ package.release }}</p>
+<p>Arch: {{ package.arch }}</p>
+{% if package.epoch %}
+<p>Epoch: {{ package.epoch }}</p>
+{% endif %}
+<p>Vendor: <a href="/vendor/{{ package.vendor }}">{{package.vendor}}</a></p>
+{% endblock %}
