@@ -26,6 +26,7 @@ import urlparse
 
 from popcorn.configs import rdb
 from popcorn.model.error import DoesNotExist
+from popcorn.model.utils import list_to_tuples
 
 class Vendor(object):
     """A Vendor is the provider of a repository.
@@ -84,8 +85,21 @@ class Vendor(object):
     def __repr__(self):
         return self.id
 
+    @property
+    def package_nvreas(self):
+        """Return a list of all the packages of this vendor
+
+        Returns a list of tuples of this form: (package_id,
+        package_nvrea) ordered by NVREA.
+
+        """
+        ids_and_names = rdb.sort('vendor:%s:packages' % self.id,
+                                 by='package:*:nvrea', alpha=True,
+                                 get=['#', 'package:*:nvrea'])
+        return list_to_tuples(ids_and_names, 2)
+        
+
 def _normalize_url(url):
     """Normalize a URL so we can use it as a redis key"""
     r = urlparse.urlsplit(url.replace(' ', ''))
     return r.geturl()
-    

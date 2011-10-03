@@ -2,4 +2,10 @@
 {% block body %}
 <h2>Vendor {{vendor.id}}</h2>
 <p>URL: {{vendor.url}}</p>
+<p>Packages:</p>
+<ul>
+  {% for (pid, nvrea) in vendor.package_nvreas %}
+  <li><a href="/package/{{ pid }}">{{ nvrea }}</a></li>
+  {% endfor %}
+</ul>
 {% endblock %}
