@@ -79,8 +79,8 @@ class Package(object):
             rdb['package:%s:nvrea' % self.id] = self.full_name
             rdb.sadd("vendor:%s:packages" % vendor, self.id)
 
-        rdb['submission:%s:package:%s:status' % (sub, self.id)] = self.status
-        rdb.sadd('submission:%s:packages' % vendor, self.id)
+        rdb['submission:%s:package:%s:status' % (sub.id, self.id)] = self.status
+        rdb.sadd('submission:%s:packages' % sub.id, self.id)
 
         rdb.hincrby('package:%s:status' % self.id, self.status, 1)
 
