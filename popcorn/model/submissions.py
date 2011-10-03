@@ -25,6 +25,7 @@
 from datetime import date
 
 from popcorn.configs import rdb
+from popcorn.model.utils import list_to_tuples
 
 class Submission(object):
     """A set of data from a system captured at a specific time.
@@ -85,13 +86,10 @@ class Submission(object):
         return "<Submissions %s from %s>" % (self.id, self.date)
 
     def get_package_names_with_status(self):
-        """Return a list of tuples of the form ('package-name', 'status')"""
+        """Return a list of tuples of the form (id, package-name, status)"""
         # get the set sorted by name (Nvrea)
-        package_ids = rdb.sort('submission:%s:packages' % self.id,
-                               by='package:*:nvrea', alpha=True)
-        status_keys = ['submission:%s:package:%s:status' % (self.id, pid)
-                       for pid in package_ids]
-        statuses = rdb.mget(*status_keys)
-        name_keys = ['package:%s:nvrea' % pid for pid in package_ids]
-        names = rdb.mget(*name_keys)
-        return zip(package_ids, names, statuses)
+        alist  = rdb.sort('submission:%s:packages' % self.id,
+                          by='package:*:nvrea', alpha=True,
+                          get=['#', 'package:*:nvrea',
+                               'submission:%s:package:*:status' % self.id])
+        return list_to_tuples(alist, 3)

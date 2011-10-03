@@ -70,9 +70,7 @@ def submission(sub_id):
         sub = Submission.find(sub_id)
     except DoesNotExist:
         abort(404)
-    name_statuses = sub.get_package_names_with_status()
-    return render_template('submission.html', submission=sub,
-                           name_statuses=name_statuses)
+    return render_template('submission.html', submission=sub)
 
 @app.route('/system/<hw_uuid>')
 def system(hw_uuid):
