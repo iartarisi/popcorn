@@ -29,7 +29,7 @@ from flask import Flask, abort, render_template, request
 app = Flask("popcorn")
 
 from popcorn.configs import rdb
-from popcorn.model import System, Vendor
+from popcorn.model import System, Vendor, Submission
 from popcorn.model.error import DoesNotExist
 
 from popcorn.parse import parse_text
@@ -63,6 +63,17 @@ def vendor(vendor_id):
     except DoesNotExist:
         abort(404)
     return render_template('vendor.html', vendor=vendor)
+
+@app.route('/submission/<sub_id>')
+def submission(sub_id):
+    """Return a Submission object"""
+    try:
+        submission = Submission.find(sub_id)
+    except DoesNotExist:
+        abort(404)
+    name_statuses = submission.get_package_names_with_status()
+    return render_template('submission.html', submission=submission,
+                           name_statuses=name_statuses)
 
 @app.route('/system/<hw_uuid>')
 def system(hw_uuid):

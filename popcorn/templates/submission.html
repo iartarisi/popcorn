@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block body %}
+<h2>Submission {{submission.id}}</h2>
+<p>Packages:</p>
+<ul>
+  {% for pname, pstatus in name_statuses %}
+  <li>{{ pname }} - {{ pstatus }}</li>
+  {% endfor %}
+</ul>
+{% endblock %}
