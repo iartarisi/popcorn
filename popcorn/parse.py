@@ -40,7 +40,7 @@ def parse_text(data):
     datalines = data.splitlines()
     (popcorn, version, distro, distrover, arch, hw_uuid) = datalines[0].split()
 
-    system = System(hw_uuid, arch)
+    system = System(hw_uuid, distro, distrover, arch)
     # TODO check if system can submit based on date
     sub = Submission(system, version)
     for line in datalines[1:]:

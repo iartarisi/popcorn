@@ -28,7 +28,7 @@ import sys
 from flask import Flask, abort, render_template, request
 app = Flask("popcorn")
 
-from popcorn.model import Package, System, Vendor, Submission
+from popcorn.model import Distro, Package, System, Vendor, Submission
 from popcorn.model.error import DoesNotExist
 
 from popcorn.parse import parse_text
@@ -37,11 +37,9 @@ sys.path.append("/home/mapleoin/popcorn/")
 
 @app.route('/', methods=['GET'])
 def index():
-    systems = System.get_all_ids()
+    distros = Distro.get_all_ids()
     vendors = Vendor.get_all_ids()
-    return render_template('index.html',
-                           systems = systems,
-                           vendors = vendors)
+    return render_template('index.html', distros=distros, vendors=vendors)
 
 @app.route('/', methods=['POST'])
 def receive_submission():
@@ -89,6 +87,15 @@ def package(pkg_id):
     except DoesNotExist:
         abort(404)
     return render_template('package.html', package=pkg)
+
+@app.route('/distro/<distro_id>')
+def distro(distro_id):
+    """Return a Distro object"""
+    try:
+        dist = Distro.find(distro_id)
+    except DoesNotExist:
+        abort(404)
+    return render_template('distro.html', distro=dist)
 
 if __name__ == "__main__":
     app.debug = True

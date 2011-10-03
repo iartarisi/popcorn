@@ -54,7 +54,7 @@ class Submission(object):
         if None in (date, popcorn):
             raise DoesNotExist('Submission', sub_id)
 
-        obj = Submission.__new__(Submission)
+        obj = cls.__new__(cls)
         obj.__dict__.update(date=date, popcorn=popcorn, id=str(sub_id))
         return obj
 

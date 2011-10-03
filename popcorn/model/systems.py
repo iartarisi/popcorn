@@ -25,6 +25,7 @@
 from popcorn.configs import rdb
 from popcorn.model.error import DoesNotExist
 from popcorn.model import Submission
+from distros import Distro
 
 ARCHES = ['i586', 'x86_64']
 
@@ -37,20 +38,19 @@ class System(object):
 
     A hash is stored in 'system:%(hw_uuid)s' containing:
      - arch - the architecture of the system
-
+     - distro - the id of the Distro object that this System belongs to
     """
     @classmethod
-    def get_all_ids(cls):
-        """Return a set of the ids of all the System objects"""
-        return rdb.smembers('systems')
-
-    @classmethod
-    def find(cls, hw_uuid):
+    def find(cls, system_id):
+        try:
+            hw_uuid = rdb['system:'+system_id]
+        except KeyError:
+            raise DoesNotExist("System", system_id)
         return System(hw_uuid)
 
     # XXX think about memoizing the objects in this class, so they don't
     # get created every time we need to look for one
-    def __init__(self, hw_uuid, arch=None):
+    def __init__(self, hw_uuid, distroname=None, distrover=None, arch=None):
         """Check if the system is in our database and create it if it isn't
 
         :hw-uuid: smolt hw-uuid to uniquely indentify each system
@@ -65,20 +65,23 @@ class System(object):
         try:
             self.id = rdb[key]
         except KeyError:
-            if not arch:
+            if not arch or not distroname or not distrover:
                 raise DoesNotExist('System', hw_uuid)
             self.id = str(rdb.incr('global:nextSystemId'))
 
-            # TODO - distros
-            rdb.sadd('systems', hw_uuid)
+            self.distro = Distro(distroname, distrover)
+            self.distro.add_system(self.id)
             rdb[key] = self.id
 
             # XXX see if this constraint can go in the database,
             # otherwise just make it prettier
             assert arch in ARCHES
-            rdb.hset('system:%s' % self.id, 'arch', arch)
+            rdb.hmset('system:%s' % self.id, {'arch': arch,
+                                              'distro': self.distro.id,
+                                              'hw_uuid': self.hw_uuid})
         else:
-            self.arch = rdb.hget('system:%s' % self.id, 'arch')
+            self.arch, self.distro = rdb.hmget('system:%s' % self.id,
+                                               ['arch', 'distro'])
 
     def __repr__(self):
         return "<System %s>" % self.hw_uuid
