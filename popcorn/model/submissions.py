@@ -75,7 +75,7 @@ class Submission(object):
         rdb.hmset('submission:%s' % self.id, {'date': self.date,
                                               'popcorn': popcorn})
         # attach submission to system
-        rdb.sadd('system:%s:submissions' % self.system, self.id)
+        rdb.sadd('system:%s:submissions' % self.system.id, self.id)
 
     def add_package(self, package):
         """Add a Package to this submission"""
