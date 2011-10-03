@@ -57,10 +57,11 @@ class Submission(object):
         obj.__dict__.update(date=date, popcorn=popcorn, id=str(sub_id))
         return obj
 
-    def __init__(self, system, version=None):
-        """
+    def __init__(self, system, popcorn=None):
+        """Create a new submission
+
         :system: a System object that this submission was sent from
-        :version: a string with the Popcorn version that sent this submission
+        :popcorn: a string with the Popcorn version that sent this submission
 
         """
         self.system = system
@@ -68,13 +69,17 @@ class Submission(object):
         # TODO check time interval from last submission
         # create new submission
         self.id = str(rdb.incr('global:nextSubmissionId'))
-        self.date = date.today().strftime('%y-%m-%d')
+        self.date = date.today().strftime('%d-%m-%y')
+        self.popcorn = popcorn
 
         rdb.hmset('submission:%s' % self.id, {'date': self.date,
-                                              'popcorn': version})
+                                              'popcorn': popcorn})
         # attach submission to system
         rdb.sadd('system:%s:submissions' % self.system, self.id)
 
     def add_package(self, package):
         """Add a Package to this submission"""
-        rdb.lpush("submission:%s:packages" % self.id, package.id)
+        rdb.sadd("submission:%s:packages" % self.id, package.id)
+
+    def __repr__(self):
+        return "<Submissions %s from %s>" % (self.id, self.date)
