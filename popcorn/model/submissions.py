@@ -86,10 +86,12 @@ class Submission(object):
 
     def get_package_names_with_status(self):
         """Return a list of tuples of the form ('package-name', 'status')"""
-        package_ids = rdb.smembers('submission:%s:packages' % self.id)
+        # get the set sorted by name (Nvrea)
+        package_ids = rdb.sort('submission:%s:packages' % self.id,
+                               by='package:*:nvrea', alpha=True)
         status_keys = ['submission:%s:package:%s:status' % (self.id, pid)
                        for pid in package_ids]
         statuses = rdb.mget(*status_keys)
         name_keys = ['package:%s:nvrea' % pid for pid in package_ids]
         names = rdb.mget(*name_keys)
-        return zip(names, statuses)
+        return zip(package_ids, names, statuses)
