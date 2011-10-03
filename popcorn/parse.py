@@ -38,7 +38,7 @@ class FormatError(Exception):
 def parse_text(data):
     """Parse a plaintext submission, recording everything in the database"""
     datalines = data.splitlines()
-    (popcorn, version, arch, hw_uuid) = datalines[0].split()
+    (popcorn, version, distro, distrover, arch, hw_uuid) = datalines[0].split()
 
     system = System(hw_uuid, arch)
     # TODO check if system can submit based on date

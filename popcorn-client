@@ -32,8 +32,8 @@ import rpm
 import smtplib
 import time
 
-version             = '0.1'
 popcorn_post_server = 'popcorn.opensuse.org'
+VERSION             = '0.1'
 popcorn_post_uri    = '/'
 popcorn_email       = 'popcorn@popcorn.opensuse.org'
 HWUUID_FILE         = '/etc/smolt/hw-uuid'
@@ -46,7 +46,6 @@ pathre = '^/(bin|boot|lib|lib64|sbin|usr/bin|usr/games|usr/include|usr/lib|usr/l
 system_mounts = ['binfmt_misc', 'debugfs', 'devpts', 'fuse.gvfs-fuse-daemon', 'fusectl', 'nfs', 'nfs4', 'proc', 'rootfs', 'rpc_pipefs', 'securityfs', 'sysfs']
 
 class Statistics:
-    arch = platform.machine()
     packages = []
 
     def fill_packages(self):
@@ -107,7 +106,10 @@ class Statistics:
             self.packages.append((cat, name, version, release, epoch, arch, vendor))
 
     def serialize(self):
-        ret = [ 'POPCORN %s %s %s' % (version, self.arch, get_system_id()) ]
+        distro, distro_ver, arch = platform.linux_distribution()
+        uuid = get_system_id()
+        ret = ['POPCORN %(version)s %(distro)s %(distro_ver)s %(arch)s %(uuid)s'
+               % dict(version=VERSION, **locals())]
         for pkg in self.packages:
             ret.append( ' '.join(pkg) )
         ret.append('')
