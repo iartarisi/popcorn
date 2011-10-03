@@ -38,7 +38,7 @@ class Package(object):
 
     Packages belong to a vendor and their ids are stored in the set
     ``vendor:%(vendor_id)s:packages``. Their ids are also stored in the
-    set ``system:%(system_id)s:packages``.
+    set ``submission:%(submission_id)s:packages``.
 
     A list of package statuses are stored in
     ``package:%(package_id)s:status`` as a hash with these keys:
@@ -48,7 +48,7 @@ class Package(object):
 
     """
     def __init__(self, name, version, release, epoch,
-                 arch, vendor, status, system):
+                 arch, vendor, status, sub):
         """Get or create a package object"""
         self.name = name
         self.version = version
@@ -57,7 +57,7 @@ class Package(object):
         self.vendor = vendor
         self.epoch = epoch
         self.status = _get_status(status)
-        self.system = system
+        self.sub = sub
 
         sepoch = ":"+epoch if epoch != 'None' else ''
         self.full_name = ("%(name)s-%(version)s-%(release)s%(sepoch)s.%(arch)s"
@@ -79,8 +79,8 @@ class Package(object):
             rdb['package:%s:nvrea' % self.id] = self.full_name
             rdb.sadd("vendor:%s:packages" % vendor, self.id)
 
-        rdb['system:%s:package:%s:status' % (system, self.id)] = self.status
-        rdb.sadd('system:%s:packages' % vendor, self.id)
+        rdb['submission:%s:package:%s:status' % (sub, self.id)] = self.status
+        rdb.sadd('submission:%s:packages' % vendor, self.id)
 
         rdb.hincrby('package:%s:status' % self.id, self.status, 1)
 

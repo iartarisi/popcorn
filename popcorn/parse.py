@@ -41,6 +41,5 @@ def parse_text(data):
          epoch, arch, vendor) = line.split(None, 6)
         vendor = Vendor(vendor)
         package = Package(name, version, release, epoch,
-                          arch, vendor, status, system)
-        sub.add_package(package)
+                          arch, vendor, status, sub)
     rdb.save()
