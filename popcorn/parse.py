@@ -28,6 +28,13 @@ from popcorn.model import Package, Submission, System, Vendor
 
 """Functionality for parsing the submissions received from the clients"""
 
+class FormatError(Exception):
+    """Exception class for format errors found in a submission"""
+    def __init__(self, message):
+        self.message = message
+    def __str__(self, message):
+        return "The submission format is invalid: %s" % self.message
+
 def parse_text(data):
     """Parse a plaintext submission, recording everything in the database"""
     datalines = data.splitlines()
@@ -39,6 +46,8 @@ def parse_text(data):
     for line in datalines[1:]:
         (status, name, version, release,
          epoch, arch, vendor) = line.split(None, 6)
+        assert status in ['v', 'r', 'o', 'n'], FormatError(
+            "the package's status could not be recognized")
         vendor = Vendor(vendor)
         package = Package(name, version, release, epoch,
                           arch, vendor, status, sub)

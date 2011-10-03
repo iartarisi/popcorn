@@ -24,7 +24,6 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 from popcorn.configs import rdb
-from popcorn.exceptions import FormatError
 
 class Package(object):
     """A package object
@@ -111,8 +110,4 @@ def _get_status(s):
                   'r': 'recent',
                   'o': 'old',
                   'n': 'nofiles'}
-    try:
-        status = status_map[s]
-    except KeyError:
-        raise FormatError("the package's status could not be recognized.")
-    return status
+    return status_map[s]
