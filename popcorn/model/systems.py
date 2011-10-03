@@ -24,6 +24,7 @@
 
 from popcorn.configs import rdb
 from popcorn.model.error import DoesNotExist
+from popcorn.model import Submission
 
 ARCHES = ['i586', 'x86_64']
 
@@ -80,14 +81,13 @@ class System(object):
             self.arch = rdb.hget('system:%s' % self.id, 'arch')
 
     def __repr__(self):
-        return self.id
+        return "<System %s>" % self.hw_uuid
 
-    def get_packages_with_status(self):
-        """Return a list of tuples of the form (package-name, status)"""
-        package_ids = rdb.smembers('system:%s:packages' % self.id)
-        status_keys = ['system:%s:package:%s:status' % (self.id, pid)
-                       for pid in package_ids]
-        statuses = rdb.mget(*status_keys)
-        name_keys = ['package:%s:nvrea' % pid for pid in package_ids]
-        names = rdb.mget(*name_keys)
-        return zip(names, statuses)
+    def __str__(self):
+        return self.hw_uuid
+
+    @property
+    def submissions(self):
+        sub_ids = rdb.smembers('system:%s:submissions' % self.id)
+        submissions = [Submission.find(sub_id) for sub_id in sub_ids]
+        return submissions

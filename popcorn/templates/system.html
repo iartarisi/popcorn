@@ -3,9 +3,10 @@
 <h2>System {{system.hw_uuid}}</h2>
 <p>Id: {{ system.id }}</p>
 <p>Arch: {{system.arch}}</p>
+<p>Submissions:</p>
 <ul>
-  {% for pname, pstatus in name_statuses %}
-  <li>{{ pname }} - {{ pstatus }}</li>
+  {% for sub in system.submissions %}
+  <li><a href="/submission/{{ sub.id }}">{{sub.date}}</a></li>
   {% endfor %}
 </ul>
 {% endblock %}

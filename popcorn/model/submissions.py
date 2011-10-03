@@ -47,9 +47,15 @@ class Submission(object):
 
     """
     @classmethod
-    def find(self, sub_id):
+    def find(cls, sub_id):
         """Return an existing submission"""
-        raise NotImplementedError()
+        obj = Submission.__new__(Submission)
+
+        date, popcorn = rdb.hmget('submission:%s' % sub_id, ['date', 'popcorn'])
+        if (date, popcorn) == (None, None):
+            raise DoesNotExist('Submission', sub_id)
+        obj.__dict__.update(date=date, popcorn=popcorn, id=str(sub_id))
+        return obj
 
     def __init__(self, system, version=None):
         """
