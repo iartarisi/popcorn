@@ -49,12 +49,12 @@ class Submission(object):
     """
     @classmethod
     def find(cls, sub_id):
-        """Return an existing submission"""
-        obj = Submission.__new__(Submission)
-
+        """Return an existing Submission by id"""
         date, popcorn = rdb.hmget('submission:%s' % sub_id, ['date', 'popcorn'])
-        if (date, popcorn) == (None, None):
+        if None in (date, popcorn):
             raise DoesNotExist('Submission', sub_id)
+
+        obj = Submission.__new__(Submission)
         obj.__dict__.update(date=date, popcorn=popcorn, id=str(sub_id))
         return obj
 
