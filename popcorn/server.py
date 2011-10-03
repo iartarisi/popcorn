@@ -28,7 +28,6 @@ import sys
 from flask import Flask, abort, render_template, request
 app = Flask("popcorn")
 
-from popcorn.configs import rdb
 from popcorn.model import System, Vendor, Submission
 from popcorn.model.error import DoesNotExist
 
@@ -59,30 +58,30 @@ def vendor(vendor_id):
 
     """
     try:
-        vendor = Vendor.find(vendor_id)
+        ven = Vendor.find(vendor_id)
     except DoesNotExist:
         abort(404)
-    return render_template('vendor.html', vendor=vendor)
+    return render_template('vendor.html', vendor=ven)
 
 @app.route('/submission/<sub_id>')
 def submission(sub_id):
     """Return a Submission object"""
     try:
-        submission = Submission.find(sub_id)
+        sub = Submission.find(sub_id)
     except DoesNotExist:
         abort(404)
-    name_statuses = submission.get_package_names_with_status()
-    return render_template('submission.html', submission=submission,
+    name_statuses = sub.get_package_names_with_status()
+    return render_template('submission.html', submission=sub,
                            name_statuses=name_statuses)
 
 @app.route('/system/<hw_uuid>')
 def system(hw_uuid):
     """Return a System object"""
     try:
-        system = System(hw_uuid)
+        sys = System(hw_uuid)
     except DoesNotExist:
         abort(404)
-    return render_template('system.html', system=system)
+    return render_template('system.html', system=sys)
 
 if __name__ == "__main__":
     app.debug = True

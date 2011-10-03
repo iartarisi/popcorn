@@ -28,7 +28,7 @@ import redis
 
 from popcorn import configs
 configs.rdb = rdb = redis.Redis('localhost', db='13')
-from popcorn.model import Package, Vendor, System
+from popcorn.model import Package, Vendor, System, Submission
 
 
 class TestPackages(unittest.TestCase):
@@ -36,30 +36,31 @@ class TestPackages(unittest.TestCase):
     def test_init_package_attributes(self):
         ven = Vendor('v')
         sys = System('sysid', 'i586')
-        p = Package('name', 'ver', 'rel', 'ep', 'arch', ven, 'o', sys)
+        sub = Submission(sys, 'popver')
+        p = Package('name', 'ver', 'rel', 'ep', 'arch', ven, 'o', sub)
         self.assertTupleEqual(
-            (p.name, p.version, p.release, p.epoch, p.arch, p.vendor, p.status, p.system),
-            ('name', 'ver', 'rel', 'ep', 'arch', ven, 'old', 'sysid'))
+            (p.name, p.version, p.release, p.epoch, p.arch, p.vendor, p.status, p.sub.__class__),
+            ('name', 'ver', 'rel', 'ep', 'arch', ven, 'old', Submission))
 
     def test_init_package_status_old(self):
         vendor = Vendor('v')
-        sys = System('sysid')
-        Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v', sys)
-        p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v', sys)
+        sys = System('sysid', 'i586')
+        Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'o', sys)
+        p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'o', sys)
         self.assertEqual(p.old, '2')
 
     def test_init_package_status_recent(self):
         vendor = Vendor('v')
-        sys = System('sysid')
-        Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v', sys)
-        p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v', sys)
+        sys = System('sysid', 'i586')
+        Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'r', sys)
+        p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'r', sys)
         self.assertEqual(p.recent, '2')
 
     def test_init_package_status_nofiles(self):
         vendor = Vendor('v')
-        sys = System('sysid')
-        Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v', sys)
-        p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v', sys)
+        sys = System('sysid', 'i586')
+        Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'n', sys)
+        p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'n', sys)
         self.assertEqual(p.nofiles, '2')
 
     def test_init_package_status_voted(self):
