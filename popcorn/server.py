@@ -84,37 +84,6 @@ def system(hw_uuid):
         abort(404)
     return render_template('system.html', system=system)
 
-def get_sorted_packages(key='voted'):
-    """Get a lists of package attributes sorted by `key`
-
-    The list returned is made of [names, voted, recent, old, nofiles]
-
-    """
-    if key not in ['name', 'voted', 'recent', 'old', 'nofiles']:
-        raise Exception("Unrecognized key")
-
-    packages_tuples = []
-    for attr in ['name', 'voted', 'recent', 'old', 'nofiles']:
-        packages_tuples.append(rdb.sort('packageIds',
-                                        by='package:*:%s' % key,
-                                        desc=True,
-                                        get='package:*:%s' % attr))
-    return packages_tuples
-
-
-def get_package_id(name, ver, rel, arch, vendor):
-    """Get or create a package for this name, ver, rel, arch, vendor combo"""
-    key = 'packageId:%(name)s:%(ver)s:%(rel)s:%(arch)s:%(vendor)s' % locals()
-    try:
-        package_id = rdb[key]
-    except KeyError:
-        package_id = str(rdb.incr('global:nextPackageId'))
-        rdb[key] = package_id
-        rdb.lpush('packageIds', package_id)
-        rdb.set('package:%s:name' % package_id, name)
-        rdb.sadd('vendor:%s:packages' % vendor, package_id)
-    return package_id
-
 if __name__ == "__main__":
     app.debug = True
     app.run()
