@@ -26,6 +26,7 @@ from datetime import date
 
 from popcorn.configs import rdb
 from popcorn.model.utils import list_to_tuples
+from popcorn.model import Package
 
 class Submission(object):
     """A set of data from a system captured at a specific time.
@@ -93,3 +94,10 @@ class Submission(object):
                           get=['#', 'package:*:nvrea',
                                'submission:%s:package:*:status' % self.id])
         return list_to_tuples(alist, 3)
+
+    @property
+    def packages(self):
+        """Return a set of Package objects belonging to this submission"""
+        package_ids = rdb.smembers('submission:%s:packages' % self.id)
+        packages = set(Package.find(p_id) for p_id in package_ids)
+        return packages
