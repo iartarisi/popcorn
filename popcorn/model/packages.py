@@ -57,12 +57,12 @@ class Package(object):
             raise DoesNotExist('Package', pkg_id)
 
         obj = cls.__new__(cls)
+        obj.id = pkg_id
         obj.__dict__.update(name=n, version=v, release=r, epoch=e,
                             arch=a, vendor=Vendor.find(vendor_id))
         sepoch = ":"+e if e != 'None' else ''
         obj.full_name = ("%(n)s-%(v)s-%(r)s%(sepoch)s.%(a)s"
                          % locals())
-
         return obj
         
     def __init__(self, name, version, release, epoch,
@@ -107,6 +107,8 @@ class Package(object):
 
     def status_on_system(self, system):
         """Return a string with this Package's status on System ``system``"""
+        return rdb['submission:%s:package:%s:status' %
+                   (system.last_submission.id, self.id)]
 
     @property
     def old(self):
