@@ -28,14 +28,17 @@ import redis
 
 from popcorn import configs
 configs.rdb = rdb = redis.Redis('localhost', db='13')
-from popcorn.model import Package, Vendor, System, Submission
+from popcorn.model import Distro, Package, Vendor, System, Submission
 
 
 class TestPackages(unittest.TestCase):
 
+    def setUp(self):
+        self.distro = Distro('Foo', '0.0')
+
     def test_init_package_attributes(self):
         ven = Vendor('v')
-        sys = System('sysid', 'i586')
+        sys = System('sysid', 'Foo', '0.0', 'i586')
         sub = Submission(sys, 'popver')
         p = Package('name', 'ver', 'rel', 'ep', 'arch', ven, 'o', sub)
         self.assertTupleEqual(
@@ -44,28 +47,28 @@ class TestPackages(unittest.TestCase):
 
     def test_init_package_status_old(self):
         vendor = Vendor('v')
-        sys = System('sysid', 'i586')
+        sys = System('sysid', 'Foo', '0.0', 'i586')
         Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'o', sys)
         p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'o', sys)
         self.assertEqual(p.old, '2')
 
     def test_init_package_status_recent(self):
         vendor = Vendor('v')
-        sys = System('sysid', 'i586')
+        sys = System('sysid', 'Foo', '0.0', 'i586')
         Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'r', sys)
         p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'r', sys)
         self.assertEqual(p.recent, '2')
 
     def test_init_package_status_nofiles(self):
         vendor = Vendor('v')
-        sys = System('sysid', 'i586')
+        sys = System('sysid', 'Foo', '0.0', 'i586')
         Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'n', sys)
         p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'n', sys)
         self.assertEqual(p.nofiles, '2')
 
     def test_init_package_status_voted(self):
         vendor = Vendor('v')
-        sys = System('sysid', 'i586')
+        sys = System('sysid', 'Foo', '0.0', 'i586')
         Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v', sys)
         p = Package('name', 'ver', 'rel', 'ep', 'arch', vendor, 'v', sys)
         self.assertEqual(p.voted, '2')

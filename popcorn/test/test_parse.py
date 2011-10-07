@@ -32,8 +32,8 @@ from popcorn.parse import parse_text
 
 
 class TestParsePopcorn(unittest.TestCase):
-    def test_parse_popcorn_success(self):
-        submission = ("POPCORN 0.1 x86_64 TEST_HW_UUID\n"
+    def test_parse_popcorn_success_redis(self):
+        submission = ("POPCORN 0.1 openSUSE 11.4 x86_64 TEST_HW_UUID\n"
                       "v python 2.5 1.1 None x86_64 http://repo.url\n"
                       "o python-lint 1.1 1 None noarch http://repo.url\n")
         parse_text(submission)
@@ -50,7 +50,8 @@ class TestParsePopcorn(unittest.TestCase):
         self.assertEqual(rdb.smembers('vendors'), set(['1']))
         self.assertEqual(rdb.smembers('vendor:1:packages'),
                          set(['1', '2']))
-        self.assertEqual(rdb.smembers('systems'), set(['TEST_HW_UUID']))
+        self.assertEqual(rdb.smembers('distros'), set(['1']))
+        self.assertEqual(rdb.smembers('distro:1:systems'), set(['1']))
         self.assertEqual(rdb.smembers('system:1:submissions'), set(['1']))
 
     def tearDown(self):
