@@ -37,7 +37,6 @@ import time
 popcorn_post_server = 'popcorn.opensuse.org'
 VERSION             = '0.1'
 popcorn_post_uri    = '/'
-popcorn_email       = 'popcorn@popcorn.opensuse.org'
 HWUUID_FILE         = '/etc/smolt/hw-uuid'
 
 days_recent = 30
@@ -141,9 +140,6 @@ class Client:
         response = conn.getresponse()
         print response.read()
 
-    def write(self):
-        print self.data,
-
 def multipart(data):
     """Return multipart content (rfc1341) as one file from data"""
     # we will hopefully not need this anymore in the future:
@@ -165,13 +161,7 @@ def multipart(data):
     content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
     return (content_type, body)
 
-enabled = os.environ['POPCORN_ENABLED'] if os.environ.has_key('POPCORN_ENABLED') else None
+enabled = os.environ.get('POPCORN_ENABLED')
 if enabled and enabled != '0' and enabled != 'false':
-    method = os.environ['POPCORN_METHOD'] if os.environ.has_key('POPCORN_METHOD') else None
     client = Client()
-    if method == 'email':
-        client.email()
-    elif method == 'post':
-        client.post()
-    else:
-        client.write()
+    client.post()
