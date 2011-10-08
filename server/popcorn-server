@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+
+from popcorn import app
+app.run(debug=False)

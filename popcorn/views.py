@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # Copyright (c) 2011 Ionuț Arțăriși <iartarisi@suse.cz>
 #
@@ -23,17 +22,12 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-import sys
+from flask import abort, render_template, request
 
-from flask import Flask, abort, render_template, request
-app = Flask("popcorn")
-
+from popcorn import app
 from popcorn.model import Distro, Package, System, Vendor, Submission
 from popcorn.model.error import DoesNotExist
-
 from popcorn.parse import parse_text
-
-sys.path.append("/home/mapleoin/popcorn/")
 
 @app.route('/', methods=['GET'])
 def index():
@@ -96,7 +90,3 @@ def distro(distro_id):
     except DoesNotExist:
         abort(404)
     return render_template('distro.html', distro=dist)
-
-if __name__ == "__main__":
-    app.debug = True
-    app.run()

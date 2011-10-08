@@ -1,9 +1,13 @@
-FILES=README popcorn-client popcorn.conf popcorn.cron server/index.html server/popcorn-server server/popcorn-server.init server/server.conf
+FILES=README popcorn-client popcorn.conf popcorn.cron setup.py MANIFEST.in
+DIRS=popcorn server
 
 all: release
 
 release: popcorn.tar.bz2
 
-popcorn.tar.bz2: $(FILES)
-	tar cf popcorn.tar $(FILES)
+popcorn.tar.bz2: $(FILES) $(DIRS)
+	tar cf popcorn.tar $(FILES) $(DIRS)
 	bzip2 --best popcorn.tar
+
+clean:
+	rm -rf popcorn.tar.bz2

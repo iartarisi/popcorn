@@ -1,6 +1,4 @@
-#
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
-#
+%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 
 Name:           popcorn
 Version:        0.1
@@ -12,6 +10,7 @@ Group:          System/Packages
 Source:         %{name}.tar.bz2
 Requires:       cron
 Requires:       rpm-python
+BuildRequires:  python-devel
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildArch:      noarch
 
@@ -20,8 +19,11 @@ Popularity Contest (for RPM).
 
 %package server
 Summary:        Server for Popularity Contest (for RPM)
+Requires:       redis
 Requires:       python-redis
-Requires:       python-tornado
+Requires:       python-Flask
+Requires:       python-jinja2
+BuildRequires:  python-devel
 
 %description server
 Server for Popularity Contest (for RPM).
@@ -30,22 +32,20 @@ Server for Popularity Contest (for RPM).
 %setup -q -c -n %{name}
 
 %build
-# not needed
+python setup.py build
 
 %install
 # client files
 install -D -m 0755 popcorn-client %{buildroot}%{_bindir}/popcorn
 install -D -m 0644 popcorn.conf   %{buildroot}%{_sysconfdir}/popcorn.conf
 install -D -m 0755 popcorn.cron   %{buildroot}%{_sysconfdir}/cron.weekly/popcorn
+
 # server files
+python setup.py install --skip-build --root %{buildroot} --prefix=%{_prefix}
 install -D -m 0755 server/popcorn-server      %{buildroot}%{_sbindir}/popcorn-server
-install -D -m 0644 server/index.html          %{buildroot}%{_datadir}/popcorn/index.html
 install -D -m 0644 server/server.conf         %{buildroot}%{_sysconfdir}/popcorn-server.conf
 install -D -m 0755 server/popcorn-server.init %{buildroot}%{_initddir}/popcorn-server
 ln -s %{_initddir}/popcorn-server %{buildroot}%{_sbindir}/rcpopcorn-server
-# use absolute paths
-sed -i "s:^CONFIG_FILE = .*$:CONFIG_FILE = '%{_sysconfdir}/popcorn-server.conf':" %{buildroot}%{_sbindir}/popcorn-server
-sed -i "s:^INDEX_FILE  = .*$:INDEX_FILE  = '%{_datadir}/popcorn/index.html':"     %{buildroot}%{_sbindir}/popcorn-server
 
 %clean
 rm -rf %{buildroot}
@@ -75,8 +75,8 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %doc README
 %config(noreplace) %{_sysconfdir}/popcorn-server.conf
-%dir %{_datadir}/popcorn
-%{_datadir}/popcorn/index.html
+%{python_sitelib}/popcorn
+%{python_sitelib}/%{name}-*.egg-info
 %{_sbindir}/popcorn-server
 %{_sbindir}/rcpopcorn-server
 %{_initddir}/popcorn-server
