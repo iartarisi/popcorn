@@ -57,10 +57,10 @@ rm -rf %{buildroot}
 %post server
 %fillup_and_insserv -y popcorn-server
 
-%preun
+%preun server
 %stop_on_removal popcorn-server
 
-%postun
+%postun server
 %restart_on_update popcorn-server
 %insserv_cleanup
 
