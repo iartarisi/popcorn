@@ -30,6 +30,8 @@ import platform
 import re
 import rpm
 import smtplib
+import socket
+import sys
 import time
 
 popcorn_post_server = 'popcorn.opensuse.org'
@@ -132,7 +134,10 @@ class Client:
         (content_type, body) = multipart(self.data)
         headers = {"Content-Type": content_type,}
         conn = httplib.HTTPConnection(popcorn_post_server)
-        conn.request("POST", popcorn_post_uri, body, headers)
+        try:
+            conn.request("POST", popcorn_post_uri, body, headers)
+        except socket.error, e:
+            sys.exit("Could not connect to the Popcorn server. %s" % e)
         response = conn.getresponse()
         print response.read()
 
