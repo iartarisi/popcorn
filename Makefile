@@ -11,3 +11,13 @@ popcorn.tar.bz2: $(FILES) $(DIRS)
 
 clean:
 	rm -rf popcorn.tar.bz2
+
+test:
+	unit2 discover
+
+coverage:
+	coverage run --source=popcorn /usr/bin/unit2 discover
+	coverage report -m
+	rm .coverage
+
+
