@@ -40,6 +40,9 @@ class TestPackages(unittest.TestCase):
         self.vendor = Vendor('v')
         self.sub = Submission(self.sys, 'popver')
 
+    def tearDown(self):
+        rdb.flushdb()
+
     def test_init_package_attributes(self):
         p = Package('name', 'ver', 'rel', 'ep', 'arch',
                     self.vendor, 'o', self.sub)
@@ -99,6 +102,7 @@ class TestPackages(unittest.TestCase):
         p = Package('name', 'ver', 'rel', 'ep', 'arch', self.vendor, 'o', s2)
         self.assertEqual(p.status_on_system(self.sys), 'old')
 
-
-    def tearDown(self):
-        rdb.flushdb()
+    def test_repr(self):
+        p = Package('name', 'ver', 'rel', 'ep', 'arch',
+                    self.vendor, 'v', self.sub)
+        self.assertEqual("%s" % p, "name-ver-rel:ep.arch")
