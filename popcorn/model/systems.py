@@ -39,6 +39,7 @@ class System(object):
     A hash is stored in 'system:%(hw_uuid)s' containing:
      - arch - the architecture of the system
      - distro - the id of the Distro object that this System belongs to
+
     """
     @classmethod
     def find(cls, system_id):
@@ -76,6 +77,7 @@ class System(object):
             # XXX see if this constraint can go in the database,
             # otherwise just make it prettier
             assert arch in ARCHES
+            self.arch = arch
             rdb.hmset('system:%s' % self.id, {'arch': arch,
                                               'distro': self.distro.id,
                                               'hw_uuid': self.hw_uuid})
