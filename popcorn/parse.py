@@ -24,7 +24,7 @@
 
 from datetime import datetime
 
-from popcorn.configs import config, rdb
+from popcorn.configs import submission_interval, rdb
 from popcorn.model import Package, Submission, System, Vendor
 
 """Functionality for parsing the submissions received from the clients"""
@@ -74,7 +74,7 @@ def _can_submit(system):
     if not last_sub:
         return True
     delta = datetime.now() - last_sub.datetime
-    if int(config.get('app', 'submission_interval')) < delta.days:
+    if submission_interval < delta.days:
         return True
     else:
         return False

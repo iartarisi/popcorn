@@ -33,3 +33,4 @@ config.read(CONFIG_FILE)
 rdb = redis.Redis(config.get('redis', 'hostname'),
                   int(config.get('redis', 'port')),
                   int(config.get('redis', 'db')))
+submission_interval = int(config.get('app', 'submission_interval'))
