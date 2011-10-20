@@ -27,13 +27,13 @@ from datetime import datetime
 from popcorn.configs import submission_interval, rdb
 from popcorn.model import Package, Submission, System, Vendor
 
-"""Functionality for parsing the submissions received from the clients"""
+"""Parsing the submissions received from the clients and saving them to the DB"""
 
 class FormatError(Exception):
     """Exception class for format errors found in a submission"""
     def __init__(self, message):
         self.message = message
-    def __str__(self, message):
+    def __str__(self):
         return "The submission format is invalid: %s" % self.message
 
 class EarlySubmission(Exception):
@@ -58,8 +58,11 @@ def parse_text(data):
 
     sub = Submission(system, version)
     for line in datalines[1:]:
-        (status, name, version, release,
-         epoch, arch, vendor) = line.split(None, 6)
+        try:
+            (status, name, version, release,
+             epoch, arch, vendor) = line.split(None, 6)
+        except ValueError, e:
+            raise FormatError(e.message)
         assert status in ['v', 'r', 'o', 'n'], FormatError(
             "the package's status could not be recognized")
         vendor = Vendor(vendor)
