@@ -97,8 +97,11 @@ class System(object):
 
     @property
     def last_submission(self):
-        """Return the last(current) submission for this system"""
+        """Return the last(current) submission for this system or None"""
         ids = rdb.smembers('system:%s:submissions' % self.id)
+        if not ids:
+            return None
+
         # the last submission should be the one with the highest id
         sub_id = max(ids)
         return Submission.find(sub_id)
