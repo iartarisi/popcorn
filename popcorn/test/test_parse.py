@@ -22,13 +22,15 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
+import datetime
 import unittest
 
 import redis
+from mock import Mock
 
 from popcorn import configs
 configs.rdb = rdb = redis.Redis('localhost', db='13')
-from popcorn.parse import parse_text
+from popcorn.parse import parse_text, _can_submit, EarlySubmission
 
 
 class TestParsePopcorn(unittest.TestCase):
@@ -54,5 +56,38 @@ class TestParsePopcorn(unittest.TestCase):
         self.assertEqual(rdb.smembers('distro:1:systems'), set(['1']))
         self.assertEqual(rdb.smembers('system:1:submissions'), set(['1']))
 
+    def test_parse_raise_early_submission(self):
+        submission = ("POPCORN 0.1 openSUSE 11.4 x86_64 TEST_HW_UUID\n")
+        parse_text(submission)
+        self.assertEqual(rdb.scard('system:1:submissions'), 1)
+        self.assertRaises(EarlySubmission, parse_text, submission)
+        self.assertEqual(rdb.scard('system:1:submissions'), 1)
+
     def tearDown(self):
         rdb.flushdb()
+
+class TestCanSubmit(unittest.TestCase):
+    def test_can_submit(self):
+        # Mock a System object (we only need system.last_submission.datetime)
+        system = Mock()
+        system.last_submission = Mock()
+        # 400 days ago should be fine for the last submission
+        last_time = datetime.datetime.now() - datetime.timedelta(400)
+        system.last_submission.datetime = last_time
+
+        self.assertTrue(_can_submit(system))
+
+    def test_can_submit_no_last_submission(self):
+        system = Mock()
+        system.last_submission = None
+
+        self.assertTrue(_can_submit(system))
+
+    def test_can_submit_too_early(self):
+        system = Mock()
+        system.last_submission = Mock()
+        # 1 day ago should be too early for another submission
+        last_time = datetime.datetime.now() - datetime.timedelta(1)
+        system.last_submission.datetime = last_time
+
+        self.assertFalse(_can_submit(system))

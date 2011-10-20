@@ -22,9 +22,10 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-from popcorn.configs import rdb
-from popcorn.model import Package, Submission, System, Vendor
+from datetime import datetime
 
+from popcorn.configs import config, rdb
+from popcorn.model import Package, Submission, System, Vendor
 
 """Functionality for parsing the submissions received from the clients"""
 
@@ -35,13 +36,20 @@ class FormatError(Exception):
     def __str__(self, message):
         return "The submission format is invalid: %s" % self.message
 
+class EarlySubmission(Exception):
+    """Raised when another Submission has been submitted too soon for a System"""
+    pass
+
 def parse_text(data):
     """Parse a plaintext submission, recording everything in the database"""
     datalines = data.splitlines()
     (popcorn, version, distro, distrover, arch, hw_uuid) = datalines[0].split()
 
     system = System(hw_uuid, distro, distrover, arch)
-    # TODO check if system can submit based on date
+    
+    if not _can_submit(system):
+        raise EarlySubmission
+
     sub = Submission(system, version)
     for line in datalines[1:]:
         (status, name, version, release,
@@ -52,3 +60,21 @@ def parse_text(data):
         package = Package(name, version, release, epoch,
                           arch, vendor, status, sub)
     rdb.save()
+
+def _can_submit(system):
+    """Checks the Submission interval for this System
+
+    :system: a System object
+
+    If the interval has elapsed or there are no previous submissions, it
+    will return True, otherwise returns False.
+
+    """
+    last_sub = system.last_submission
+    if not last_sub:
+        return True
+    delta = datetime.now() - last_sub.datetime
+    if int(config.get('app', 'submission_interval')) < delta.days:
+        return True
+    else:
+        return False

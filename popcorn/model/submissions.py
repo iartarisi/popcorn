@@ -22,7 +22,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-from datetime import date
+from datetime import date, datetime
 
 from popcorn.configs import rdb
 from popcorn.model.utils import list_to_tuples
@@ -48,6 +48,8 @@ class Submission(object):
     at 'system:%s:submissions'.
 
     """
+    _date_format = '%d-%m-%y'
+
     @classmethod
     def find(cls, sub_id):
         """Return an existing Submission by id"""
@@ -71,7 +73,7 @@ class Submission(object):
         # TODO check time interval from last submission
         # create new submission
         self.id = str(rdb.incr('global:nextSubmissionId'))
-        self.date = date.today().strftime('%d-%m-%y')
+        self.date = date.today().strftime(self._date_format)
         self.popcorn = popcorn
 
         rdb.hmset('submission:%s' % self.id, {'date': self.date,
@@ -84,7 +86,7 @@ class Submission(object):
         rdb.sadd("submission:%s:packages" % self.id, package.id)
 
     def __repr__(self):
-        return "<Submissions %s from %s>" % (self.id, self.date)
+        return "<Submission %s from %s>" % (self.id, self.date)
 
     def get_package_names_with_status(self):
         """Return a list of tuples of the form (id, package-name, status)"""
@@ -101,3 +103,8 @@ class Submission(object):
         package_ids = rdb.smembers('submission:%s:packages' % self.id)
         packages = set(Package.find(p_id) for p_id in package_ids)
         return packages
+
+    @property
+    def datetime(self):
+        """Return a datetime object compiled from the date"""
+        return datetime.strptime(self.date, self._date_format)
