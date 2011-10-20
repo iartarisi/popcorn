@@ -27,7 +27,8 @@ from flask import abort, render_template, request
 from popcorn import app
 from popcorn.model import Distro, Package, System, Vendor, Submission
 from popcorn.model.error import DoesNotExist
-from popcorn.parse import parse_text
+from popcorn.parse import parse_text, EarlySubmission
+
 
 @app.route('/', methods=['GET'])
 def index():
@@ -38,8 +39,10 @@ def index():
 @app.route('/', methods=['POST'])
 def receive_submission():
     f = request.files['popcorn']
-    # TODO exception handling
-    parse_text(f.read())
+    try:
+        parse_text(f.read())
+    except EarlySubmission, e:
+        return str(e)
     return 'Submission received. Thanks!'
     
 @app.route('/vendor/<vendor_id>')

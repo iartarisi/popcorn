@@ -38,7 +38,13 @@ class FormatError(Exception):
 
 class EarlySubmission(Exception):
     """Raised when another Submission has been submitted too soon for a System"""
-    pass
+    def __init__(self, last_date, submission_interval):
+        self.last_date = last_date
+        self.interval = submission_interval
+    def __str__(self):
+        return ("You need to wait %s days between submissions. "
+                "Your last recorded submission was on %s."
+                % (self.interval, self.last_date))
 
 def parse_text(data):
     """Parse a plaintext submission, recording everything in the database"""
@@ -48,7 +54,7 @@ def parse_text(data):
     system = System(hw_uuid, distro, distrover, arch)
     
     if not _can_submit(system):
-        raise EarlySubmission
+        raise EarlySubmission(system.last_submission.date, submission_interval)
 
     sub = Submission(system, version)
     for line in datalines[1:]:
