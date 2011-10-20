@@ -84,3 +84,5 @@ class Distro(object):
                            by='system:*', get=['#', 'system:*->hw_uuid'])
         return list_to_tuples(systems, 2)
         
+    def __repr__(self):
+        return '<Distro %s>' % self.id
