@@ -126,6 +126,9 @@ class Client:
         stats = Statistics()
         stats.fill_packages()
         self.data = stats.serialize()
+        # write the submission text to a file so it can be inspected easily
+        with open('/tmp/submission.txt', 'w') as f:
+            f.write(self.data)
 
     def post(self, compress=False):
         """Send a POST request to the default server
