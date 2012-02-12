@@ -103,7 +103,8 @@ class Statistics:
             release = h[rpm.RPMTAG_RELEASE] or 'None'
             arch = h[rpm.RPMTAG_ARCH]
             vendor = h[rpm.RPMTAG_VENDOR] or 'None'
-            epoch = h[rpm.RPMTAG_EPOCH] or 'None'
+            # collate to string as it can be a long
+            epoch = str(h[rpm.RPMTAG_EPOCH]) or 'None'
             self.packages.append((cat, name, version, release, epoch, arch, vendor))
 
     def serialize(self):
