@@ -22,7 +22,13 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 from flask import Flask
-app = Flask(__name__)
 
+from popcorn.database import db_session
+
+app = Flask(__name__)
 # Flask docs say we need this in order to use decorators
 import popcorn.views
+
+@app.teardown_request
+def shutdown_session(exception=None):
+    db_session.remove()
