@@ -13,7 +13,7 @@ clean:
 	rm -rf popcorn.tar.bz2
 
 test:
-	unit2 discover
+	python -m unittest discover
 
 coverage:
 	coverage run --source=popcorn /usr/bin/unit2 discover
