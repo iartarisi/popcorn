@@ -22,10 +22,18 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-# import the models in the order in which their tables need to be
-# created; init_db will break otherwise
-from arch import Arch
-from distro import Distro
-from system import System
-from vendor import Vendor
-from package import Package
+from sqlalchemy import Column, String
+
+from popcorn.database import Base
+
+class Vendor(Base):
+    __tablename__ = 'vendors'
+    name = Column(String(20), primary_key=True)
+    url = Column(String(100), unique=True)
+
+    def __init__(self, url):
+        self.url = url
+        self.name = url[:20] # FIXME get better information on the vendor
+
+    def __repr__(self):
+        return '<Vendor %s>' % self.name

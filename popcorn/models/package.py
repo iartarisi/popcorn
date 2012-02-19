@@ -22,10 +22,33 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-# import the models in the order in which their tables need to be
-# created; init_db will break otherwise
-from arch import Arch
-from distro import Distro
-from system import System
-from vendor import Vendor
-from package import Package
+from sqlalchemy import Column, ForeignKey, String
+
+from popcorn.database import Base
+
+class Package(Base):
+    __tablename__ = 'packages'
+    name = Column(String(50), primary_key=True)
+    version = Column(String(20), primary_key=True)
+    release = Column(String(10), primary_key=True)
+    epoch = Column(String(10), primary_key=True)
+    arch = Column(String(10), ForeignKey('arches.name'), primary_key=True)
+    vendor_name = Column(String(20), ForeignKey('vendors.name'),
+                         primary_key=True)
+
+    def __init__(self, name, version, release, epoch, arch, vendor_name):
+        self.name = name
+        self.version = version
+        self.release = release
+        self.epoch = epoch
+        self.arch = arch
+        self.vendor_name = vendor_name
+
+    def __repr__(self):
+        if self.epoch:
+            return ('<Package %(name)s-%(release)s-%(epoch)s.%(arch)s '
+                    'from %(vendor_name)s' % self.__dict__)
+        else:
+            return ('<Package %(name)s-%(release)s.%(arch)s '
+                    'from %(vendor_name)s' % self.__dict__)
+        
