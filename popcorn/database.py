@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2011 Ionuț Arțăriși <iartarisi@suse.cz>
+# Copyright (c) 2012 Ionuț Arțăriși <iartarisi@suse.cz>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
