@@ -30,9 +30,9 @@ from popcorn.models import Distro
 class System(Base):
     __tablename__ = 'systems'
     hw_uuid = Column(String(36), primary_key=True)
-    distro_name = Column(String(20))
-    distro_version = Column(String(10))
-    arch = Column(String(10), ForeignKey('arches.name'))
+    distro_name = Column(String(20), nullable=False)
+    distro_version = Column(String(10), nullable=False)
+    arch = Column(String(10), ForeignKey('arches.name'), nullable=False)
     __table_args__ = (ForeignKeyConstraint([distro_name, distro_version],
                                            [Distro.name, Distro.version]),
                       {})
