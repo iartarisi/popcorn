@@ -22,11 +22,22 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-# import the models in the order in which their tables need to be
-# created; init_db will break otherwise
-from arch import Arch
-from distro import Distro
-from system import System
-from vendor import Vendor
-from package import Package
-from submission import Submission
+from sqlalchemy import Column, DateTime, ForeignKey, String
+from sqlalchemy.orm import relationship
+
+from popcorn.database import Base
+
+class Submission(Base):
+    __tablename__ = 'submissions'
+    date = Column(DateTime(), primary_key=True)
+    system_hw_uuid = Column(String(36), ForeignKey('systems.hw_uuid'),
+                            primary_key=True)
+    popcorn_version = Column(String(30), nullable=False)
+
+    def __init__(self, date, system_hw_uuid, popcorn_version):
+        self.date = date
+        self.system_hw_uuid = system_hw_uuid
+        self.popcorn_version = popcorn_version
+
+    def __repr__(self):
+        return '<Submission from %s at %s>' % (self.system_hw_uuid, self.date)

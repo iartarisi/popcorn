@@ -23,6 +23,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 from sqlalchemy import Column, ForeignKey, ForeignKeyConstraint, String
+from sqlalchemy.orm import relationship
 
 from popcorn.database import Base
 from popcorn.models import Distro
@@ -33,6 +34,9 @@ class System(Base):
     distro_name = Column(String(20), nullable=False)
     distro_version = Column(String(10), nullable=False)
     arch = Column(String(10), ForeignKey('arches.name'), nullable=False)
+
+    submissions = relationship('Submission')
+
     __table_args__ = (ForeignKeyConstraint([distro_name, distro_version],
                                            [Distro.name, Distro.version]),
                       {})
@@ -45,4 +49,3 @@ class System(Base):
 
     def __repr__(self):
         return '<System: %s>' % self.hw_uuid
-    

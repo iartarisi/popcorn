@@ -22,13 +22,14 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
+from datetime import datetime
 import unittest
 
 from sqlalchemy import create_engine, event
 from sqlalchemy.exc import IntegrityError
 
 from popcorn.database import db_session, Base
-from popcorn.models import Arch, Distro, System
+from popcorn.models import Arch, Distro, System, Submission
 
 # we need to explicitly enable foreign key constraints for sqlite
 def _fk_pragma_on_connect(dbapi_con, con_record):
@@ -63,8 +64,9 @@ class ModelsTest(unittest.TestCase):
 
     def test_created(self):
         self.assertEqual(Distro.query.all(), [self.d1, self.d2])
-        self.assertEqual(System.query.all(), [self.s1, self.s2])
         self.assertEqual(Arch.query.all(), [self.a])
+        self.assertEqual(System.query.all(), [self.s1, self.s2])
+        self.assertEqual(self.d1.systems, [self.s1])
 
     def test_system_foreign_key_constraint(self):
         db_session.add(System('hw_uu', 'i586', 'bogus', 'bogus'))
@@ -73,4 +75,18 @@ class ModelsTest(unittest.TestCase):
         db_session.rollback()
 
         db_session.add(System('hw_uu', 'bogus', 'Fedora', '16'))
+        self.assertRaises(IntegrityError, db_session.commit)
+
+    def test_submission_creation(self):
+        sub = Submission(datetime.now(), 'hw_uuid1', 'POPCORN v0.0.1')
+        db_session.add(sub)
+        db_session.commit()
+
+        self.assertEqual(Submission.query.all(), [sub])
+        self.assertEqual(self.s1.submissions, [sub])
+
+    def test_submission_foreign_key_constraint(self):
+        sub = Submission(datetime.now(), 'bogus', 'POPCORN v0.0.1')
+        db_session.add(sub)
+
         self.assertRaises(IntegrityError, db_session.commit)
