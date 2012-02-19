@@ -31,12 +31,12 @@ class Distro(Base):
     __tablename__ = 'distros'
     name = Column(String(20), primary_key=True)
     version = Column(String(10), primary_key=True)
-    systems = relationship("System")
+    systems = relationship('System')
 
     def __init__(self, name, version):
         self.name = name
         self.version = version
 
     def __repr__(self):
-        return '<Distro: %s %s>' % (self.name, self.version)
+        return "<Distro: %s %s>" % (self.name, self.version)
     
