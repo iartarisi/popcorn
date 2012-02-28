@@ -22,14 +22,17 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-from datetime import datetime
+"""Glue tests to ensure relationships between tables and other constraints"""
+
+from datetime import date
 import unittest
 
 from sqlalchemy import create_engine, event
 from sqlalchemy.exc import IntegrityError
 
 from popcorn.database import db_session, Base
-from popcorn.models import Arch, Distro, System, Submission
+from popcorn.models import (Arch, Distro, System, Submission,
+                            PackageStatus, SubmissionPackage, Vendor)
 
 # we need to explicitly enable foreign key constraints for sqlite
 def _fk_pragma_on_connect(dbapi_con, con_record):
@@ -39,6 +42,8 @@ class ModelsTest(unittest.TestCase):
 
     def setUp(self):
         engine = create_engine('sqlite:///:memory:')
+        # engine = create_engine('sqlite:///test.db')
+        
         event.listen(engine, 'connect', _fk_pragma_on_connect)
         db_session.configure(bind=engine)
 
@@ -78,7 +83,7 @@ class ModelsTest(unittest.TestCase):
         self.assertRaises(IntegrityError, db_session.commit)
 
     def test_submission_creation(self):
-        sub = Submission(datetime.now(), 'hw_uuid1', 'POPCORN v0.0.1')
+        sub = Submission(date.today(), 'hw_uuid1', 'POPCORN v0.0.1')
         db_session.add(sub)
         db_session.commit()
 
@@ -86,7 +91,20 @@ class ModelsTest(unittest.TestCase):
         self.assertEqual(self.s1.submissions, [sub])
 
     def test_submission_foreign_key_constraint(self):
-        sub = Submission(datetime.now(), 'bogus', 'POPCORN v0.0.1')
+        sub = Submission(date.today(), 'bogus', 'POPCORN v0.0.1')
         db_session.add(sub)
 
         self.assertRaises(IntegrityError, db_session.commit)
+
+    def test_submission_package(self):
+        sub = Submission(date.today(), 'hw_uuid1', 'POPCORN v0.0.1')
+        status = PackageStatus('voted')
+        vendor = Vendor('repo1')
+        subp = SubmissionPackage('hw_uuid1', date.today(), 'python', '2.7',
+                                 '3', '', 'i586', 'repo1', 'voted')
+        db_session.add(sub)
+        db_session.add(status)
+        db_session.add(vendor)
+        db_session.commit()
+        db_session.add(subp)
+        db_session.commit()

@@ -22,21 +22,21 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-from sqlalchemy import Column, ForeignKey, String
+from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
 from popcorn.database import Base
 
 class Distro(Base):
     __tablename__ = 'distros'
-    name = Column(String(20), primary_key=True)
-    version = Column(String(10), primary_key=True)
+    distro_name = Column(String(20), primary_key=True)
+    distro_version = Column(String(10), primary_key=True)
     systems = relationship('System')
 
-    def __init__(self, name, version):
-        self.name = name
-        self.version = version
+    def __init__(self, distro_name, distro_version):
+        self.distro_name = distro_name
+        self.distro_version = distro_version
 
     def __repr__(self):
-        return "<Distro: %s %s>" % (self.name, self.version)
+        return "<Distro: %s %s>" % (self.distro_name, self.distro_version)
     

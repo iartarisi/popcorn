@@ -28,5 +28,6 @@ from arch import Arch
 from distro import Distro
 from system import System
 from vendor import Vendor
-from package import Package
 from submission import Submission
+from package_status import PackageStatus
+from submission_package import SubmissionPackage

@@ -22,22 +22,22 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-from sqlalchemy import Column, DateTime, ForeignKey, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Date, ForeignKey, String
 
 from popcorn.database import Base
 
 class Submission(Base):
     __tablename__ = 'submissions'
-    date = Column(DateTime(), primary_key=True)
-    system_hw_uuid = Column(String(36), ForeignKey('systems.hw_uuid'),
-                            primary_key=True)
+    sub_date = Column(Date(), primary_key=True)
+    sys_hwuuid = Column(String(36), ForeignKey('systems.sys_hwuuid'),
+                        primary_key=True)
     popcorn_version = Column(String(30), nullable=False)
 
-    def __init__(self, date, system_hw_uuid, popcorn_version):
-        self.date = date
-        self.system_hw_uuid = system_hw_uuid
+    def __init__(self, date, sys_hwuuid, popcorn_version):
+        self.sub_date = date
+        self.sys_hwuuid = sys_hwuuid
         self.popcorn_version = popcorn_version
 
     def __repr__(self):
-        return '<Submission from %s at %s>' % (self.system_hw_uuid, self.date)
+        return '<Submission from %s at %s>' % (self.sys_hwuuid,
+                                               self.sub_date)

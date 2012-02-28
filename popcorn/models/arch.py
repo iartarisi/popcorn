@@ -28,11 +28,11 @@ from popcorn.database import Base
 
 class Arch(Base):
     __tablename__ = 'arches'
-    name = Column(String(10), primary_key=True)
+    arch = Column(String(10), primary_key=True)
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, arch):
+        self.arch = arch
 
     def __repr__(self):
-        return '<Arch: %s>' % self.name
+        return '<Arch: %s>' % self.arch
     

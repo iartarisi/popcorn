@@ -28,12 +28,13 @@ from popcorn.database import Base
 
 class Vendor(Base):
     __tablename__ = 'vendors'
-    name = Column(String(20), primary_key=True)
-    url = Column(String(100), unique=True, nullable=False)
+    vendor_name = Column(String(20), primary_key=True)
+    vendor_url = Column(String(100), unique=True, nullable=False)
 
-    def __init__(self, url):
-        self.url = url
-        self.name = url[:20] # FIXME get better information on the vendor
+    def __init__(self, vendor_url):
+        self.vendor_url = vendor_url
+         # FIXME get better information on the vendor from the RPM
+        self.vendor_name = vendor_url[:20]
 
     def __repr__(self):
-        return '<Vendor %s>' % self.name
+        return '<Vendor %s>' % self.vendor_name

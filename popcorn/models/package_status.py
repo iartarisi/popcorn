@@ -22,33 +22,37 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-from sqlalchemy import Column, ForeignKey, String
+from sqlalchemy import Column, String
 
 from popcorn.database import Base
 
-class Package(Base):
-    __tablename__ = 'packages'
-    name = Column(String(50), primary_key=True)
-    version = Column(String(20), primary_key=True)
-    release = Column(String(10), primary_key=True)
-    epoch = Column(String(10), primary_key=True)
-    arch = Column(String(10), ForeignKey('arches.name'), primary_key=True)
-    vendor_name = Column(String(20), ForeignKey('vendors.name'),
-                         primary_key=True)
+class PackageStatus(Base):
+    """The Package Status in a submission. Can be one of:
 
-    def __init__(self, name, version, release, epoch, arch, vendor_name):
-        self.name = name
-        self.version = version
-        self.release = release
-        self.epoch = epoch
-        self.arch = arch
-        self.vendor_name = vendor_name
+    * (r) recent
+    - package has been recently installed (less than 30 days)
 
-    def __repr__(self):
-        if self.epoch:
-            return ('<Package %(name)s-%(release)s-%(epoch)s.%(arch)s '
-                    'from %(vendor_name)s' % self.__dict__)
-        else:
-            return ('<Package %(name)s-%(release)s.%(arch)s '
-                    'from %(vendor_name)s' % self.__dict__)
+    * (v) voted
+    - package is older than 30 days and has been used in the last 30 days
+    - ( now - install_time > 30 days ) and ( now - access_time < 30 days)
+
+    * (o) old
+    - package is older than 30 days and hasn't been used recently
+    - ( now - install_time > 30 days ) and ( now - access_time > 30 days)
+
+    * (n) no-files
+    - there are no watched files present in the package
+    - access_time = 0
+
+    """
+    __tablename__ = 'package_statuses'
+    pkg_status = Column(String(10), primary_key=True)
+    short_status = Column(String(1), unique=True)
+
+    def __init__(self, pkg_status):
+        # TODO: disable this after creating the initial statuses in a script
+        self.pkg_status = pkg_status
+        self.short_status = pkg_status[0]
         
+    def __repr__(self):
+        return '<PackageStatus: %s(%s)>' % (self.pkg_status, self.short_status)

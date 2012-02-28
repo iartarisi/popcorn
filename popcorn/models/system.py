@@ -30,22 +30,23 @@ from popcorn.models import Distro
 
 class System(Base):
     __tablename__ = 'systems'
-    hw_uuid = Column(String(36), primary_key=True)
+    sys_hwuuid = Column(String(36), primary_key=True)
     distro_name = Column(String(20), nullable=False)
     distro_version = Column(String(10), nullable=False)
-    arch = Column(String(10), ForeignKey('arches.name'), nullable=False)
+    arch = Column(String(10), ForeignKey('arches.arch'), nullable=False)
 
     submissions = relationship('Submission')
 
-    __table_args__ = (ForeignKeyConstraint([distro_name, distro_version],
-                                           [Distro.name, Distro.version]),
-                      {})
+    __table_args__ = (
+        ForeignKeyConstraint([distro_name, distro_version],
+                             [Distro.distro_name, Distro.distro_version]),
+        {})
 
-    def __init__(self, hw_uuid, arch, distro_name, distro_version):
-        self.hw_uuid = hw_uuid
+    def __init__(self, sys_hwuuid, arch, distro_name, distro_version):
+        self.sys_hwuuid = sys_hwuuid
         self.arch = arch
         self.distro_name = distro_name
         self.distro_version = distro_version
 
     def __repr__(self):
-        return '<System: %s>' % self.hw_uuid
+        return "<System: %s>" % self.sys_hwuuid
