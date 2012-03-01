@@ -96,7 +96,7 @@ class ModelsTest(unittest.TestCase):
 
         self.assertRaises(IntegrityError, db_session.commit)
 
-    def test_submission_package(self):
+    def test_submission_package_creation(self):
         sub = Submission(date.today(), 'hw_uuid1', 'POPCORN v0.0.1')
         status = PackageStatus('voted')
         vendor = Vendor('repo1')
@@ -108,3 +108,5 @@ class ModelsTest(unittest.TestCase):
         db_session.commit()
         db_session.add(subp)
         db_session.commit()
+
+        self.assertEqual(SubmissionPackage.query.first(), subp)
