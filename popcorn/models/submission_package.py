@@ -45,8 +45,6 @@ class SubmissionPackage(Base):
     pkg_status = Column(String(10), ForeignKey('package_statuses.pkg_status'),
                         nullable=False)
 
-    system = relationship('System', uselist=False)
-
     __table_args__ = (
         ForeignKeyConstraint(
             [sys_hwuuid, sub_date],
