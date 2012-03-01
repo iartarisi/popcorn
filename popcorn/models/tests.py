@@ -83,7 +83,7 @@ class ModelsTest(unittest.TestCase):
         self.assertRaises(IntegrityError, db_session.flush)
 
     def test_submission_creation(self):
-        sub = Submission(date.today(), 'hw_uuid1', 'POPCORN v0.0.1')
+        sub = Submission('hw_uuid1', 'POPCORN v0.0.1')
         db_session.add(sub)
         db_session.flush()
 
@@ -91,13 +91,13 @@ class ModelsTest(unittest.TestCase):
         self.assertEqual(self.s1.submissions, [sub])
 
     def test_submission_foreign_key_constraint(self):
-        sub = Submission(date.today(), 'bogus', 'POPCORN v0.0.1')
+        sub = Submission('bogus', 'POPCORN v0.0.1')
         db_session.add(sub)
 
         self.assertRaises(IntegrityError, db_session.commit)
 
     def test_submission_package_creation(self):
-        sub = Submission(date.today(), 'hw_uuid1', 'POPCORN v0.0.1')
+        sub = Submission('hw_uuid1', 'POPCORN v0.0.1')
         status = PackageStatus('voted')
         vendor = Vendor('repo1')
         subp = SubmissionPackage('hw_uuid1', date.today(), 'python', '2.7',

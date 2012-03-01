@@ -22,6 +22,8 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
+from datetime import date
+
 from sqlalchemy import Column, Date, ForeignKey, String
 
 from popcorn.database import Base
@@ -33,7 +35,7 @@ class Submission(Base):
                         primary_key=True)
     popcorn_version = Column(String(30), nullable=False)
 
-    def __init__(self, date, sys_hwuuid, popcorn_version):
+    def __init__(self, sys_hwuuid, popcorn_version, date=date.today()):
         self.sub_date = date
         self.sys_hwuuid = sys_hwuuid
         self.popcorn_version = popcorn_version
