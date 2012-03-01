@@ -58,7 +58,7 @@ class ModelsTest(unittest.TestCase):
         db_session.add(self.d1)
         db_session.add(self.d2)
         # system is dependent on both arch and distro already being in the db
-        db_session.commit()
+        db_session.flush()
 
         db_session.add(self.s1)
         db_session.add(self.s2)
@@ -75,17 +75,17 @@ class ModelsTest(unittest.TestCase):
 
     def test_system_foreign_key_constraint(self):
         db_session.add(System('hw_uu', 'i586', 'bogus', 'bogus'))
-        self.assertRaises(IntegrityError, db_session.commit)
 
+        self.assertRaises(IntegrityError, db_session.flush)
         db_session.rollback()
 
         db_session.add(System('hw_uu', 'bogus', 'Fedora', '16'))
-        self.assertRaises(IntegrityError, db_session.commit)
+        self.assertRaises(IntegrityError, db_session.flush)
 
     def test_submission_creation(self):
         sub = Submission(date.today(), 'hw_uuid1', 'POPCORN v0.0.1')
         db_session.add(sub)
-        db_session.commit()
+        db_session.flush()
 
         self.assertEqual(Submission.query.all(), [sub])
         self.assertEqual(self.s1.submissions, [sub])
@@ -105,8 +105,8 @@ class ModelsTest(unittest.TestCase):
         db_session.add(sub)
         db_session.add(status)
         db_session.add(vendor)
-        db_session.commit()
+        db_session.flush()
         db_session.add(subp)
-        db_session.commit()
+        db_session.flush()
 
         self.assertEqual(SubmissionPackage.query.first(), subp)
