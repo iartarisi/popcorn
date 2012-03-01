@@ -43,7 +43,8 @@ class SubmissionPackage(Base):
     vendor_name = Column(String(20), ForeignKey('vendors.vendor_name'),
                          primary_key=True)
     # not primary key
-    pkg_status = Column(String(10), ForeignKey('package_statuses.pkg_status'))
+    pkg_status = Column(String(10), ForeignKey('package_statuses.pkg_status'),
+                        nullable=False)
 
     system = relationship('System', uselist=False)
 
