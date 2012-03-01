@@ -26,8 +26,8 @@
 # created; init_db will break otherwise
 from arch import Arch
 from distro import Distro
+from submission import Submission
 from system import System
 from vendor import Vendor
-from submission import Submission
 from package_status import PackageStatus
 from submission_package import SubmissionPackage

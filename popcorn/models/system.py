@@ -26,7 +26,7 @@ from sqlalchemy import Column, ForeignKey, ForeignKeyConstraint, String
 from sqlalchemy.orm import relationship
 
 from popcorn.database import Base
-from popcorn.models import Distro
+from popcorn.models import Distro, Submission
 
 class System(Base):
     __tablename__ = 'systems'
@@ -35,7 +35,7 @@ class System(Base):
     distro_version = Column(String(10), nullable=False)
     arch = Column(String(10), ForeignKey('arches.arch'), nullable=False)
 
-    submissions = relationship('Submission')
+    submissions = relationship('Submission', order_by=Submission.sub_date.desc())
 
     __table_args__ = (
         ForeignKeyConstraint([distro_name, distro_version],
