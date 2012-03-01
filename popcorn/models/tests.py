@@ -24,7 +24,7 @@
 
 """Glue tests to ensure relationships between tables and other constraints"""
 
-from datetime import date
+from datetime import date, timedelta
 import unittest
 
 from sqlalchemy import create_engine, event
@@ -110,3 +110,14 @@ class ModelsTest(unittest.TestCase):
         db_session.flush()
 
         self.assertEqual(SubmissionPackage.query.first(), subp)
+
+    def test_system_last_submission(self):
+        sub1 = Submission('hw_uuid1', 'P1', date.today())
+        sub2 = Submission('hw_uuid2', 'P1', date.today() - timedelta(days=31*2))
+        sub3 = Submission('hw_uuid1', 'P1', date.today() - timedelta(days=31*3))
+
+        db_session.add_all([sub1, sub2, sub3])
+        db_session.flush()
+
+        self.assertEqual([sub1, sub3], self.s1.submissions)
+        self.assertEqual(sub1, self.s1.last_submission)

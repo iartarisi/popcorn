@@ -50,3 +50,8 @@ class System(Base):
 
     def __repr__(self):
         return "<System: %s>" % self.sys_hwuuid
+
+    @property
+    def last_submission(self):
+        return Submission.query.filter_by(sys_hwuuid=self.sys_hwuuid).order_by(
+            Submission.sub_date.desc()).first()
