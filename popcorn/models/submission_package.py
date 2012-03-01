@@ -22,19 +22,18 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-from sqlalchemy import Column, Date, ForeignKey, String
+from sqlalchemy import Column, Date, ForeignKey, ForeignKeyConstraint, String
 from sqlalchemy.orm import relationship
 
 from popcorn.database import Base
+from popcorn.models import Submission
 
 class SubmissionPackage(Base):
     __tablename__ = 'submission_packages'
 
-    # primary keys
-    sys_hwuuid = Column(String(36), ForeignKey('systems.sys_hwuuid'),
-                        primary_key=True)
-    sub_date = Column(Date(), ForeignKey('submissions.sub_date'),
-                      primary_key=True)
+    # primary key
+    sys_hwuuid = Column(String(36), primary_key=True)
+    sub_date = Column(Date(), primary_key=True)
     pkg_name = Column(String(50), primary_key=True)
     pkg_version = Column(String(20), primary_key=True)
     pkg_release = Column(String(10), primary_key=True)
@@ -47,6 +46,13 @@ class SubmissionPackage(Base):
                         nullable=False)
 
     system = relationship('System', uselist=False)
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            [sys_hwuuid, sub_date],
+            [Submission.sys_hwuuid, Submission.sub_date]
+            ),
+        )
 
     def __init__(self, sys_hwuuid, sub_date, pkg_name, pkg_version, pkg_release,
                  pkg_epoch, pkg_arch, vendor_name, pkg_status):
