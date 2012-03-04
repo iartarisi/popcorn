@@ -24,10 +24,9 @@
 
 from datetime import datetime
 
-from popcorn.configs import submission_interval, rdb
-from popcorn.model import Package, Submission, System, Vendor
 
 """Parsing the submissions received from the clients and saving them to the DB"""
+from popcorn.configs import submission_interval
 
 class FormatError(Exception):
     """Exception class for format errors found in a submission"""

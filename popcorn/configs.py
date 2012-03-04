@@ -22,15 +22,11 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-import redis
-
 from ConfigParser import RawConfigParser
 
 CONFIG_FILE = '/etc/popcorn-server.conf'
 
 config = RawConfigParser()
 config.read(CONFIG_FILE)
-rdb = redis.Redis(config.get('redis', 'hostname'),
-                  int(config.get('redis', 'port')),
-                  int(config.get('redis', 'db')))
+
 submission_interval = int(config.get('app', 'submission_interval'))

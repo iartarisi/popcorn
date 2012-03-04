@@ -25,11 +25,8 @@
 import datetime
 import unittest
 
-import redis
 from mock import Mock
 
-from popcorn import configs
-configs.rdb = rdb = redis.Redis('localhost', db='13')
 from popcorn.parse import parse_text, _can_submit, EarlySubmission
 
 
