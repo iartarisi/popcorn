@@ -108,7 +108,8 @@ class Statistics:
             self.packages.append((cat, name, version, release, epoch, arch, vendor))
 
     def serialize(self):
-        distro, distro_ver, arch = platform.linux_distribution()
+        distro, distro_ver, code = platform.linux_distribution()
+        arch = platform.machine()
         uuid = get_system_id()
         ret = ['POPCORN %(version)s %(distro)s %(distro_ver)s %(arch)s %(uuid)s'
                % dict(version=VERSION, **locals())]
