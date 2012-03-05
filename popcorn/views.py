@@ -23,6 +23,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 from flask import abort, render_template, request
+from sqlalchemy.orm.exc import NoResultFound
 
 from popcorn import app
 from popcorn.models import Distro, Vendor
@@ -43,18 +44,18 @@ def receive_submission():
         return str(e)
     return 'Submission received. Thanks!'
     
-@app.route('/vendor/<vendor_id>')
-def vendor(vendor_id):
+@app.route('/vendor/<vendor_name>')
+def vendor(vendor_name):
     """Return a Vendor object
 
-    :vendor_id: the id of the Vendor
+    :vendor_name: the name of the Vendor
 
     """
     try:
-        ven = Vendor.find(vendor_id)
-    except DoesNotExist:
+        vendor = Vendor.query.filter_by(vendor_name=vendor_name).one()
+    except NoResultFound:
         abort(404)
-    return render_template('vendor.html', vendor=ven)
+    return render_template('vendor.html', vendor=vendor)
 
 @app.route('/submission/<sub_id>')
 def submission(sub_id):
