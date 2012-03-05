@@ -26,6 +26,7 @@
 
 from datetime import date
 
+from sqlalchemy.exc import DataError
 from sqlalchemy.orm.exc import NoResultFound
 
 from popcorn.configs import submission_interval
@@ -92,7 +93,16 @@ def parse_text(data):
         except KeyError:
             raise FormatError("the package's status could not be recognized")
 
-        vendor = Vendor(vendor)
+        try:
+            vendor = Vendor.query.filter_by(vendor_url=vendor).one()
+        except NoResultFound:
+            vendor = Vendor(vendor)
+            db_session.add(vendor)
+            try:
+                db_session.flush()
+            except DataError: # TODO mail this to the admins
+                raise
+            
         sp = SubmissionPackage(hw_uuid, date.today(), name, version, release,
                                epoch, arch, vendor.vendor_name, status)
         db_session.add(sp)
