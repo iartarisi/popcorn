@@ -39,7 +39,7 @@ def receive_submission():
     f = request.files['popcorn']
     try:
         parse_text(f.read())
-    except (EarlySubmission, FormatError), e:
+    except (EarlySubmissionError, FormatError), e:
         return str(e)
     return 'Submission received. Thanks!'
     
