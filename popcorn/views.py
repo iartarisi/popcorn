@@ -25,15 +25,13 @@
 from flask import abort, render_template, request
 
 from popcorn import app
-from popcorn.model import Distro, Package, System, Vendor, Submission
-from popcorn.model.error import DoesNotExist
-from popcorn.parse import parse_text, EarlySubmission
-
+from popcorn.models import Distro, Vendor
+from popcorn.parse import FormatError, EarlySubmissionError, parse_text
 
 @app.route('/', methods=['GET'])
 def index():
-    distros = Distro.get_all_ids()
-    vendors = Vendor.get_all_ids()
+    distros = Distro.query.all()
+    vendors = Vendor.query.all()
     return render_template('index.html', distros=distros, vendors=vendors)
 
 @app.route('/', methods=['POST'])

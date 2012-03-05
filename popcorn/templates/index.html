@@ -3,16 +3,21 @@
 <div id="systems">
   <h2>Distros</h2>
   <ul>
-    {% for distro_id in distros %}
-    <li><a href="/distro/{{distro_id}}">{{ distro_id }}</a></li>
+    {% for distro in distros %}
+    <li>
+      <a href="/distro/{{ distro.distro_name }}_{{ distro.distro_version }}">
+        {{ distro.distro_name }} {{ distro.distro_version }}</a>
+    </li>
     {% endfor %}
   </ul>
 </div>
 <div id="vendors">
   <h2>Vendors</h2>
   <ul>
-    {% for vendor_id in vendors %}
-    <li><a href="/vendor/{{vendor_id}}">{{vendor_id}}</a></li>
+    {% for vendor in vendors %}
+    <li>
+      <a href="/vendor/{{ vendor.vendor_name }}">{{ vendor.vendor_name }}</a>
+    </li>
     {% endfor %}
   </ul>
 </div>
