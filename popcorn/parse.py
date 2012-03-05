@@ -107,7 +107,10 @@ def parse_text(data):
                                epoch, arch, vendor.vendor_name, status)
         db_session.add(sp)
 
-    db_session.commit()
+    try:
+        db_session.commit()
+    except DataError: # TODO mail this to the admins
+        raise
 
 def _can_submit(system):
     """Checks the Submission interval for this System
