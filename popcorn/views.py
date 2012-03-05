@@ -62,7 +62,7 @@ def submission(sub_id):
     """Return a Submission object"""
     try:
         sub = Submission.find(sub_id)
-    except DoesNotExist:
+    except NoResultFound:
         abort(404)
     return render_template('submission.html', submission=sub)
 
@@ -71,7 +71,7 @@ def system(hw_uuid):
     """Return a System object"""
     try:
         sys = System(hw_uuid)
-    except DoesNotExist:
+    except NoResultFound:
         abort(404)
     return render_template('system.html', system=sys)
 
@@ -80,7 +80,7 @@ def package(pkg_id):
     """Return a Package object"""
     try:
         pkg = Package.find(pkg_id)
-    except DoesNotExist:
+    except NoResultFound:
         abort(404)
     return render_template('package.html', package=pkg)
 
@@ -90,6 +90,6 @@ def distro(name, version):
     try:
         distro = Distro.query.filter_by(distro_name=name,
                                         distro_version=version).one()
-    except DoesNotExist:
+    except NoResultFound:
         abort(404)
     return render_template('distro.html', distro=distro)
