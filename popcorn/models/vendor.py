@@ -29,7 +29,7 @@ from popcorn.database import Base
 class Vendor(Base):
     __tablename__ = 'vendors'
     vendor_name = Column(String(20), primary_key=True)
-    vendor_url = Column(String(100), unique=True, nullable=False)
+    vendor_url = Column(String(100), unique=True, nullable=False, index=True)
 
     def __init__(self, vendor_url):
         self.vendor_url = vendor_url
