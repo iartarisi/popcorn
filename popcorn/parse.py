@@ -22,11 +22,16 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-from datetime import datetime
+"""Parse the submissions received from the clients and save them to the DB"""
 
+from datetime import date
 
-"""Parsing the submissions received from the clients and saving them to the DB"""
+from sqlalchemy.orm.exc import NoResultFound
+
 from popcorn.configs import submission_interval
+from popcorn.database import db_session
+from popcorn.models import (Arch, Distro, SubmissionPackage, Submission,
+                            System, Vendor)
 
 class FormatError(Exception):
     """Exception class for format errors found in a submission"""
@@ -35,39 +40,64 @@ class FormatError(Exception):
     def __str__(self):
         return "The submission format is invalid: %s" % self.message
 
-class EarlySubmission(Exception):
+class EarlySubmissionError(Exception):
     """Raised when another Submission has been submitted too soon for a System"""
-    def __init__(self, last_date, submission_interval):
+    def __init__(self, last_date):
         self.last_date = last_date
-        self.interval = submission_interval
     def __str__(self):
         return ("You need to wait %s days between submissions. "
                 "Your last recorded submission was on %s."
-                % (self.interval, self.last_date))
+                % (submission_interval, self.last_date))
 
 def parse_text(data):
     """Parse a plaintext submission, recording everything in the database"""
     datalines = data.splitlines()
     (popcorn, version, distro, distrover, arch, hw_uuid) = datalines[0].split()
 
-    system = System(hw_uuid, distro, distrover, arch)
-    
-    if not _can_submit(system):
-        raise EarlySubmission(system.last_submission.date, submission_interval)
+    try: # TEST THIS
+        system = System.query.filter_by(sys_hwuuid=hw_uuid).one()
+    except NoResultFound:
+        system = System(hw_uuid, arch, distro, distrover)
+        try:
+            Arch.query.filter_by(arch=arch).one()
+        except NoResultFound:
+            raise FormatError("unknown arch - " + arch)
 
-    sub = Submission(system, version)
+        try:
+            Distro.query.filter_by(distro_name=distro,
+                                   distro_version=distrover).one()
+        except NoResultFound:
+            distro = Distro(distro, distrover)
+            db_session.add(distro)
+        db_session.add(system)
+
+    # TODO: think about moving this to the model
+    if not _can_submit(system):
+        raise EarlySubmissionError(system.last_submission.sub_date)
+
+    sub = Submission(system.sys_hwuuid, version)
+    db_session.add(sub)
     for line in datalines[1:]:
         try:
             (status, name, version, release,
              epoch, arch, vendor) = line.split(None, 6)
-        except ValueError, e:
+        except ValueError, e: # test this
             raise FormatError(e.message)
-        assert status in ['v', 'r', 'o', 'n'], FormatError(
-            "the package's status could not be recognized")
+
+        try:
+            status = {'v': 'voted',
+                      'r': 'recent',
+                      'o': 'old',
+                      'n': 'no-files'}[status]
+        except KeyError:
+            raise FormatError("the package's status could not be recognized")
+
         vendor = Vendor(vendor)
-        package = Package(name, version, release, epoch,
-                          arch, vendor, status, sub)
-    rdb.save()
+        sp = SubmissionPackage(hw_uuid, date.today(), name, version, release,
+                               epoch, arch, vendor.vendor_name, status)
+        db_session.add(sp)
+
+    db_session.commit()
 
 def _can_submit(system):
     """Checks the Submission interval for this System
@@ -81,7 +111,7 @@ def _can_submit(system):
     last_sub = system.last_submission
     if not last_sub:
         return True
-    delta = datetime.now() - last_sub.datetime
+    delta = date.today() - last_sub.sub_date
     if submission_interval < delta.days:
         return True
     else:

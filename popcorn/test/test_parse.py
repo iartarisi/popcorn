@@ -22,69 +22,88 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-import datetime
-import unittest
+from datetime import date, timedelta
 
-from mock import Mock
+from popcorn.parse import (parse_text, _can_submit, EarlySubmissionError,
+                           FormatError)
 
-from popcorn.parse import parse_text, _can_submit, EarlySubmission
+from popcorn.models import System, Submission, SubmissionPackage, Vendor
+from popcorn.models.tests import ModelsTest
 
-
-class TestParsePopcorn(unittest.TestCase):
+class TestParsePopcorn(ModelsTest):
     def test_parse_popcorn_success_redis(self):
-        submission = ("POPCORN 0.1 openSUSE 11.4 x86_64 TEST_HW_UUID\n"
-                      "v python 2.5 1.1 None x86_64 http://repo.url\n"
-                      "o python-lint 1.1 1 None noarch http://repo.url\n")
-        parse_text(submission)
-        self.assertEqual(rdb.get('global:nextSubmissionId'), '1')
-        self.assertEqual(rdb.get('global:nextSystemId'), '1')
-        self.assertEqual(rdb.get('global:nextPackageId'), '2')
-        self.assertEqual(rdb.get(
-            'vendor:1:package:python-2.5-1.1.x86_64'), '1')
-        self.assertEqual(rdb.get(
-            'vendor:1:package:python-lint-1.1-1.noarch'), '2')
-        self.assertEqual(rdb.hget('package:1:status', 'voted'), '1')
-        self.assertEqual(rdb.hget('package:2:status', 'old'), '1')
+        self.assertEqual(System.query.filter_by(sys_hwuuid='TEST_HW_UUID'
+                                                ).count(), 0)
+        self.assertEqual(SubmissionPackage.query.all(), [])
+        subm_text = ("POPCORN 0.1 openSUSE 12.1 i586 TEST_HW_UUID\n"
+                     "v python 2.5 1.1 None x86_64 http://repo.url\n"
+                     "o python-lint 1.1 1 None noarch http://repo.url\n")
+        parse_text(subm_text)
 
-        self.assertEqual(rdb.smembers('vendors'), set(['1']))
-        self.assertEqual(rdb.smembers('vendor:1:packages'),
-                         set(['1', '2']))
-        self.assertEqual(rdb.smembers('distros'), set(['1']))
-        self.assertEqual(rdb.smembers('distro:1:systems'), set(['1']))
-        self.assertEqual(rdb.smembers('system:1:submissions'), set(['1']))
+        system = System.query.filter_by(sys_hwuuid='TEST_HW_UUID').one()
+        
+        self.assertEqual(len(system.submissions), 1)
 
-    def test_parse_raise_early_submission(self):
-        submission = ("POPCORN 0.1 openSUSE 11.4 x86_64 TEST_HW_UUID\n")
-        parse_text(submission)
-        self.assertEqual(rdb.scard('system:1:submissions'), 1)
-        self.assertRaises(EarlySubmission, parse_text, submission)
-        self.assertEqual(rdb.scard('system:1:submissions'), 1)
+        sub = system.last_submission
+        self.assertEqual(len(sub.submission_packages), 2)
+        self.assertEqual(SubmissionPackage.query.count(), 2)
+        self.assertEqual(Vendor.query.first().vendor_name, "http://repo.url")
 
-    def tearDown(self):
-        rdb.flushdb()
+        p1 = SubmissionPackage.query.filter_by(pkg_name="python").one()
+        self.assertEqual(p1.pkg_name, "python")
+        self.assertEqual(p1.pkg_version, "2.5")
+        self.assertEqual(p1.pkg_release, "1.1")
+        self.assertEqual(p1.pkg_epoch, "")
+        self.assertEqual(p1.pkg_arch, "x86_64")
+        self.assertEqual(p1.pkg_status, "voted")
 
-class TestCanSubmit(unittest.TestCase):
+    def test_parse_unknown_arch_error(self):
+        subm_text = ("POPCORN 0.1 Fedora 12 unknown-arch TEST_HW_UUID\n")
+
+        self.assertRaises(FormatError, parse_text, subm_text)
+
+    def test_parse_early_submission_error(self):
+        system = System.query.first()
+
+        sub = Submission(system.sys_hwuuid, '0.1', date.today())
+        self.db_session.add(sub)
+        self.db_session.commit()
+        self.assertEqual(system.submissions, [sub])
+
+        submission = ("POPCORN 0.1 openSUSE 11.4 x86_64 %s\n"
+                      % system.sys_hwuuid)
+
+        self.assertRaises(EarlySubmissionError, parse_text, submission)
+        self.assertEqual(system.submissions, [sub])
+
+
+class TestCanSubmit(ModelsTest):
     def test_can_submit(self):
-        # Mock a System object (we only need system.last_submission.datetime)
-        system = Mock()
-        system.last_submission = Mock()
-        # 400 days ago should be fine for the last submission
-        last_time = datetime.datetime.now() - datetime.timedelta(400)
-        system.last_submission.datetime = last_time
+        system = System.query.first()
+
+        # make a submission 400 days ago
+        sub1 = Submission(system.sys_hwuuid, 'POPCORN1',
+                          date.today() - timedelta(days=400))
+        self.db_session.add(sub1)
+        self.db_session.commit()
+        self.assertEqual(system.last_submission, sub1)
 
         self.assertTrue(_can_submit(system))
 
     def test_can_submit_no_last_submission(self):
-        system = Mock()
-        system.last_submission = None
+        system = System.query.first()
 
+        self.assertIsNone(system.last_submission)
         self.assertTrue(_can_submit(system))
 
     def test_can_submit_too_early(self):
-        system = Mock()
-        system.last_submission = Mock()
+        system = System.query.first()
+
         # 1 day ago should be too early for another submission
-        last_time = datetime.datetime.now() - datetime.timedelta(1)
-        system.last_submission.datetime = last_time
+        sub1 = Submission(system.sys_hwuuid, 'POPCORN 1',
+                          date.today() - timedelta(1))
+        self.db_session.add(sub1)
+        self.db_session.commit()
+        self.assertEqual(system.last_submission, sub1)
 
         self.assertFalse(_can_submit(system))

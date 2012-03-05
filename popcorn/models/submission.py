@@ -25,8 +25,12 @@
 from datetime import date
 
 from sqlalchemy import Column, Date, ForeignKey, String
+from sqlalchemy.orm import relationship
 
 from popcorn.database import Base
+
+class SubmissionError(Exception):
+    pass
 
 class Submission(Base):
     __tablename__ = 'submissions'
@@ -34,6 +38,8 @@ class Submission(Base):
     sys_hwuuid = Column(String(36), ForeignKey('systems.sys_hwuuid'),
                         primary_key=True)
     popcorn_version = Column(String(30), nullable=False)
+
+    submission_packages = relationship('SubmissionPackage')
 
     def __init__(self, sys_hwuuid, popcorn_version, date=date.today()):
         self.sub_date = date

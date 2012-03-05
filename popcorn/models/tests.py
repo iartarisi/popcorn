@@ -49,30 +49,24 @@ class ModelsTest(unittest.TestCase):
 
         Base.metadata.create_all(bind=engine)
 
-        self.a = Arch('i586')
-        self.d1 = Distro('Fedora', '16')
-        self.d2 = Distro('openSUSE', '12.1')
-        self.s1 = System('hw_uuid1', 'i586', 'Fedora', '16')
-        self.s2 = System('hw_uuid2', 'i586', 'openSUSE', '12.1')
-        db_session.add(self.a)
-        db_session.add(self.d1)
-        db_session.add(self.d2)
-        # system is dependent on both arch and distro already being in the db
+        db_session.add_all([Arch('i586'), Arch('x86_64'), Arch('noarch')])
+        db_session.add_all([Distro('Fedora', '16'), Distro('openSUSE', '12.1')])
+        db_session.add_all([PackageStatus('voted'), PackageStatus('recent'),
+                            PackageStatus('no-files'), PackageStatus('old')])
+        db_session.add(Vendor('http://repo.url'))
         db_session.flush()
 
-        db_session.add(self.s1)
-        db_session.add(self.s2)
+        # system is dependent on both arches and distros already being in the db
+        db_session.add_all([System('hw_uuid1', 'i586', 'Fedora', '16'),
+                            System('hw_uuid2', 'i586', 'openSUSE', '12.1')])
         db_session.commit()
+
+        self.db_session = db_session
 
     def tearDown(self):
         db_session.remove()
 
-    def test_created(self):
-        self.assertEqual(Distro.query.all(), [self.d1, self.d2])
-        self.assertEqual(Arch.query.all(), [self.a])
-        self.assertEqual(System.query.all(), [self.s1, self.s2])
-        self.assertEqual(self.d1.systems, [self.s1])
-
+class ModelsSimpleTests(ModelsTest):
     def test_system_foreign_key_constraint(self):
         db_session.add(System('hw_uu', 'i586', 'bogus', 'bogus'))
 
@@ -84,11 +78,15 @@ class ModelsTest(unittest.TestCase):
 
     def test_submission_creation(self):
         sub = Submission('hw_uuid1', 'POPCORN v0.0.1')
+
+        s1 = System.query.first()
+        self.assertEqual(s1.submissions, [])
+
         db_session.add(sub)
-        db_session.flush()
+        db_session.commit()
 
         self.assertEqual(Submission.query.all(), [sub])
-        self.assertEqual(self.s1.submissions, [sub])
+        self.assertEqual(s1.submissions, [sub])
 
     def test_submission_foreign_key_constraint(self):
         sub = Submission('bogus', 'POPCORN v0.0.1')
@@ -98,12 +96,10 @@ class ModelsTest(unittest.TestCase):
 
     def test_submission_package_creation(self):
         sub = Submission('hw_uuid1', 'POPCORN v0.0.1')
-        status = PackageStatus('voted')
         vendor = Vendor('repo1')
         subp = SubmissionPackage('hw_uuid1', date.today(), 'python', '2.7',
                                  '3', '', 'i586', 'repo1', 'voted')
         db_session.add(sub)
-        db_session.add(status)
         db_session.add(vendor)
         db_session.flush()
         db_session.add(subp)
@@ -116,8 +112,14 @@ class ModelsTest(unittest.TestCase):
         sub2 = Submission('hw_uuid2', 'P1', date.today() - timedelta(days=31*2))
         sub3 = Submission('hw_uuid1', 'P1', date.today() - timedelta(days=31*3))
 
-        db_session.add_all([sub1, sub2, sub3])
-        db_session.flush()
+        s1 = System.query.first()
+        self.assertIsNone(s1.last_submission)
 
-        self.assertEqual([sub1, sub3], self.s1.submissions)
-        self.assertEqual(sub1, self.s1.last_submission)
+        db_session.add_all([sub1, sub2, sub3])
+        db_session.commit()
+
+        self.assertEqual([sub1, sub3], s1.submissions)
+        self.assertEqual(sub1, s1.last_submission)
+
+    def test_submission_package_no_epoch(self):
+        sub = Submission("hw_uuid1", "P1", date.today())

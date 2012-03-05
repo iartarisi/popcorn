@@ -35,7 +35,8 @@ class System(Base):
     distro_version = Column(String(10), nullable=False)
     arch = Column(String(10), ForeignKey('arches.arch'), nullable=False)
 
-    submissions = relationship('Submission', order_by=Submission.sub_date.desc())
+    submissions = relationship('Submission', backref='system',
+                               order_by=Submission.sub_date.desc())
 
     __table_args__ = (
         ForeignKeyConstraint([distro_name, distro_version],

@@ -59,7 +59,7 @@ class SubmissionPackage(Base):
         self.pkg_name = pkg_name
         self.pkg_version = pkg_version
         self.pkg_release = pkg_release
-        self.pkg_epoch = pkg_epoch
+        self.pkg_epoch = pkg_epoch if pkg_epoch != "None" else ""
         self.pkg_arch = pkg_arch
         self.vendor_name = vendor_name
         self.pkg_status = pkg_status
