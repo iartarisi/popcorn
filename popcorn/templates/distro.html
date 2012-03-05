@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 {% block body %}
-<h2>Distro {{distro.name}}-{{distro.version}}</h2>
+<h2>Distro {{ distro.distro_name }}-{{ distro.distro_version }}</h2>
 <p>Systems:</p>
 <ul>
-  {% for sysid, hw_uuid in distro.systems %}
-  <li><a href="/system/{{ hw_uuid }}">{{hw_uuid}}</a></li>
+  {% for sys in distro.systems %}
+  <li><a href="/system/{{ sys.sys_hwuuid }}">{{sys.sys_hwuuid}}</a></li>
   {% endfor %}
 </ul>
 {% endblock %}

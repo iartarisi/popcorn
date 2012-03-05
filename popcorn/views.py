@@ -84,11 +84,12 @@ def package(pkg_id):
         abort(404)
     return render_template('package.html', package=pkg)
 
-@app.route('/distro/<distro_id>')
-def distro(distro_id):
+@app.route('/distro/<name>_<version>')
+def distro(name, version):
     """Return a Distro object"""
     try:
-        dist = Distro.find(distro_id)
+        distro = Distro.query.filter_by(distro_name=name,
+                                        distro_version=version).one()
     except DoesNotExist:
         abort(404)
-    return render_template('distro.html', distro=dist)
+    return render_template('distro.html', distro=distro)
