@@ -26,7 +26,7 @@ from flask import abort, render_template, request
 from sqlalchemy.orm.exc import NoResultFound
 
 from popcorn import app
-from popcorn.models import Distro, Vendor
+from popcorn.models import Distro, System, Vendor
 from popcorn.parse import FormatError, EarlySubmissionError, parse_text
 
 @app.route('/', methods=['GET'])
@@ -66,14 +66,14 @@ def submission(sub_id):
         abort(404)
     return render_template('submission.html', submission=sub)
 
-@app.route('/system/<hw_uuid>')
-def system(hw_uuid):
+@app.route('/system/<hwuuid>')
+def system(hwuuid):
     """Return a System object"""
     try:
-        sys = System(hw_uuid)
+        system = System.query.filter_by(sys_hwuuid=hwuuid).one()
     except NoResultFound:
         abort(404)
-    return render_template('system.html', system=sys)
+    return render_template('system.html', system=system)
 
 @app.route('/package/<pkg_id>')
 def package(pkg_id):
