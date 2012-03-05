@@ -94,7 +94,7 @@ def parse_text(data):
             raise FormatError("the package's status could not be recognized")
 
         try:
-            vendor = Vendor.query.filter_by(vendor_url=vendor).one()
+            vendor = Vendor.query.filter_by(vendor_name=vendor[:20]).one()
         except NoResultFound:
             vendor = Vendor(vendor)
             db_session.add(vendor)
