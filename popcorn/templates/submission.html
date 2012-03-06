@@ -1,10 +1,19 @@
 {% extends "layout.html" %}
 {% block body %}
-<h2>Submission {{submission.id}}</h2>
+<h2>Submission from {{ submission.sys_hwuuid }}
+    on {{ submission.sub_date }}
+</h2>
 <p>Packages:</p>
 <ul>
-  {% for pid, pname, pstatus in submission.get_package_names_with_status() %}
-  <li><a href="/package/{{pid}}">{{ pname }} - {{ pstatus }}</a></li>
+  {% for p in submission.submission_packages %}
+  <li>
+    {% if p.pkg_epoch %}
+    <a href="/package/{{ p.pkg_name }}/{{ p.pkg_version}}/{{ p.pkg_release }}/{{ p.pkg_epoch }}/{{ p.pkg_arch }}">{{ p.nvrea }}</a></li>
+    {% else %}
+    <a href="/package/{{ p.pkg_name }}/{{ p.pkg_version}}/{{ p.pkg_release }}/{{ p.pkg_arch }}">{{ p.nvrea }}</a></li>
+
+    {% endif %}
+  </li>
   {% endfor %}
 </ul>
 {% endblock %}

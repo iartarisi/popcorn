@@ -26,8 +26,9 @@ from flask import abort, render_template, request
 from sqlalchemy.orm.exc import NoResultFound
 
 from popcorn import app
-from popcorn.models import Distro, System, Vendor
 from popcorn.parse import FormatError, EarlySubmissionError, parse_text
+from popcorn.models import (Distro, SubmissionPackage, Submission,
+                            System, Vendor)
 
 @app.route('/', methods=['GET'])
 def index():
@@ -57,11 +58,12 @@ def vendor(vendor_name):
         abort(404)
     return render_template('vendor.html', vendor=vendor)
 
-@app.route('/submission/<sub_id>')
-def submission(sub_id):
+@app.route('/system/<hwuuid>/submission/<sub_date>')
+def submission(hwuuid, sub_date):
     """Return a Submission object"""
     try:
-        sub = Submission.find(sub_id)
+        sub = Submission.query.filter_by(
+            sys_hwuuid=hwuuid, sub_date=sub_date).one()
     except NoResultFound:
         abort(404)
     return render_template('submission.html', submission=sub)

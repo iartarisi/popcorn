@@ -78,3 +78,16 @@ class SubmissionPackage(Base):
                              arch=self.pkg_arch,
                              status=self.pkg_status,
                              **self.__dict__)
+
+    @property
+    def nvrea(self):
+        if self.pkg_epoch:
+            nvrea = "%(name)s-%(ver)s-%(rel)s-%(epoch)s.%(arch)s"
+        else:
+            nvrea = "%(name)s-%(ver)s-%(rel)s.%(arch)s"
+
+        return nvrea % dict(name=self.pkg_name,
+                            ver=self.pkg_version,
+                            rel=self.pkg_release,
+                            epoch=self.pkg_epoch,
+                            arch=self.pkg_arch)
