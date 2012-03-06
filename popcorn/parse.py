@@ -89,7 +89,7 @@ def parse_text(data):
             status = {'v': 'voted',
                       'r': 'recent',
                       'o': 'old',
-                      'n': 'no-files'}[status]
+                      'n': 'nofiles'}[status]
         except KeyError:
             raise FormatError("the package's status could not be recognized")
 
