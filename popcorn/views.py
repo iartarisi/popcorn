@@ -23,9 +23,12 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 from flask import abort, render_template, request
+
+from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 
 from popcorn import app
+from popcorn.database import db_session
 from popcorn.parse import FormatError, EarlySubmissionError, parse_text
 from popcorn.models import (Distro, SubmissionPackage, Submission,
                             System, Vendor)
@@ -77,14 +80,36 @@ def system(hwuuid):
         abort(404)
     return render_template('system.html', system=system)
 
-@app.route('/package/<pkg_id>')
-def package(pkg_id):
+# TODO this could be breadcrumbs, where you can put in as many arguments
+# as you want and get as much information back, i.e. put in name,
+# release and version and get all the arches, epochs, statuses with
+# links
+@app.route('/package/<name>/<version>/<release>/<arch>')
+@app.route('/package/<name>/<version>/<release>/<epoch>/<arch>')
+def package(name, version, release, arch, epoch=''):
     """Return a Package object"""
-    try:
-        pkg = Package.find(pkg_id)
-    except NoResultFound:
+
+    pkgs = SubmissionPackage.query.filter_by(
+        pkg_name=name, pkg_version=version, pkg_release=release,
+        pkg_epoch=epoch, pkg_arch=arch).all()
+    if not pkgs:
         abort(404)
-    return render_template('package.html', package=pkg)
+
+    pkg_statuses = db_session.query(
+        SubmissionPackage.pkg_status, func.count(SubmissionPackage.pkg_status)
+        ).filter_by(
+        pkg_name=name, pkg_version=version, pkg_release=release,
+        pkg_epoch=epoch, pkg_arch=arch
+        ).group_by(
+            SubmissionPackage.pkg_status).all()
+    statuses = dict()
+    for k, v in pkg_statuses:
+        statuses[k] = v
+    print statuses
+        
+    return render_template('packages.html',
+                           generic_package=pkgs[0],
+                           packages=pkgs, **statuses)
 
 @app.route('/distro/<name>_<version>')
 def distro(name, version):

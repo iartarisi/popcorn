@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block body %}
+<h2>Package</h2>
+<p>Name: {{ generic_package.pkg_name }}</p>
+<p>Version: {{ generic_package.pkg_version }}</p>
+<p>Release: {{ generic_package.pkg_release }}</p>
+<p>Arch: {{ generic_package.pkg_arch }}</p>
+{% if generic_package.pkg_epoch %}
+<p>Epoch: {{ generic_package.pkg_epoch }}</p>
+{% endif %}
+
+<p>Voted: {{ voted | default(0) }}</p>
+<p>Recent: {{ recent or 0 }}</p>
+<p>No-files: {{ nofiles or 0 }}</p>
+<p>Old: {{ old or 0 }}</p>
+{% endblock %}
