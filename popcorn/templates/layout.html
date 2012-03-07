@@ -1,6 +1,9 @@
 <!doctype html>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-<title>Popcorn eats you!</title>
+<head>
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+  <title>Popcorn eats you!</title>
+  {% block javascript %}{% endblock %}
+</head>
 <div id="box">
   <div id="page">
     <h1>Popcorn eats you!</h1>
