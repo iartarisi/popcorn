@@ -22,8 +22,9 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-from flask import abort, render_template, request
+import json
 
+from flask import abort, render_template, request
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -37,7 +38,19 @@ from popcorn.models import (Distro, SubmissionPackage, Submission,
 def index():
     distros = Distro.query.all()
     vendors = Vendor.query.all()
-    return render_template('index.html', distros=distros, vendors=vendors)
+
+    # packages by distro
+    # XXX think about moving this to the model
+    distro_packages = db_session.query(
+        Distro.distro_name, func.count(SubmissionPackage.pkg_name)
+        ).select_from(SubmissionPackage).join(System).join(Distro
+        ).group_by(Distro.distro_name).all()
+
+    # transform the list of tuples returned by SQLA into a nested JS array
+    distro_packages = json.dumps(distro_packages)
+    return render_template('index.html',
+                           distros=distros, vendors=vendors,
+                           distro_packages=distro_packages)
 
 @app.route('/', methods=['POST'])
 def receive_submission():
