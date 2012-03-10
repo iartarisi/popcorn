@@ -34,10 +34,10 @@ import socket
 import sys
 import time
 
-popcorn_post_server = 'popcorn.opensuse.org'
-VERSION             = '0.1'
-popcorn_post_uri    = '/'
-HWUUID_FILE         = '/etc/smolt/hw-uuid'
+POST_SERVER = 'localhost:5000'
+POST_URI    = '/'
+VERSION     = '0.1'
+HWUUID_FILE = '/etc/smolt/hw-uuid'
 
 days_recent = 30
 days_voted  = 30
@@ -137,9 +137,9 @@ class Client:
         """
         (content_type, body) = multipart(self.data)
         headers = {"Content-Type": content_type,}
-        conn = httplib.HTTPConnection(popcorn_post_server)
+        conn = httplib.HTTPConnection(POST_SERVER)
         try:
-            conn.request("POST", popcorn_post_uri, body, headers)
+            conn.request("POST", POST_URI, body, headers)
         except socket.error, e:
             sys.exit("Could not connect to the Popcorn server. %s" % e)
         response = conn.getresponse()
