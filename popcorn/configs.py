@@ -22,11 +22,4 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-from ConfigParser import RawConfigParser
-
-CONFIG_FILE = '/etc/popcorn-server.conf'
-
-config = RawConfigParser()
-config.read(CONFIG_FILE)
-
-submission_interval = int(config.get('app', 'submission_interval'))
+SUBMISSION_INTERVAL = 30

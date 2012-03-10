@@ -29,7 +29,7 @@ from datetime import date
 from sqlalchemy.exc import DataError
 from sqlalchemy.orm.exc import NoResultFound
 
-from popcorn.configs import submission_interval
+from popcorn.configs import SUBMISSION_INTERVAL
 from popcorn.database import db_session
 from popcorn.models import (Arch, Distro, SubmissionPackage, Submission,
                             System, Vendor)
@@ -48,7 +48,7 @@ class EarlySubmissionError(Exception):
     def __str__(self):
         return ("You need to wait %s days between submissions. "
                 "Your last recorded submission was on %s."
-                % (submission_interval, self.last_date))
+                % (SUBMISSION_INTERVAL, self.last_date))
 
 def parse_text(data):
     """Parse a plaintext submission, recording everything in the database"""
@@ -125,7 +125,7 @@ def _can_submit(system):
     if not last_sub:
         return True
     delta = date.today() - last_sub.sub_date
-    if submission_interval < delta.days:
+    if SUBMISSION_INTERVAL < delta.days:
         return True
     else:
         return False
