@@ -39,7 +39,16 @@ Base.query = db_session.query_property()
 import popcorn.models
 
 def init_db():
+    Arch, Status = popcorn.models.Arch, popcorn.models.PackageStatus
+
     Base.metadata.create_all(bind=engine)
+    # TODO think about having only one arch for i?86
+    db_session.add_all([Arch('noarch'), Arch('i586'), Arch('i686'),
+                        Arch('i486'), Arch('i386'), Arch('x86_64'),
+                        Arch('ppc'), Arch('ppc64'), Arch('s390'),
+                        Status('voted'), Status('nofiles'),
+                        Status('recent'), Status('old')])
+    db_session.commit()
 
 def drop_db():
     Base.metadata.drop_all(bind=engine)
