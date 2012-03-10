@@ -1,7 +1,7 @@
 POPCORN - Popularity Contest (for RPM)
 ======================================
 
-MIT License
+**MIT License**
 
 Copyright (c) 2009-2011 Pavol Rusnak <stick@gk2.sk>
 
@@ -39,10 +39,12 @@ Packages
 --------
 
 popcorn-client
+
 * client-side written in Python
 * gathers info about packages and sends to server (via HTTP POST)
 
 popcorn-server
+
 * server which receives, processes, stores and displays submissions
 * see README.server for more information
 
