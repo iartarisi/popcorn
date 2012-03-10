@@ -1,9 +1,10 @@
 POPCORN - Popularity Contest (for RPM)
---------------------------------------
+======================================
 
 Licensed under MIT License
 Copyright (c) 2009-2011 Pavol Rusnak <stick@gk2.sk>
-Copyright (c) 2011 Ionuț Arțăriși <iartarisi@suse.cz>
+Copyright (c) 2011-2012 Ionuț Arțăriși <iartarisi@suse.cz>
+
 
 Introduction
 ------------
@@ -22,7 +23,7 @@ four categories depending on the package install time and package access time:
 * (o) old
   - package is older than 30 days and hasn't been used recently
   - ( now - install_time > 30 days ) and ( now - access_time > 30 days)
-* (n) no-files
+* (n) nofiles
   - there are no watched files present in the package
   - access_time = 0
 
@@ -31,26 +32,34 @@ number of the installed packages.
 
 Popcorn is inspired by Debian Popcon available from http://popcon.debian.org/
 
-Files
------
+
+Packages
+--------
 
 popcorn-client
   * client-side written in Python
-  * gathers info about packages and sends to server (either via e-mail or HTTP POST)
-  * is called from cron every week (random time for each machine)
+  * gathers info about packages and sends to server (via HTTP POST)
+
+popcorn-server
+  * server which receives, processes, stores and displays submissions
+  * see README.server for more information
+
 
 Submission format
 -----------------
 
-Format is simple plaintext. First line contains string POPCORN followed by the
-popcorn version, machine architecture and uuid. Then the list of packages follows.
-Each line represents one package, values are separated by space. First value is
-one character describing the category (see Introduction), second value is the
-package name, third and fourth are version and release, fifth and sixth
-are architecture and repository of the package.
+Format is plaintext. The first line contains the string POPCORN followed
+by the popcorn version, distribution name and version, machine
+architecture and uuid. Then the list of packages follows.
 
-Plaintext size is around 100 KiB on casual machine, which could be later compressed
-to around 20 KiB using HTTP gzip compression.
+Each line represents one package, values are separated by space. First
+value is one character describing the category (see Introduction),
+second value is the package name, third, fourth and fifth are version,
+release and epoch, sixth and seventh are architecture and repository of
+the package.
+
+Plaintext size is around 100 KiB on casual machine, which could be later
+compressed to around 20 KiB using HTTP gzip compression.
 
 Format:
 
@@ -67,6 +76,7 @@ o libfolks0 0.2.0 1.2 None i586 obs://build.opensuse.org/GNOME
 v enchant 1.6.0 2.3 1 i586 openSUSE
 o libx264-112 0.112svn20110115 1.pm.2.6 None i586 http://packman.links2linux.de
 n myspell-british 20100316 16.1 None noarch Uknown
+
 
 Watched files
 -------------
@@ -88,4 +98,7 @@ in the following directories are watched:
 /usr/sbin
 
 Note: if some of the filesystems are mounted with noatime, the packages
-      from this filesystem are always in category 'no-files'
+      from this filesystem are always in the category 'nofiles'
+
+
+**Please check README.server for information on setting up the server**
