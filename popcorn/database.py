@@ -26,8 +26,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('postgresql://popcorn:popcorn@localhost/popcorn',
-                       convert_unicode=True)
+from popcorn.configs import DB_ENGINE
+
+
+engine = create_engine(DB_ENGINE, convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))
