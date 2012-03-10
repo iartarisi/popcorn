@@ -2,7 +2,6 @@
 <head>
   <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
   <title>Popcorn eats you!</title>
-  {% block javascript %}{% endblock %}
 </head>
 <div id="box">
   <div id="page">
@@ -10,4 +9,5 @@
     {% block body %}{% endblock %}
   </div>    
   <div id="footer">The lizards say: <em>follow the <a href="http://github.com/mapleoin/popcorn">source</a>!</em></div>
+  {% block javascript %}{% endblock %}
 </div>
