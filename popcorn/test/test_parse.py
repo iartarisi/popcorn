@@ -26,9 +26,9 @@ from datetime import date, timedelta
 
 from popcorn.parse import (parse_text, _can_submit, EarlySubmissionError,
                            FormatError)
-
 from popcorn.models import System, Submission, SubmissionPackage, Vendor
-from popcorn.models.tests import ModelsTest
+
+from popcorn.test.test_models import ModelsTest
 
 class TestParsePopcorn(ModelsTest):
     def test_parse_popcorn_success_redis(self):
