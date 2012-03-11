@@ -25,7 +25,11 @@
 """Glue tests to ensure relationships between tables and other constraints"""
 
 from datetime import date, timedelta
-import unittest
+import sys
+if sys.version >= '2.7':
+    import unittest
+else:
+    import unittest2 as unittest
 
 from sqlalchemy import create_engine, event
 from sqlalchemy.exc import IntegrityError
