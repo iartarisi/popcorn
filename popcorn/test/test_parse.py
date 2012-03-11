@@ -24,9 +24,11 @@
 
 from datetime import date, timedelta
 
+from sqlalchemy.orm.exc import NoResultFound
+
 from popcorn.parse import (parse_text, _can_submit, EarlySubmissionError,
                            FormatError)
-from popcorn.models import System, Submission, SubmissionPackage, Vendor
+from popcorn.models import Distro, System, Submission, SubmissionPackage, Vendor
 
 from popcorn.test.test_models import ModelsTest
 
@@ -76,6 +78,17 @@ class TestParsePopcorn(ModelsTest):
         self.assertRaises(EarlySubmissionError, parse_text, submission)
         self.assertEqual(system.submissions, [sub])
 
+    def test_parse_distro_doesnt_exist_gets_created(self):
+        self.assertRaises(NoResultFound,
+                          Distro.query.filter_by(distro_name="new_Distro").one)
+
+        parse_text("POPCORN 0.1 Distroxillix 1.0 x86_64 some_hwwuid\n")
+
+        distro = Distro.query.filter_by(distro_name="Distroxillix").one()
+
+        self.assertEqual("Distroxillix", distro.distro_name)
+        self.assertEqual("1.0", distro.distro_version)
+        
 
 class TestCanSubmit(ModelsTest):
     def test_can_submit(self):
