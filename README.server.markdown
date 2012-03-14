@@ -17,9 +17,9 @@ $ virtualenv vpopcorn
 $ source vpopcorn/bin/activate
 ```
 
-You will need the postgresql development files to install psycopg2 which
+You will need the python development files and the postgresql development files to install psycopg2 which
 is a required dependency for popcorn you should install this using your
-distribution's package manager. Example: `zypper install gcc postgresql-devel`
+distribution's package manager. Example: `zypper install gcc python-devel postgresql-devel`
 
 Set up your development environment. This will add the popcorn package
 to your python path, but will not install it anywhere else. You can now
@@ -39,7 +39,7 @@ Install and setup postgresql-server for your distribution, then turn it
 on. Create the popcorn user and database.
 
 ```
-$ su - postgres
+$ su - postgres #run as root
 $ createuser popcorn -P
 Enter password for new role: <enter popcorn as the password>
 Enter it again: <popcorn again>
@@ -47,6 +47,13 @@ Shall the new role be a superuser? (y/n) n
 Shall the new role be allowed to create databases? (y/n) n
 Shall the new role be allowed to create more new roles? (y/n) n
 $ createdb popcorn --owner=popcorn
+```
+
+Add these records to `pg_hba.conf` file(present in `$PGDATA`):
+
+```
+host    popcorn    popcorn    127.0.0.1/32    trust
+host    popcorn    popcorn    ::1/128         trust
 ```
 
 If you've set different values here than the default, edit `DB_ENGINE` in
@@ -85,3 +92,4 @@ Submission received. Thanks!
 
 If you now look on the popcorn webUI, you should see a lot of data about
 your currently installed packages.
+
