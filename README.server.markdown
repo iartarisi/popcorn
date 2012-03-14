@@ -1,5 +1,4 @@
-Server setup
-------------
+## Server setup
 
 The server is using in Python, using the Flask web framework and SQLAlchemy for the models.
 
@@ -35,6 +34,9 @@ You can check that the unittests run fine
 
 ```$ ./setup.py test```
 
+
+### Setup the database
+
 Install and setup postgresql-server for your distribution, then turn it
 on. Create the popcorn user and database.
 
@@ -51,6 +53,25 @@ $ createdb popcorn --owner=popcorn
 
 If you've set different values here than the default, edit `DB_ENGINE` in
  `popcorn/configs.py` and set them there as well
+
+Setup the database to use md5 authentication for local users by editing your system's `pg_hba.conf` file and replacing these lines:
+
+```
+# "local" is for Unix domain socket connections only
+local   all         all                               ident sameuser
+# IPv4 local connections:
+host    all         all         127.0.0.1/32          ident sameuser
+```
+
+with these:
+
+```
+# "local" is for Unix domain socket connections only
+local   all         all                               md5
+# IPv4 local connections:
+host    all         all         127.0.0.1/32          md5
+```
+
 
 Initialize the database (installs tables and initial data).
 
@@ -70,8 +91,7 @@ You can now point your browser to http://127.0.0.1:5000/ (there won't be
  much to see).
 
 
-Client
-------
+## Client
  
 In order to test the client, you will need to have the `python-rpm`
 package installed. It's easier to do this from outside the virtualenv,
