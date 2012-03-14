@@ -17,9 +17,9 @@ $ virtualenv vpopcorn
 $ source vpopcorn/bin/activate
 ```
 
-You will need the postgresql development files to install psycopg2 which
+You will need the postgresql and python development files to install psycopg2 which
 is a required dependency for popcorn you should install this using your
-distribution's package manager. Example: `zypper install gcc postgresql-devel`
+distribution's package manager. Example: `zypper install gcc python-devel postgresql-devel`
 
 Set up your development environment. This will add the popcorn package
 to your python path, but will not install it anywhere else. You can now
