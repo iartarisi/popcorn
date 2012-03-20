@@ -37,12 +37,6 @@ from popcorn.pagination import Pagination
 
 PER_PAGE = 50
 
-def url_for_other_page(page):
-    args = request.view_args.copy()
-    args['page'] = page
-    return url_for(request.endpoint, **args)
-app.jinja_env.globals['url_for_other_page'] = url_for_other_page
-
 @app.route('/', methods=['GET'])
 def index():
     distros = Distro.query.all()
@@ -83,22 +77,24 @@ def vendor(vendor_name):
         abort(404)
     return render_template('vendor.html', vendor=vendor)
 
-@app.route('/system/<hwuuid>/submission/<sub_date>/',
-           defaults={'page': 1})
-@app.route('/system/<hwuuid>/submission/<sub_date>/<int:page>')
-def submission(hwuuid, sub_date, page):
+@app.route('/system/<hwuuid>/submission/<sub_date>/')
+def submission(hwuuid, sub_date):
     """Return a Submission object"""
     try:
         sub = Submission.query.filter_by(
             sys_hwuuid=hwuuid, sub_date=sub_date).one()
     except NoResultFound:
         abort(404)
-    count = len(sub.submission_packages)
+    page = request.args.get('page', 0, type=int)
+    packages = sub.submission_packages
+    count = len(packages)
     pagination = Pagination(page, PER_PAGE, count)
-    if page > pagination.pages:
-        abort(404)
+    if page:
+        packages = packages[pagination.start:pagination.end + 1]
+        if page > pagination.pages:
+            abort(404)
     return render_template('submission.html', submission=sub,
-            pagination=pagination)
+                           pagination=pagination, packages=packages)
 
 @app.route('/system/<hwuuid>')
 def system(hwuuid):

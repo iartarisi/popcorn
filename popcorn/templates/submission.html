@@ -6,7 +6,7 @@
 </h2>
 <p>Packages:</p>
 <ul>
-  {% for p in submission.submission_packages[pagination.start:pagination.end + 1] %}
+  {% for p in packages %}
   <li>
     {% if p.pkg_epoch %}
     <a href="/package/{{ p.pkg_name }}/{{ p.pkg_version}}/{{ p.pkg_release }}/{{ p.pkg_epoch }}/{{ p.pkg_arch }}">{{ p.nvrea }}</a></li>

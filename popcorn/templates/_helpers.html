@@ -17,5 +17,6 @@
   {% if pagination.has_next %}
     <a href="{{ url_for_other_page(pagination.page + 1) }}">Next &raquo;</a>
   {% endif %}
+  <a href="{{ url_for_other_page() }}">All</a>
   </div>
 {% endmacro %}
