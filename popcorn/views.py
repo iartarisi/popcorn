@@ -24,7 +24,7 @@
 
 import json
 
-from flask import abort, render_template, request
+from flask import abort, render_template, request, redirect, url_for
 from sqlalchemy import func
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -33,6 +33,9 @@ from popcorn.database import db_session
 from popcorn.parse import FormatError, EarlySubmissionError, parse_text
 from popcorn.models import (Distro, SubmissionPackage, Submission,
                             System, Vendor)
+from popcorn.pagination import Pagination
+
+PER_PAGE = 50
 
 @app.route('/', methods=['GET'])
 def index():
@@ -74,7 +77,7 @@ def vendor(vendor_name):
         abort(404)
     return render_template('vendor.html', vendor=vendor)
 
-@app.route('/system/<hwuuid>/submission/<sub_date>')
+@app.route('/system/<hwuuid>/submission/<sub_date>/')
 def submission(hwuuid, sub_date):
     """Return a Submission object"""
     try:
@@ -82,7 +85,16 @@ def submission(hwuuid, sub_date):
             sys_hwuuid=hwuuid, sub_date=sub_date).one()
     except NoResultFound:
         abort(404)
-    return render_template('submission.html', submission=sub)
+    page = request.args.get('page', 0, type=int)
+    packages = sub.submission_packages
+    count = len(packages)
+    pagination = Pagination(page, PER_PAGE, count)
+    if page:
+        packages = packages[pagination.start:pagination.end + 1]
+        if page > pagination.pages:
+            abort(404)
+    return render_template('submission.html', submission=sub,
+                           pagination=pagination, packages=packages)
 
 @app.route('/system/<hwuuid>')
 def system(hwuuid):

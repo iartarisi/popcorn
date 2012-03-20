@@ -1,11 +1,12 @@
 {% extends "layout.html" %}
+{% from '_helpers.html' import render_pagination %}
 {% block body %}
 <h2>Submission from {{ submission.sys_hwuuid }}
     on {{ submission.sub_date }}
 </h2>
 <p>Packages:</p>
 <ul>
-  {% for p in submission.submission_packages %}
+  {% for p in packages %}
   <li>
     {% if p.pkg_epoch %}
     <a href="/package/{{ p.pkg_name }}/{{ p.pkg_version}}/{{ p.pkg_release }}/{{ p.pkg_epoch }}/{{ p.pkg_arch }}">{{ p.nvrea }}</a></li>
@@ -16,4 +17,5 @@
   </li>
   {% endfor %}
 </ul>
+{{ render_pagination(pagination) }}
 {% endblock %}
