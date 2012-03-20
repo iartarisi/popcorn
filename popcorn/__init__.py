@@ -21,7 +21,7 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
-from flask import Flask
+from flask import Flask, url_for, request
 
 from popcorn.database import db_session
 
@@ -32,3 +32,12 @@ import popcorn.views
 @app.teardown_request
 def shutdown_session(exception=None):
     db_session.remove()
+
+def url_for_other_page(page=None):
+    """ Return url for page if specified, else for all """
+    args = request.view_args.copy()
+    if page:
+        args['page'] = page
+    return url_for(request.endpoint, **args)
+
+app.jinja_env.globals['url_for_other_page'] = url_for_other_page
