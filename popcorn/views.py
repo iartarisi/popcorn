@@ -23,6 +23,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 import json
+import gzip
 
 from flask import abort, render_template, request, redirect, url_for
 from sqlalchemy import func
@@ -58,6 +59,8 @@ def index():
 @app.route('/', methods=['POST'])
 def receive_submission():
     f = request.files['popcorn']
+    if f.content_type == 'gzip':
+        f = gzip.GzipFile(fileobj=f, mode='rb')
     try:
         parse_text(f.read())
     except (EarlySubmissionError, FormatError), e:

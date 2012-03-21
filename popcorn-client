@@ -33,6 +33,8 @@ import smtplib
 import socket
 import sys
 import time
+import gzip
+import cStringIO
 
 POST_SERVER = 'localhost:5000'
 POST_URI    = '/'
@@ -139,8 +141,12 @@ class Client:
         """Send a POST request to the default server
 
         """
-        (content_type, body) = multipart(self.data)
-        headers = {"Content-Type": content_type,}
+        if compress:
+            content = gzip_compress(self.data)
+        else:
+            content = self.data
+        (content_type, body) = multipart(content, compress)
+        headers = {"Content-Type": content_type, }
         conn = httplib.HTTPConnection(POST_SERVER)
         try:
             conn.request("POST", POST_URI, body, headers)
@@ -149,7 +155,7 @@ class Client:
         response = conn.getresponse()
         print response.read()
 
-def multipart(data):
+def multipart(data, compress=False):
     """Return multipart content (rfc1341) as one file from data"""
     # we will hopefully not need this anymore in the future:
     # http://bugs.python.org/issue3244
@@ -160,7 +166,10 @@ def multipart(data):
     L.append('--' + BOUNDARY)
     L.append('Content-Disposition: form-data; '
              'name="popcorn"; filename="popcorn"')
-    L.append('Content-Type: text/plain')
+    if compress:
+        L.append('Content-Type: gzip')
+    else:
+        L.append('Content-Type: text/plain')
     L.append('')
     L.append(data)
     L.append('--'+BOUNDARY+'--')
@@ -170,6 +179,14 @@ def multipart(data):
     content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
     return (content_type, body)
 
+def gzip_compress(data):
+    """Return gzip of data as string"""
+    buf = cStringIO.StringIO()
+    f = gzip.GzipFile(mode='wb',  fileobj=buf)
+    f.write(data)
+    f.close()
+    return buf.getvalue()
+
 if __name__ == '__main__':
     client = Client()
-    client.post()
+    client.post(compress=True)
