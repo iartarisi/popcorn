@@ -46,14 +46,14 @@ pathre = '^/(bin|boot|lib|lib64|sbin|usr/bin|usr/games|usr/include|usr/lib|usr/l
 
 system_mounts = ['binfmt_misc', 'debugfs', 'devpts', 'fuse.gvfs-fuse-daemon', 'fusectl', 'nfs', 'nfs4', 'proc', 'rootfs', 'rpc_pipefs', 'securityfs', 'sysfs']
 
-class Statistics:
+class Statistics: # TODO break this class into functions
     # this needs to be a set, because rpm.TransactionSet().dbMatch()
     # sometimes returns duplicate packages with only a few
     # inconsequential headers differing e.g. RPMTAG_INSTALLTIME,
     # RPMTAG_OLDFILENAMES, RPMTAG_INSTALLTID
     packages = set()
 
-    def fill_packages(self):
+    def fill_packages(self): # XXX this method is way too long
         pathreprg = re.compile(pathre)
         now = int(time.time())
 
