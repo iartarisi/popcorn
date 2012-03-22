@@ -47,7 +47,11 @@ pathre = '^/(bin|boot|lib|lib64|sbin|usr/bin|usr/games|usr/include|usr/lib|usr/l
 system_mounts = ['binfmt_misc', 'debugfs', 'devpts', 'fuse.gvfs-fuse-daemon', 'fusectl', 'nfs', 'nfs4', 'proc', 'rootfs', 'rpc_pipefs', 'securityfs', 'sysfs']
 
 class Statistics:
-    packages = []
+    # this needs to be a set, because rpm.TransactionSet().dbMatch()
+    # sometimes returns duplicate packages with only a few
+    # inconsequential headers differing e.g. RPMTAG_INSTALLTIME,
+    # RPMTAG_OLDFILENAMES, RPMTAG_INSTALLTID
+    packages = set()
 
     def fill_packages(self):
         pathreprg = re.compile(pathre)
@@ -105,7 +109,7 @@ class Statistics:
             vendor = h[rpm.RPMTAG_VENDOR] or 'Unknown'
             # collate to string as it can be a long
             epoch = str(h[rpm.RPMTAG_EPOCH]) or 'None'
-            self.packages.append((cat, name, version, release, epoch, arch, vendor))
+            self.packages.add((cat, name, version, release, epoch, arch, vendor))
 
     def serialize(self):
         distro, distro_ver, code = platform.linux_distribution()
