@@ -36,7 +36,7 @@ class SubmissionPackage(Base):
                         primary_key=True,)
     sub_date = Column(Date(), primary_key=True)
     pkg_name = Column(String(50), primary_key=True)
-    pkg_version = Column(String(20), primary_key=True)
+    pkg_version = Column(String(50), primary_key=True)
     pkg_release = Column(String(50), primary_key=True)
     pkg_epoch = Column(String(10), primary_key=True)
     pkg_arch = Column(String(10), ForeignKey('arches.arch'), primary_key=True)
