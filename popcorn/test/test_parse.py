@@ -33,7 +33,7 @@ from popcorn.models import Distro, System, Submission, SubmissionPackage, Vendor
 from popcorn.test.test_models import ModelsTest
 
 class TestParsePopcorn(ModelsTest):
-    def test_parse_popcorn_success_redis(self):
+    def test_parse_popcorn_success(self):
         self.assertEqual(System.query.filter_by(sys_hwuuid='TEST_HW_UUID'
                                                 ).count(), 0)
         self.assertEqual(SubmissionPackage.query.all(), [])
