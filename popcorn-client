@@ -170,7 +170,6 @@ def multipart(data):
     content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
     return (content_type, body)
 
-enabled = os.environ.get('POPCORN_ENABLED')
-if enabled and enabled != '0' and enabled != 'false':
+if __name__ == '__main__':
     client = Client()
     client.post()
