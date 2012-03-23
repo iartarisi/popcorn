@@ -34,7 +34,7 @@ import socket
 import sys
 import time
 
-POST_SERVER = 'localhost:5000'
+POST_SERVER = 'popcorn.mapleoin.eu'
 POST_URI    = '/'
 VERSION     = '0.1'
 HWUUID_FILE = '/etc/smolt/hw-uuid'
