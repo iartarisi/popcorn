@@ -137,16 +137,20 @@ class Client:
         with open('/tmp/submission.txt', 'w') as f:
             f.write(self.data)
 
-    def post(self, compress=False):
+    def post(self, compress=True):
         """Send a POST request to the default server
 
         """
         if compress:
             content = gzip_compress(self.data)
+            headers = {'Content-Encoding': 'gzip', }
         else:
             content = self.data
-        (content_type, body) = multipart(content, compress)
-        headers = {"Content-Type": content_type, }
+        (content_type, body) = multipart(content)
+        try:
+            headers['Content-Type'] = content_type
+        except NameError:
+            headers = {'Content-Type': content_type, }
         conn = httplib.HTTPConnection(POST_SERVER)
         try:
             conn.request("POST", POST_URI, body, headers)
@@ -155,7 +159,7 @@ class Client:
         response = conn.getresponse()
         print response.read()
 
-def multipart(data, compress=False):
+def multipart(data):
     """Return multipart content (rfc1341) as one file from data"""
     # we will hopefully not need this anymore in the future:
     # http://bugs.python.org/issue3244
@@ -166,10 +170,7 @@ def multipart(data, compress=False):
     L.append('--' + BOUNDARY)
     L.append('Content-Disposition: form-data; '
              'name="popcorn"; filename="popcorn"')
-    if compress:
-        L.append('Content-Type: gzip')
-    else:
-        L.append('Content-Type: text/plain')
+    L.append('Content-Type: text/plain')
     L.append('')
     L.append(data)
     L.append('--'+BOUNDARY+'--')
@@ -189,4 +190,4 @@ def gzip_compress(data):
 
 if __name__ == '__main__':
     client = Client()
-    client.post(compress=True)
+    client.post()

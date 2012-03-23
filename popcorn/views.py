@@ -59,14 +59,18 @@ def index():
 @app.route('/', methods=['POST'])
 def receive_submission():
     f = request.files['popcorn']
-    if f.content_type == 'gzip':
-        f = gzip.GzipFile(fileobj=f, mode='rb')
+    if request.headers['Content-Encoding'] == 'gzip':
+        g = gzip.GzipFile(fileobj=f, mode='rb')
     try:
-        parse_text(f.read())
+        submission = g.read()
+    except IOError:
+        submission = f.read()
+    try:
+        parse_text(submission)
     except (EarlySubmissionError, FormatError), e:
         return str(e)
     return 'Submission received. Thanks!'
-    
+
 @app.route('/vendor/<vendor_name>')
 def vendor(vendor_name):
     """Return a Vendor object
