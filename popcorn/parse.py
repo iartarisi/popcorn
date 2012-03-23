@@ -76,7 +76,8 @@ def parse_text(data):
     if not _can_submit(system):
         raise EarlySubmissionError(system.last_submission.sub_date)
 
-    sub = Submission(system.sys_hwuuid, version)
+    today = date.today()
+    sub = Submission(system.sys_hwuuid, version, today)
     db_session.add(sub)
     for line in datalines[1:]:
         try:
@@ -103,7 +104,7 @@ def parse_text(data):
             except DataError: # TODO mail this to the admins
                 raise
             
-        sp = SubmissionPackage(hw_uuid, date.today(), name, version, release,
+        sp = SubmissionPackage(hw_uuid, today, name, version, release,
                                epoch, arch, vendor.vendor_name, status)
         db_session.add(sp)
 
