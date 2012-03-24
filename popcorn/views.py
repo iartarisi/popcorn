@@ -59,11 +59,13 @@ def index():
 @app.route('/', methods=['POST'])
 def receive_submission():
     f = request.files['popcorn']
-    if request.headers['Content-Encoding'] == 'gzip':
-        g = gzip.GzipFile(fileobj=f, mode='rb')
-    try:
-        submission = g.read()
-    except IOError:
+    if request.headers.get('Content-Encoding') == 'gzip':
+        with gzip.GzipFile(fileobj=f, mode='rb') as g:
+            try:
+                submission = g.read()
+            except IOError:
+                submission = f.read()
+    else:
         submission = f.read()
     try:
         parse_text(submission)
