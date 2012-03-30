@@ -23,6 +23,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 import json
+import gzip
 
 from flask import abort, render_template, request, redirect, url_for
 from sqlalchemy import func
@@ -58,12 +59,20 @@ def index():
 @app.route('/', methods=['POST'])
 def receive_submission():
     f = request.files['popcorn']
+    if request.headers.get('Content-Encoding') == 'gzip':
+        with gzip.GzipFile(fileobj=f, mode='rb') as g:
+            try:
+                submission = g.read()
+            except IOError:
+                submission = f.read()
+    else:
+        submission = f.read()
     try:
-        parse_text(f.read())
+        parse_text(submission)
     except (EarlySubmissionError, FormatError), e:
         return str(e)
     return 'Submission received. Thanks!'
-    
+
 @app.route('/vendor/<vendor_name>')
 def vendor(vendor_name):
     """Return a Vendor object
