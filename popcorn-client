@@ -33,6 +33,8 @@ import smtplib
 import socket
 import sys
 import time
+import gzip
+import cStringIO
 
 POST_SERVER = 'localhost:5000'
 POST_URI    = '/'
@@ -135,12 +137,20 @@ class Client:
         with open('/tmp/submission.txt', 'w') as f:
             f.write(self.data)
 
-    def post(self, compress=False):
+    def post(self, compress=True):
         """Send a POST request to the default server
 
         """
-        (content_type, body) = multipart(self.data)
-        headers = {"Content-Type": content_type,}
+        if compress:
+            content = gzip_compress(self.data)
+            headers = {'Content-Encoding': 'gzip', }
+        else:
+            content = self.data
+        (content_type, body) = multipart(content)
+        try:
+            headers['Content-Type'] = content_type
+        except NameError:
+            headers = {'Content-Type': content_type, }
         conn = httplib.HTTPConnection(POST_SERVER)
         try:
             conn.request("POST", POST_URI, body, headers)
@@ -169,6 +179,14 @@ def multipart(data):
     body = CRLF.join(L)
     content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
     return (content_type, body)
+
+def gzip_compress(data):
+    """Return gzip of data as string"""
+    buf = cStringIO.StringIO()
+    f = gzip.GzipFile(mode='wb',  fileobj=buf)
+    f.write(data)
+    f.close()
+    return buf.getvalue()
 
 if __name__ == '__main__':
     client = Client()
