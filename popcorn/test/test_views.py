@@ -60,8 +60,6 @@ class PopcornTestCase(unittest.TestCase):
     def tearDown(self):
         db_session.remove()
 
-    # helper functions
-
     def init_db(self):
         db_session.add_all([Arch('noarch'), Arch('i586'), Arch('i686'),
                             Arch('i486'), Arch('i386'), Arch('x86_64'),
@@ -88,8 +86,6 @@ class PopcornTestCase(unittest.TestCase):
                     headers={'Content-Encoding': 'gzip', })
         else:
             return self.app.post('/', data=dict(popcorn=(f, 'popcorn.txt')))
-
-    # testing functions
 
     def test_submission_gzip_with_header(self):
         rv = self.submit(compress=True, header=True)
