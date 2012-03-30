@@ -28,6 +28,8 @@ from datetime import date
 
 from sqlalchemy.exc import DataError
 from sqlalchemy.orm.exc import NoResultFound
+from popcorn.trace_mail import mail_to_admin
+import traceback
 
 from popcorn.configs import SUBMISSION_INTERVAL
 from popcorn.database import db_session
@@ -102,8 +104,9 @@ def parse_text(data):
             try:
                 db_session.flush()
             except DataError: # TODO mail this to the admins
-                raise
-            
+                #raise
+                tb=traceback.format_exc()
+                mail_to_admin(tb)  
         sp = SubmissionPackage(hw_uuid, today, name, version, release,
                                epoch, arch, vendor.vendor_name, status)
         db_session.add(sp)
@@ -111,8 +114,10 @@ def parse_text(data):
     try:
         db_session.commit()
     except DataError: # TODO mail this to the admins
-        raise
-
+        #raise
+        tb=traceback.format_exc()
+        mail_to_admin(tb)
+ 
 def _can_submit(system):
     """Checks the Submission interval for this System
 
