@@ -8,7 +8,6 @@ else:
     import unittest2 as unittest
 
 from sqlalchemy import create_engine, event
-from sqlalchemy.exc import IntegrityError
 
 from popcorn import app
 from popcorn.database import db_session, Base
@@ -47,12 +46,6 @@ class PopcornTestCase(unittest.TestCase):
                             PackageStatus('recent'), PackageStatus('old')])
         db_session.commit()
 
-    def reset_db(self):
-        for table in reversed(Base.metadata.sorted_tables):
-            db_session.execute(table.delete())
-        db_session.commit()
-        self.init_db()
-
     def submit(self, compress, header):
         submission_file = os.path.join(os.path.dirname(__file__), 'fixtures',
                                        'submission-suse.txt')
@@ -74,22 +67,14 @@ class PopcornTestCase(unittest.TestCase):
 
     # testing functions
 
-    def test_submission(self):
-        # gzipped file with Content-Encoding:gzip header
+    def test_submission_gzip_with_header(self):
         rv = self.submit(compress=True, header=True)
-        assert 'Submission received. Thanks!' in rv.data
-        self.reset_db()
+        self.assertEqual('Submission received. Thanks!', rv.data)
 
-        # plaintext file with Content-Encoding:gzip header
-        # server decompressed gzipped submission
+    def test_submission_plaintext_with_header(self):
         rv = self.submit(compress=False, header=True)
-        assert 'Submission received. Thanks!' in rv.data
-        self.reset_db()
+        self.assertEqual('Submission received. Thanks!', rv.data)
 
-        # plaintext submission without Content-Encoding:gzip header
+    def test_submission_plaintext_without_header(self):
         rv = self.submit(compress=False, header=False)
-        assert 'Submission received. Thanks!' in rv.data
-        self.reset_db()
-
-if __name__ == '__main__':
-    unittest.main()
+        self.assertEqual('Submission received. Thanks!', rv.data)
