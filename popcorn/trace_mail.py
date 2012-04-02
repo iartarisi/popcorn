@@ -9,7 +9,6 @@ def mail_to_admin(traceback):
 		smtpObj=smtplib.SMTP(SMTP_SERVER,SMTP_PORT)
 		smtpObj.ehlo()
 		smtpObj.starttls()
-		smtpObj.ehlo()
 		smtpObj.login(HOST_EMAIL,HOST_PASS)
 		message=MESSAGE+str(traceback)
 		smtpObj.sendmail(HOST_EMAIL,ADMIN_MAIL,message)
