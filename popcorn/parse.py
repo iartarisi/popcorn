@@ -25,6 +25,8 @@
 """Parse the submissions received from the clients and save them to the DB"""
 
 from datetime import date
+import traceback
+from popcorn.configs import *
 
 from sqlalchemy.exc import DataError
 from sqlalchemy.orm.exc import NoResultFound
@@ -102,8 +104,9 @@ def parse_text(data):
             try:
                 db_session.flush()
             except DataError: # TODO mail this to the admins
-                raise
-            
+                #raise
+                tb=traceback.format_exc()
+                mail_to_admin(tb)
         sp = SubmissionPackage(hw_uuid, today, name, version, release,
                                epoch, arch, vendor.vendor_name, status)
         db_session.add(sp)
@@ -111,8 +114,9 @@ def parse_text(data):
     try:
         db_session.commit()
     except DataError: # TODO mail this to the admins
-        raise
-
+        #raise
+	 tb=traceback.format_exc()
+         mail_to_admin(tb) 
 def _can_submit(system):
     """Checks the Submission interval for this System
 
