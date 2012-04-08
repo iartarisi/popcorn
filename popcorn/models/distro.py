@@ -27,6 +27,7 @@ from sqlalchemy.orm import relationship
 
 from popcorn.database import Base
 
+
 class Distro(Base):
     __tablename__ = 'distros'
     distro_name = Column(String(20), primary_key=True)
@@ -39,4 +40,3 @@ class Distro(Base):
 
     def __repr__(self):
         return "<Distro: %s %s>" % (self.distro_name, self.distro_version)
-    

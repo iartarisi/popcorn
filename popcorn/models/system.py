@@ -28,6 +28,7 @@ from sqlalchemy.orm import relationship
 from popcorn.database import Base
 from popcorn.models import Distro, Submission
 
+
 class System(Base):
     __tablename__ = 'systems'
     sys_hwuuid = Column(String(36), primary_key=True)

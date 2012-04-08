@@ -28,6 +28,7 @@ from sqlalchemy.orm import relationship
 from popcorn.database import Base
 from popcorn.models import Submission
 
+
 class SubmissionPackage(Base):
     __tablename__ = 'submission_packages'
 
@@ -53,8 +54,8 @@ class SubmissionPackage(Base):
             ),
         )
 
-    def __init__(self, sys_hwuuid, sub_date, pkg_name, pkg_version, pkg_release,
-                 pkg_epoch, pkg_arch, vendor_name, pkg_status):
+    def __init__(self, sys_hwuuid, sub_date, pkg_name, pkg_version,
+                 pkg_release, pkg_epoch, pkg_arch, vendor_name, pkg_status):
         self.sys_hwuuid = sys_hwuuid
         self.sub_date = sub_date
         self.pkg_name = pkg_name
@@ -64,11 +65,12 @@ class SubmissionPackage(Base):
         self.pkg_arch = pkg_arch
         self.vendor_name = vendor_name
         self.pkg_status = pkg_status
-        
+
     def __repr__(self):
         if self.pkg_epoch:
             output = ("<SubmissionPackage: %(sys_hwuuid)s %(sub_date)s "
-                      "%(name)s-%(ver)s-%(rel)s-%(epoch)s.%(arch)s - %(status)s")
+                      "%(name)s-%(ver)s-%(rel)s-%(epoch)s.%(arch)s - "
+                      "%(status)s")
         else:
             output = ("<SubmissionPackage: %(sys_hwuuid)s %(sub_date)s "
                       "%(name)s-%(ver)s-%(rel)s.%(arch)s - %(status)s")

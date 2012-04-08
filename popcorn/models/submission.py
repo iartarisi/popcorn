@@ -29,8 +29,10 @@ from sqlalchemy.orm import relationship
 
 from popcorn.database import Base
 
+
 class SubmissionError(Exception):
     pass
+
 
 class Submission(Base):
     __tablename__ = 'submissions'
