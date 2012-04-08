@@ -29,9 +29,11 @@ app = Flask(__name__)
 # Flask docs say we need this in order to use decorators
 import popcorn.views
 
+
 @app.teardown_request
 def shutdown_session(exception=None):
     db_session.remove()
+
 
 def url_for_other_page(page=None):
     """ Return url for page if specified, else for all """

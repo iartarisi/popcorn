@@ -34,28 +34,35 @@ from popcorn.database import db_session
 from popcorn.models import (Arch, Distro, SubmissionPackage, Submission,
                             System, Vendor)
 
+
 class FormatError(Exception):
     """Exception class for format errors found in a submission"""
     def __init__(self, message):
         self.message = message
+
     def __str__(self):
         return "The submission format is invalid: %s" % self.message
 
+
 class EarlySubmissionError(Exception):
-    """Raised when another Submission has been submitted too soon for a System"""
+    """Raised when another Submission has been submitted too soon for a
+    System
+    """
     def __init__(self, last_date):
         self.last_date = last_date
+
     def __str__(self):
         return ("You need to wait %s days between submissions. "
                 "Your last recorded submission was on %s."
                 % (SUBMISSION_INTERVAL, self.last_date))
+
 
 def parse_text(data):
     """Parse a plaintext submission, recording everything in the database"""
     datalines = data.splitlines()
     (popcorn, version, distro, distrover, arch, hw_uuid) = datalines[0].split()
 
-    try: # TEST THIS
+    try:  # TEST THIS
         system = System.query.filter_by(sys_hwuuid=hw_uuid).one()
     except NoResultFound:
         system = System(hw_uuid, arch, distro, distrover)
@@ -83,7 +90,7 @@ def parse_text(data):
         try:
             (status, name, version, release,
              epoch, arch, vendor) = line.split(None, 6)
-        except ValueError, e: # test this
+        except ValueError, e:  # test this
             raise FormatError(e.message)
 
         try:
@@ -101,17 +108,18 @@ def parse_text(data):
             db_session.add(vendor)
             try:
                 db_session.flush()
-            except DataError: # TODO mail this to the admins
+            except DataError:  # TODO mail this to the admins
                 raise
-            
+
         sp = SubmissionPackage(hw_uuid, today, name, version, release,
                                epoch, arch, vendor.vendor_name, status)
         db_session.add(sp)
 
     try:
         db_session.commit()
-    except DataError: # TODO mail this to the admins
+    except DataError:  # TODO mail this to the admins
         raise
+
 
 def _can_submit(system):
     """Checks the Submission interval for this System
