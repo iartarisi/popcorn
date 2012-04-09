@@ -34,6 +34,23 @@ from popcorn.database import db_session
 from popcorn.models import (Arch, Distro, SubmissionPackage, Submission,
                             System, Vendor)
 
+from popcorn.configs import SMTP_PORT,SMTP_SERVER,HOST_EMAIL,HOST_PASS,ADMIN_MAIL,MESSAGE
+from smtplib import SMTPException
+import smtplib
+import traceback
+
+def mail_to_admin(Exception):
+	tb=traceback.format_exc()
+	try:
+		smtpObj=smtplib.SMTP(SMTP_SERVER,SMTP_PORT)
+		smtpObj.ehlo()
+		smtpObj.starttls()
+		smtpObj.login(HOST_EMAIL,HOST_PASS)
+		message=MESSAGE+str(tb)
+		smtpObj.sendmail(HOST_EMAIL,ADMIN_MAIL,message)
+	except SMTPException:
+		print 'Error while sending email'
+
 class FormatError(Exception):
     """Exception class for format errors found in a submission"""
     def __init__(self, message):
@@ -102,7 +119,8 @@ def parse_text(data):
             try:
                 db_session.flush()
             except DataError: # TODO mail this to the admins
-                raise
+                #raise
+                mail_to_admin(DataError)
             
         sp = SubmissionPackage(hw_uuid, today, name, version, release,
                                epoch, arch, vendor.vendor_name, status)
@@ -111,7 +129,8 @@ def parse_text(data):
     try:
         db_session.commit()
     except DataError: # TODO mail this to the admins
-        raise
+        #raise
+        mail_to_admin(DataError)
 
 def _can_submit(system):
     """Checks the Submission interval for this System
