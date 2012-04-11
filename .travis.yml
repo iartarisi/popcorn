@@ -5,6 +5,7 @@ python:
 
 install:
   - pip install -r pip-requires --use-mirrors
+  - pip install pep8
   # unittest2 is only required for testing on 2.6
   - pip install unittest2
 
@@ -14,4 +15,5 @@ before_script:
   - psql -c "GRANT ALL PRIVILEGES ON DATABASE popcorn TO popcorn;" -U postgres
 
 script:
+  - pep8 popcorn
   - python setup.py test

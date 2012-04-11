@@ -26,6 +26,7 @@ from sqlalchemy import Column, String
 
 from popcorn.database import Base
 
+
 class PackageStatus(Base):
     """The Package Status in a submission. Can be one of:
 
@@ -53,6 +54,6 @@ class PackageStatus(Base):
         # TODO: disable this after creating the initial statuses in a script
         self.pkg_status = pkg_status
         self.short_status = pkg_status[0]
-        
+
     def __repr__(self):
         return '<PackageStatus: %s(%s)>' % (self.pkg_status, self.short_status)

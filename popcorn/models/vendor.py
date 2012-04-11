@@ -26,6 +26,7 @@ from sqlalchemy import Column, String
 
 from popcorn.database import Base
 
+
 class Vendor(Base):
     __tablename__ = 'vendors'
     vendor_name = Column(String(20), primary_key=True)

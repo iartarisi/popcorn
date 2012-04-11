@@ -37,25 +37,29 @@ import gzip
 import cStringIO
 
 POST_SERVER = 'localhost:5000'
-POST_URI    = '/'
-VERSION     = '0.1'
+POST_URI = '/'
+VERSION = '0.1'
 HWUUID_FILE = '/etc/smolt/hw-uuid'
 
 days_recent = 30
-days_voted  = 30
+days_voted = 30
 
-pathre = '^/(bin|boot|lib|lib64|sbin|usr/bin|usr/games|usr/include|usr/lib|usr/lib64|usr/libexec|usr/sbin)/'
+pathre = ('^/(bin|boot|lib|lib64|sbin|usr/bin|usr/games|usr/include|usr/lib|'
+          'usr/lib64|usr/libexec|usr/sbin)/')
 
-system_mounts = ['binfmt_misc', 'debugfs', 'devpts', 'fuse.gvfs-fuse-daemon', 'fusectl', 'nfs', 'nfs4', 'proc', 'rootfs', 'rpc_pipefs', 'securityfs', 'sysfs']
+system_mounts = ['binfmt_misc', 'debugfs', 'devpts', 'fuse.gvfs-fuse-daemon',
+                 'fusectl', 'nfs', 'nfs4', 'proc', 'rootfs', 'rpc_pipefs',
+                 'securityfs', 'sysfs']
 
-class Statistics: # TODO break this class into functions
+
+class Statistics:  # TODO break this class into functions
     # this needs to be a set, because rpm.TransactionSet().dbMatch()
     # sometimes returns duplicate packages with only a few
     # inconsequential headers differing e.g. RPMTAG_INSTALLTIME,
     # RPMTAG_OLDFILENAMES, RPMTAG_INSTALLTID
     packages = set()
 
-    def fill_packages(self): # XXX this method is way too long
+    def fill_packages(self):  # XXX this method is way too long
         pathreprg = re.compile(pathre)
         now = int(time.time())
 
@@ -68,9 +72,9 @@ class Statistics: # TODO break this class into functions
                 mount = line.split(' ', 4)
                 if not mount[2] in system_mounts:
                     if mount[3].find('noatime') < 0:
-                       atime_mounts.append(mount[1])
+                        atime_mounts.append(mount[1])
                     else:
-                       noatime_mounts.append(mount[1])
+                        noatime_mounts.append(mount[1])
             f.close()
         except:
             pass
@@ -79,16 +83,22 @@ class Statistics: # TODO break this class into functions
         mi = ts.dbMatch()
         for h in mi:
             name = h[rpm.RPMTAG_NAME]
-            if name == 'gpg-pubkey': continue
+            if name == 'gpg-pubkey':
+                continue
             installed = h[rpm.RPMTAG_INSTALLTIME]
             (accessed, atime) = (0, 0)
             if len(atime_mounts) > 0:
                 for file in h[rpm.RPMTAG_FILENAMES]:
                     # skip non-watched files
-                    if not pathreprg.match(file): continue
+                    if not pathreprg.match(file):
+                        continue
+                    noatime_length = len([i for i in noatime_mounts if
+                                         file.startswith(i)])
+                    atime_length = len([i for i in atime_mounts if
+                                       file.startswith(i)])
                     # if the file is mounted from noatime mountpoint, skip it
-                    if len( [i for i in noatime_mounts if file.startswith(i)] ) >  0 and \
-                       len( [i for i in   atime_mounts if file.startswith(i)] ) <= 0: continue
+                    if noatime_length > 0 and atime_length <= 0:
+                        continue
                     try:
                         (atime, ) = os.stat(file)[7:8]
                         if atime > accessed:
@@ -96,37 +106,40 @@ class Statistics: # TODO break this class into functions
                     except:
                         pass
             if accessed == 0:
-                cat = 'n' # no-files
+                cat = 'n'  # no-files
             else:
                 if now - installed < days_recent * 86400:
-                    cat = 'r' # recent
+                    cat = 'r'  # recent
                 else:
                     if now - accessed < days_voted * 86400:
-                        cat = 'v' # voted
+                        cat = 'v'  # voted
                     else:
-                        cat ='o' # old
+                        cat = 'o'  # old
             version = h[rpm.RPMTAG_VERSION] or 'None'
             release = h[rpm.RPMTAG_RELEASE] or 'None'
             arch = h[rpm.RPMTAG_ARCH]
             vendor = h[rpm.RPMTAG_VENDOR] or 'Unknown'
             # collate to string as it can be a long
             epoch = str(h[rpm.RPMTAG_EPOCH]) or 'None'
-            self.packages.add((cat, name, version, release, epoch, arch, vendor))
+            self.packages.add((cat, name, version, release, epoch, arch,
+                              vendor))
 
     def serialize(self):
         distro, distro_ver, code = platform.linux_distribution()
         arch = platform.machine()
         uuid = get_system_id()
-        ret = ['POPCORN %(version)s %(distro)s %(distro_ver)s %(arch)s %(uuid)s'
-               % dict(version=VERSION, **locals())]
+        ret = [('POPCORN %(version)s %(distro)s %(distro_ver)s %(arch)s '
+                '%(uuid)s') % dict(version=VERSION, **locals())]
         for pkg in self.packages:
-            ret.append( ' '.join(pkg) )
+            ret.append(' '.join(pkg))
         ret.append('')
         return '\n'.join(ret)
+
 
 def get_system_id():
     with open(HWUUID_FILE) as f:
         return f.read().strip()
+
 
 class Client:
     def __init__(self):
@@ -159,6 +172,7 @@ class Client:
         response = conn.getresponse()
         print response.read()
 
+
 def multipart(data):
     """Return multipart content (rfc1341) as one file from data"""
     # we will hopefully not need this anymore in the future:
@@ -173,12 +187,13 @@ def multipart(data):
     L.append('Content-Type: text/plain')
     L.append('')
     L.append(data)
-    L.append('--'+BOUNDARY+'--')
+    L.append('--' + BOUNDARY + '--')
     L.append('')
 
     body = CRLF.join(L)
     content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
     return (content_type, body)
+
 
 def gzip_compress(data):
     """Return gzip of data as string"""
