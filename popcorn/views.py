@@ -38,6 +38,7 @@ from popcorn.pagination import Pagination
 
 PER_PAGE = 50
 
+
 @app.route('/', methods=['GET'])
 def index():
     distros = Distro.query.all()
@@ -56,6 +57,7 @@ def index():
                            distros=distros, vendors=vendors,
                            distro_packages=distro_packages)
 
+
 @app.route('/', methods=['POST'])
 def receive_submission():
     f = request.files['popcorn']
@@ -73,6 +75,7 @@ def receive_submission():
         return str(e)
     return 'Submission received. Thanks!'
 
+
 @app.route('/vendor/<vendor_name>')
 def vendor(vendor_name):
     """Return a Vendor object
@@ -85,6 +88,7 @@ def vendor(vendor_name):
     except NoResultFound:
         abort(404)
     return render_template('vendor.html', vendor=vendor)
+
 
 @app.route('/system/<hwuuid>/submission/<sub_date>/')
 def submission(hwuuid, sub_date):
@@ -105,6 +109,7 @@ def submission(hwuuid, sub_date):
     return render_template('submission.html', submission=sub,
                            pagination=pagination, packages=packages)
 
+
 @app.route('/system/<hwuuid>')
 def system(hwuuid):
     """Return a System object"""
@@ -113,6 +118,7 @@ def system(hwuuid):
     except NoResultFound:
         abort(404)
     return render_template('system.html', system=system)
+
 
 # TODO this could be breadcrumbs, where you can put in as many arguments
 # as you want and get as much information back, i.e. put in name,
@@ -140,10 +146,11 @@ def package(name, version, release, arch, epoch=''):
     for k, v in pkg_statuses:
         statuses[k] = v
     print statuses
-        
+
     return render_template('packages.html',
                            generic_package=pkgs[0],
                            packages=pkgs, **statuses)
+
 
 @app.route('/distro/<name>_<version>')
 def distro(name, version):

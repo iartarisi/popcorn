@@ -26,6 +26,7 @@ from sqlalchemy import Column, String
 
 from popcorn.database import Base
 
+
 class Arch(Base):
     __tablename__ = 'arches'
     arch = Column(String(10), primary_key=True)
@@ -35,4 +36,3 @@ class Arch(Base):
 
     def __repr__(self):
         return '<Arch: %s>' % self.arch
-    

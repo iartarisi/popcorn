@@ -28,9 +28,11 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from popcorn.parse import (parse_text, _can_submit, EarlySubmissionError,
                            FormatError)
-from popcorn.models import Distro, System, Submission, SubmissionPackage, Vendor
+from popcorn.models import (Distro, System, Submission, SubmissionPackage,
+                            Vendor)
 
 from popcorn.test.test_models import ModelsTest
+
 
 class TestParsePopcorn(ModelsTest):
     def test_parse_popcorn_success(self):
@@ -43,7 +45,7 @@ class TestParsePopcorn(ModelsTest):
         parse_text(subm_text)
 
         system = System.query.filter_by(sys_hwuuid='TEST_HW_UUID').one()
-        
+
         self.assertEqual(len(system.submissions), 1)
 
         sub = system.last_submission
@@ -88,7 +90,7 @@ class TestParsePopcorn(ModelsTest):
 
         self.assertEqual("Distroxillix", distro.distro_name)
         self.assertEqual("1.0", distro.distro_version)
-        
+
 
 class TestCanSubmit(ModelsTest):
     def test_can_submit(self):

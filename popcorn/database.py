@@ -40,6 +40,7 @@ Base.query = db_session.query_property()
 # they will be registered properly on the metadata.
 import popcorn.models
 
+
 def init_db():
     Arch, Status = popcorn.models.Arch, popcorn.models.PackageStatus
 
@@ -51,6 +52,7 @@ def init_db():
                         Status('voted'), Status('nofiles'),
                         Status('recent'), Status('old')])
     db_session.commit()
+
 
 def drop_db():
     Base.metadata.drop_all(bind=engine)
