@@ -26,10 +26,7 @@
 
 from datetime import date, timedelta
 import sys
-if sys.version >= '2.7':
-    import unittest
-else:
-    import unittest2 as unittest
+import unittest
 
 from sqlalchemy import create_engine, event
 from sqlalchemy.exc import IntegrityError

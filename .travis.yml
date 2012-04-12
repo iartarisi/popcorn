@@ -1,13 +1,10 @@
 language: python
 python:
-  - 2.6
   - 2.7
 
 install:
   - pip install -r pip-requires --use-mirrors
   - pip install pep8
-  # unittest2 is only required for testing on 2.6
-  - pip install unittest2
 
 before_script:
   - psql -c "CREATE DATABASE popcorn;" -U postgres
