@@ -95,3 +95,10 @@ class PopcornTestCase(unittest.TestCase):
     def test_submission_plaintext_without_header(self):
         rv = self.submit(compress=False, header=False)
         self.assertEqual('Submission received. Thanks!', rv.data)
+
+    def test_json_request(self):
+        self.submit(compress=False, header=False)
+        with app.test_request_context(path='/', method='GET',
+                headers=[('Accept', 'application/json')]) as ctx:
+            app.preprocess_request()
+            rv = app.process_response(app.response_class())
