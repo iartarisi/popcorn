@@ -36,3 +36,13 @@ class Arch(Base):
 
     def __repr__(self):
         return '<Arch: %s>' % self.arch
+
+    @property
+    def _flat_attrs(self):
+        return {
+           'arch': self.arch,
+        }
+
+    @property
+    def serialize(self):
+        return dict(**self._flat_attrs)
