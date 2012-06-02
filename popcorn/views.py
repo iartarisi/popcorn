@@ -89,7 +89,7 @@ def vendor(vendor_name):
         vendor = Vendor.query.filter_by(vendor_name=vendor_name).one()
     except NoResultFound:
         abort(404)
-    return dict(vendors=[i.serialize for i in vendors])
+    return dict(vendor=vendor.serialize)
 
 
 @app.route('/system/<hwuuid>/submission/<sub_date>/')

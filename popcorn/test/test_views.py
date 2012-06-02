@@ -22,6 +22,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
+import json
 import os
 import sys
 import gzip
@@ -32,7 +33,7 @@ from sqlalchemy import create_engine, event
 
 from popcorn import app
 from popcorn.database import db_session, Base
-from popcorn.models import Arch, PackageStatus
+from popcorn.models import Arch, PackageStatus, Vendor
 
 
 # we need to explicitly enable foreign key constraints for sqlite
@@ -96,9 +97,15 @@ class PopcornTestCase(unittest.TestCase):
         rv = self.submit(compress=False, header=False)
         self.assertEqual('Submission received. Thanks!', rv.data)
 
-    def test_json_request(self):
+    def test_vendor_json(self):
         self.submit(compress=False, header=False)
-        with app.test_request_context(path='/', method='GET',
+        with app.test_request_context(path='/vendor/openSUSE', method='GET',
                 headers=[('Accept', 'application/json')]) as ctx:
-            app.preprocess_request()
-            rv = app.process_response(app.response_class())
+            response = app.dispatch_request()
+            self.assertEqual(json.loads(response.data), {
+                    "vendor": {
+                        "vendor_name": "openSUSE",
+                        "vendor_url": "openSUSE"
+                        }})
+            self.assertEqual(response.headers['Content-Type'],
+                             'application/json')
