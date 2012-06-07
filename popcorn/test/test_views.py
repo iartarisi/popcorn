@@ -28,12 +28,15 @@ import sys
 import gzip
 import cStringIO
 import unittest
+from datetime import date
 
 from sqlalchemy import create_engine, event
 
 from popcorn import app
 from popcorn.database import db_session, Base
 from popcorn.models import Arch, PackageStatus, Vendor
+
+today = date.today()
 
 
 # we need to explicitly enable foreign key constraints for sqlite
@@ -97,6 +100,32 @@ class PopcornTestCase(unittest.TestCase):
         rv = self.submit(compress=False, header=False)
         self.assertEqual('Submission received. Thanks!', rv.data)
 
+    def test_index_json(self):
+        self.submit(compress=False, header=False)
+        with app.test_request_context(path='/', method='GET',
+                headers=[('Accept', 'application/json')]) as ctx:
+            response = app.dispatch_request()
+            self.assertEqual(json.loads(response.data), {
+                "distro_packages": "[[\"openSUSE\", 1285]]",
+                "vendors": [{
+                    "vendor_name": "openSUSE",
+                    "vendor_url": "openSUSE"
+                        }],
+                "distros": [{
+                    "distro_name": "openSUSE",
+                    "systems": [{
+                        "sys_hwuuid":
+                            "677ec7c2-3b9e-4b25-8f45-b651d8bbb701",
+                            "arch": "x86_64",
+                            "distro_version": "12.1",
+                            "distro_name": "openSUSE"
+                            }],
+                        "distro_version": "12.1"
+                    }]
+                })
+            self.assertEqual(response.headers['Content-Type'],
+                             'application/json')
+
     def test_vendor_json(self):
         self.submit(compress=False, header=False)
         with app.test_request_context(path='/vendor/openSUSE', method='GET',
@@ -107,5 +136,83 @@ class PopcornTestCase(unittest.TestCase):
                         "vendor_name": "openSUSE",
                         "vendor_url": "openSUSE"
                         }})
+            self.assertEqual(response.headers['Content-Type'],
+                             'application/json')
+
+    def test_system_json(self):
+        self.submit(compress=False, header=False)
+        with app.test_request_context(
+                path='/system/677ec7c2-3b9e-4b25-8f45-b651d8bbb701',
+                method='GET', headers=[('Accept', 'application/json')]) as ctx:
+            response = app.dispatch_request()
+            self.assertEqual(json.loads(response.data), {
+                "system": {
+                    "arch": "x86_64",
+                    "sys_hwuuid":
+                        "677ec7c2-3b9e-4b25-8f45-b651d8bbb701",
+                    "submissions": [{
+                        "sub_date": [today.strftime("%Y-%m-%d"), "00:00:00"],
+                        "sys_hwuuid":
+                            "677ec7c2-3b9e-4b25-8f45-b651d8bbb701",
+                        "popcorn_version": "0.1"
+                        }],
+                    "distro_name": "openSUSE",
+                    "distro_version": "12.1"
+                    }
+                })
+            self.assertEqual(response.headers['Content-Type'],
+                             'application/json')
+
+    def test_package_json(self):
+        self.submit(compress=False, header=False)
+        with app.test_request_context(path='/package/sed/4.2.1/5.1.2/x86_64',
+                method='GET', headers=[('Accept', 'application/json')]) as ctx:
+            response = app.dispatch_request()
+            self.assertEqual(json.loads(response.data), {
+                "packages": [{
+                    "sys_hwuuid": "677ec7c2-3b9e-4b25-8f45-b651d8bbb701",
+                    "sub_date": [today.strftime("%Y-%m-%d"), "00:00:00"],
+                    "pkg_status": "voted",
+                    "pkg_name": "sed",
+                    "pkg_version": "4.2.1",
+                    "pkg_arch": "x86_64",
+                    "vendor_name": "openSUSE",
+                    "pkg_epoch": "",
+                    "pkg_release": "5.1.2"
+                  }],
+                "voted": 1,
+                "generic_package": {
+                    "sys_hwuuid": "677ec7c2-3b9e-4b25-8f45-b651d8bbb701",
+                    "sub_date": [today.strftime("%Y-%m-%d"), "00:00:00"],
+                    "pkg_status": "voted",
+                    "pkg_name": "sed",
+                    "pkg_version": "4.2.1",
+                    "pkg_arch": "x86_64",
+                    "vendor_name": "openSUSE",
+                    "pkg_epoch": "",
+                    "pkg_release": "5.1.2"
+                }
+            })
+            self.assertEqual(response.headers['Content-Type'],
+                             'application/json')
+
+    def test_distro_json(self):
+        self.submit(compress=False, header=False)
+        with app.test_request_context(path='/distro/openSUSE_12.1',
+                method='GET', headers=[('Accept', 'application/json')]) as ctx:
+            response = app.dispatch_request()
+            self.assertEqual(json.loads(response.data), {
+                "distro": {
+                    "distro_name": "openSUSE",
+                    "systems": [{
+                        "sys_hwuuid":
+                            "677ec7c2-3b9e-4b25-8f45-b651d8bbb701",
+                        "arch": "x86_64",
+                        "distro_version": "12.1",
+                        "distro_name": "openSUSE"
+                        }],
+                    "distro_version": "12.1"
+                    }
+                })
             self.assertEqual(response.headers['Content-Type'],
                              'application/json')
