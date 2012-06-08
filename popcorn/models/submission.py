@@ -28,6 +28,7 @@ from sqlalchemy import Column, Date, ForeignKey, String
 from sqlalchemy.orm import relationship
 
 from popcorn.database import Base
+from popcorn.helpers import dump_datetime
 
 
 class SubmissionError(Exception):
@@ -51,3 +52,16 @@ class Submission(Base):
     def __repr__(self):
         return '<Submission from %s at %s>' % (self.sys_hwuuid,
                                                self.sub_date)
+
+    @property
+    def _flat_attrs(self):
+        return {
+           'sub_date': dump_datetime(self.sub_date),
+           'sys_hwuuid': self.sys_hwuuid,
+           'popcorn_version': self.popcorn_version,
+        }
+
+    @property
+    def serialize(self):
+        return dict({'submission_packages': [sub._flat_attrs for sub in
+                    self.submission_packages]}, **self._flat_attrs)

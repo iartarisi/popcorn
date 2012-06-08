@@ -57,3 +57,14 @@ class PackageStatus(Base):
 
     def __repr__(self):
         return '<PackageStatus: %s(%s)>' % (self.pkg_status, self.short_status)
+
+    @property
+    def _flat_attrs(self):
+        return {
+           'pkg_status': self.pkg_status,
+           'short_status': self.short_status,
+        }
+
+    @property
+    def serialize(self):
+        return dict(**self._flat_attrs)

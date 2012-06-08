@@ -57,3 +57,17 @@ class System(Base):
     def last_submission(self):
         return Submission.query.filter_by(sys_hwuuid=self.sys_hwuuid).order_by(
             Submission.sub_date.desc()).first()
+
+    @property
+    def _flat_attrs(self):
+        return {
+           'sys_hwuuid': self.sys_hwuuid,
+           'distro_name': self.distro_name,
+           'distro_version': self.distro_version,
+           'arch': self.arch,
+        }
+
+    @property
+    def serialize(self):
+        return dict({'submissions': [sub._flat_attrs for sub in
+                    self.submissions]}, **self._flat_attrs)

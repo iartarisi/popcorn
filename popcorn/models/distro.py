@@ -40,3 +40,15 @@ class Distro(Base):
 
     def __repr__(self):
         return "<Distro: %s %s>" % (self.distro_name, self.distro_version)
+
+    @property
+    def _flat_attrs(self):
+        return {
+           'distro_name': self.distro_name,
+           'distro_version': self.distro_version,
+        }
+
+    @property
+    def serialize(self):
+        return dict({'systems': [sys._flat_attrs for sys in self.systems]},
+                    **self._flat_attrs)
