@@ -151,7 +151,7 @@ class PopcornTestCase(unittest.TestCase):
                     "sys_hwuuid":
                         "677ec7c2-3b9e-4b25-8f45-b651d8bbb701",
                     "submissions": [{
-                        "sub_date": [today.strftime("%Y-%m-%d"), "00:00:00"],
+                        "sub_date": today.strftime("%Y-%m-%d"),
                         "sys_hwuuid":
                             "677ec7c2-3b9e-4b25-8f45-b651d8bbb701",
                         "popcorn_version": "0.1"
@@ -171,7 +171,7 @@ class PopcornTestCase(unittest.TestCase):
             self.assertEqual(json.loads(response.data), {
                 "packages": [{
                     "sys_hwuuid": "677ec7c2-3b9e-4b25-8f45-b651d8bbb701",
-                    "sub_date": [today.strftime("%Y-%m-%d"), "00:00:00"],
+                    "sub_date": today.strftime("%Y-%m-%d"),
                     "pkg_status": "voted",
                     "pkg_name": "sed",
                     "pkg_version": "4.2.1",
@@ -183,7 +183,7 @@ class PopcornTestCase(unittest.TestCase):
                 "voted": 1,
                 "generic_package": {
                     "sys_hwuuid": "677ec7c2-3b9e-4b25-8f45-b651d8bbb701",
-                    "sub_date": [today.strftime("%Y-%m-%d"), "00:00:00"],
+                    "sub_date": today.strftime("%Y-%m-%d"),
                     "pkg_status": "voted",
                     "pkg_name": "sed",
                     "pkg_version": "4.2.1",
