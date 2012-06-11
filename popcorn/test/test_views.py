@@ -33,7 +33,7 @@ from sqlalchemy import create_engine, event
 
 from popcorn import app
 from popcorn.database import db_session, Base
-from popcorn.models import Arch, PackageStatus, Vendor
+from popcorn.models import Arch, PackageStatus
 
 today = date.today()
 
@@ -101,8 +101,8 @@ class PopcornTestCase(unittest.TestCase):
 
     def test_index_json(self):
         self.submit(compress=False, header=False)
-        with app.test_request_context(path='/', method='GET',
-                                      headers=[('Accept', 'application/json')]):
+        with app.test_request_context(
+            path='/', method='GET', headers=[('Accept', 'application/json')]):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                 "distro_packages": "[[\"openSUSE\", 1285]]",
@@ -127,8 +127,9 @@ class PopcornTestCase(unittest.TestCase):
 
     def test_vendor_json(self):
         self.submit(compress=False, header=False)
-        with app.test_request_context(path='/vendor/openSUSE', method='GET',
-                                      headers=[('Accept', 'application/json')]):
+        with app.test_request_context(
+            path='/vendor/openSUSE', method='GET',
+            headers=[('Accept', 'application/json')]):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                     "vendor": {
