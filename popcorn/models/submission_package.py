@@ -27,7 +27,6 @@ from sqlalchemy.orm import relationship
 
 from popcorn.database import Base
 from popcorn.models import Submission
-from popcorn.helpers import dump_datetime
 
 
 class SubmissionPackage(Base):
@@ -100,7 +99,7 @@ class SubmissionPackage(Base):
     def _flat_attrs(self):
         return {
             'sys_hwuuid': self.sys_hwuuid,
-            'sub_date': dump_datetime(self.sub_date),
+            'sub_date': self.sub_date.strftime("%Y-%m-%d"),
             'pkg_name': self.pkg_name,
             'pkg_version': self.pkg_version,
             'pkg_release': self.pkg_release,
