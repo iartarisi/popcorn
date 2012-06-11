@@ -24,7 +24,6 @@
 
 import json
 import os
-import sys
 import gzip
 import cStringIO
 import unittest
@@ -103,7 +102,7 @@ class PopcornTestCase(unittest.TestCase):
     def test_index_json(self):
         self.submit(compress=False, header=False)
         with app.test_request_context(path='/', method='GET',
-                headers=[('Accept', 'application/json')]) as ctx:
+                                      headers=[('Accept', 'application/json')]):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                 "distro_packages": "[[\"openSUSE\", 1285]]",
@@ -129,7 +128,7 @@ class PopcornTestCase(unittest.TestCase):
     def test_vendor_json(self):
         self.submit(compress=False, header=False)
         with app.test_request_context(path='/vendor/openSUSE', method='GET',
-                headers=[('Accept', 'application/json')]) as ctx:
+                                      headers=[('Accept', 'application/json')]):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                     "vendor": {
@@ -143,7 +142,7 @@ class PopcornTestCase(unittest.TestCase):
         self.submit(compress=False, header=False)
         with app.test_request_context(
                 path='/system/677ec7c2-3b9e-4b25-8f45-b651d8bbb701',
-                method='GET', headers=[('Accept', 'application/json')]) as ctx:
+                method='GET', headers=[('Accept', 'application/json')]):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                 "system": {
@@ -166,7 +165,7 @@ class PopcornTestCase(unittest.TestCase):
     def test_package_json(self):
         self.submit(compress=False, header=False)
         with app.test_request_context(path='/package/sed/4.2.1/5.1.2/x86_64',
-                method='GET', headers=[('Accept', 'application/json')]) as ctx:
+                method='GET', headers=[('Accept', 'application/json')]):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                 "packages": [{
@@ -199,7 +198,7 @@ class PopcornTestCase(unittest.TestCase):
     def test_distro_json(self):
         self.submit(compress=False, header=False)
         with app.test_request_context(path='/distro/openSUSE_12.1',
-                method='GET', headers=[('Accept', 'application/json')]) as ctx:
+                method='GET', headers=[('Accept', 'application/json')]):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                 "distro": {
