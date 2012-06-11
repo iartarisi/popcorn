@@ -35,11 +35,13 @@ from popcorn.parse import FormatError, EarlySubmissionError, parse_text
 from popcorn.models import (Distro, SubmissionPackage, Submission,
                             System, Vendor)
 from popcorn.pagination import Pagination
+from popcorn.helpers import render
 
 PER_PAGE = 50
 
 
 @app.route('/', methods=['GET'])
+@render(template='index.html')
 def index():
     distros = Distro.query.all()
     vendors = Vendor.query.all()
@@ -53,9 +55,8 @@ def index():
 
     # transform the list of tuples returned by SQLA into a nested JS array
     distro_packages = json.dumps(distro_packages)
-    return render_template('index.html',
-                           distros=distros, vendors=vendors,
-                           distro_packages=distro_packages)
+    return dict(distros=[i.serialize for i in distros], vendors=[i.serialize
+                for i in vendors], distro_packages=distro_packages)
 
 
 @app.route('/', methods=['POST'])
@@ -77,6 +78,7 @@ def receive_submission():
 
 
 @app.route('/vendor/<vendor_name>')
+@render(template='vendor.html')
 def vendor(vendor_name):
     """Return a Vendor object
 
@@ -87,7 +89,7 @@ def vendor(vendor_name):
         vendor = Vendor.query.filter_by(vendor_name=vendor_name).one()
     except NoResultFound:
         abort(404)
-    return render_template('vendor.html', vendor=vendor)
+    return dict(vendor=vendor.serialize)
 
 
 @app.route('/system/<hwuuid>/submission/<sub_date>/')
@@ -111,13 +113,14 @@ def submission(hwuuid, sub_date):
 
 
 @app.route('/system/<hwuuid>')
+@render(template='system.html')
 def system(hwuuid):
     """Return a System object"""
     try:
         system = System.query.filter_by(sys_hwuuid=hwuuid).one()
     except NoResultFound:
         abort(404)
-    return render_template('system.html', system=system)
+    return dict(system=system.serialize)
 
 
 # TODO this could be breadcrumbs, where you can put in as many arguments
@@ -126,6 +129,7 @@ def system(hwuuid):
 # links
 @app.route('/package/<name>/<version>/<release>/<arch>')
 @app.route('/package/<name>/<version>/<release>/<epoch>/<arch>')
+@render(template='packages.html')
 def package(name, version, release, arch, epoch=''):
     """Return a Package object"""
 
@@ -147,12 +151,12 @@ def package(name, version, release, arch, epoch=''):
         statuses[k] = v
     print statuses
 
-    return render_template('packages.html',
-                           generic_package=pkgs[0],
-                           packages=pkgs, **statuses)
+    return dict(generic_package=pkgs[0].serialize, packages=[i.serialize
+        for i in pkgs], **statuses)
 
 
 @app.route('/distro/<name>_<version>')
+@render(template='distro.html')
 def distro(name, version):
     """Return a Distro object"""
     try:
@@ -160,4 +164,4 @@ def distro(name, version):
                                         distro_version=version).one()
     except NoResultFound:
         abort(404)
-    return render_template('distro.html', distro=distro)
+    return dict(distro=distro.serialize)

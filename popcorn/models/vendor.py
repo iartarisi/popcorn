@@ -39,3 +39,14 @@ class Vendor(Base):
 
     def __repr__(self):
         return '<Vendor %s>' % self.vendor_name
+
+    @property
+    def _flat_attrs(self):
+        return {
+           'vendor_name': self.vendor_name,
+           'vendor_url': self.vendor_url,
+        }
+
+    @property
+    def serialize(self):
+        return dict(**self._flat_attrs)
