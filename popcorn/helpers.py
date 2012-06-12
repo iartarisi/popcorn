@@ -26,13 +26,6 @@ from functools import wraps
 from flask import request, jsonify, render_template
 
 
-def dump_datetime(value):
-    """Serialize datetime object into string form for JSON processing."""
-    if value is None:
-        return None
-    return [value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")]
-
-
 def request_wants_json():
     best = request.accept_mimetypes.best_match(['application/json',
                                                'text/html'])
