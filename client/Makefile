@@ -1,6 +1,6 @@
 PREFIX?=.
 CFLAGS=-g -Wall -fPIC
-LDFLAGS=-L${PREFIX} -lpopcorn -lrpm
+LDFLAGS=-L${PREFIX} -lpopcorn -lrpm -lcurl
 SO_TARGET=libpopcorn.so
 
 all: popcorn
