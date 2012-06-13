@@ -28,73 +28,71 @@
 
 #include <rpm/rpmlib.h>
 #include <rpm/header.h>
-
 #include <curl/curl.h>
 
-void getPkgNVREA(Header header, FILE *output_f) {
-        const char *name;
-        const char *version;
-        const char *release;
-        const char *arch;
-        const char *epoch;
 
-        headerNEVRA(header, &name, NULL, &version, &release, &arch);
+void writePkgNVREA(Header header, FILE *output_f) {
+    static const char *name;
+    static const char *version;
+    static const char *release;
+    static const char *arch;
+    static const char *epoch;
 
-        /* skip any gpg-pubkey packages */
-        if (!strcmp(name, "gpg-pubkey"))
-                return ;
+    headerNEVRA(header, &name, NULL, &version, &release, &arch);
+
+    /* skip any gpg-pubkey packages */
+    if (!strcmp(name, "gpg-pubkey"))
+        return ;
         
-        /* headerNEVRA doesn't return the epoch,
-           so we have to get it manually */
-        int type;
-        int count;
-        if (!(headerGetEntry(header, RPMTAG_EPOCH, &type,
-                             (void **) epoch, &count)
-              && type == RPM_STRING_TYPE && count == 1))
-                epoch = NULL;
+    /* headerNEVRA doesn't return the epoch,
+       so we have to get it manually */
+    int type;
+    int count;
+    if (!(headerGetEntry(header, RPMTAG_EPOCH, &type, (void **) epoch, &count)
+          && type == RPM_STRING_TYPE && count == 1))
+        epoch = NULL;
 
-        if (epoch != NULL)
-                fprintf(output_f, "%s-%s-%s-%s.%s\n", name, epoch, version, release, arch);
-        else
-                fprintf(output_f, "%s-%s-%s.%s\n", name, version, release, arch);
+    if (epoch != NULL)
+        fprintf(output_f, "%s-%s-%s-%s.%s\n", name, epoch, version, release, arch);
+    else
+        fprintf(output_f, "%s-%s-%s.%s\n", name, version, release, arch);
 }
 
 /** Post data from a file to a given server */
-int popcornPostData(char *server_name, char *file_name)
-{
-  CURL *curl;
-  CURLcode res;
+int popcornPostData(char *server_name, char *file_name) {
+    CURL *curl;
+    CURLcode res;
 
-  struct curl_httppost *formpost = NULL;
-  struct curl_httppost *lastptr = NULL;
-  struct curl_slist *headerlist = NULL;
-  static const char buf[] = "Expect:";
+    struct curl_httppost *formpost = NULL;
+    struct curl_httppost *lastptr = NULL;
+    struct curl_slist *headerlist = NULL;
+    static const char buf[] = "Expect:";
 
-  curl_global_init(CURL_GLOBAL_ALL);
+    curl_global_init(CURL_GLOBAL_ALL);
 
-  /* Add file content to the request */
-  curl_formadd(&formpost,
-               &lastptr,
-               CURLFORM_COPYNAME, "popcorn",
-               CURLFORM_FILE, file_name,
-               CURLFORM_END);
+    /* Add file content to the request */
+    curl_formadd(&formpost,
+                 &lastptr,
+                 CURLFORM_COPYNAME, "popcorn",
+                 CURLFORM_FILE, file_name,
+                 CURLFORM_END);
 
-  /* Initialize */
-  curl = curl_easy_init();
-  headerlist = curl_slist_append(headerlist, buf);
-  if (curl) {
-    /* Set options */
-    curl_easy_setopt(curl, CURLOPT_URL, server_name);
-    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
-    curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
+    /* Initialize */
+    curl = curl_easy_init();
+    headerlist = curl_slist_append(headerlist, buf);
+    if (curl) {
+        /* Set options */
+        curl_easy_setopt(curl, CURLOPT_URL, server_name);
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
+        curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
 
-    /* Perform the request */
-    res = curl_easy_perform(curl);
+        /* Perform the request */
+        res = curl_easy_perform(curl);
 
-    /* Cleanup */
-    curl_easy_cleanup(curl);
-    curl_formfree(formpost);
-    curl_slist_free_all(headerlist);
-  }
-  return res;
+        /* Cleanup */
+        curl_easy_cleanup(curl);
+        curl_formfree(formpost);
+        curl_slist_free_all(headerlist);
+    }
+    return res;
 }
