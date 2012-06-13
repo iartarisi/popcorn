@@ -6,7 +6,7 @@ SO_TARGET=libpopcorn.so
 all: popcorn
 
 ${SO_TARGET}:
-	gcc ${CFLAGS} -shared -o libpopcorn.so libpopcorn.c
+	gcc ${CFLAGS} -lrpm -shared -o libpopcorn.so libpopcorn.c
 
 popcorn: ${SO_TARGET}
 
