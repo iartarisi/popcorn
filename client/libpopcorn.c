@@ -29,6 +29,8 @@
 #include <rpm/rpmlib.h>
 #include <rpm/header.h>
 
+#include <curl/curl.h>
+
 void getPkgNVREA(Header header, FILE *output_f) {
         const char *name;
         const char *version;
@@ -55,4 +57,44 @@ void getPkgNVREA(Header header, FILE *output_f) {
                 fprintf(output_f, "%s-%s-%s-%s.%s\n", name, epoch, version, release, arch);
         else
                 fprintf(output_f, "%s-%s-%s.%s\n", name, version, release, arch);
+}
+
+/** Post data from a file to a given server */
+int popcornPostData(char *server_name, char *file_name)
+{
+  CURL *curl;
+  CURLcode res;
+
+  struct curl_httppost *formpost = NULL;
+  struct curl_httppost *lastptr = NULL;
+  struct curl_slist *headerlist = NULL;
+  static const char buf[] = "Expect:";
+
+  curl_global_init(CURL_GLOBAL_ALL);
+
+  /* Add file content to the request */
+  curl_formadd(&formpost,
+               &lastptr,
+               CURLFORM_COPYNAME, "popcorn",
+               CURLFORM_FILE, file_name,
+               CURLFORM_END);
+
+  /* Initialize */
+  curl = curl_easy_init();
+  headerlist = curl_slist_append(headerlist, buf);
+  if (curl) {
+    /* Set options */
+    curl_easy_setopt(curl, CURLOPT_URL, server_name);
+    curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
+    curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
+
+    /* Perform the request */
+    res = curl_easy_perform(curl);
+
+    /* Cleanup */
+    curl_easy_cleanup(curl);
+    curl_formfree(formpost);
+    curl_slist_free_all(headerlist);
+  }
+  return res;
 }
