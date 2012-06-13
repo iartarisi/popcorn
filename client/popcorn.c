@@ -31,6 +31,7 @@
 #include <rpm/header.h>
 
 void getPkgNVREA(Header header, FILE *output_f);
+int popcornPostData(char *server_name, char *file_name);
 
 int main(int argc, char **argv) {
         rpmReadConfigFiles(NULL, NULL);
@@ -42,9 +43,14 @@ int main(int argc, char **argv) {
         FILE *output_f = fopen("/tmp/popcorn.txt", "w");
         while ( (header = rpmdbNextIterator(iter) ) != NULL) {
                 getPkgNVREA(header, output_f);
-        } 
+        }
 
+        /* Cleanup*/
+        fclose(output_f);
         rpmts rpmtsFree(rpmts ts);
+
+        /* Upload data to the server */
+        popcornPostData("http://popcorn.mapleoin.eu", "/tmp/popcorn.txt");
 
         return(0);
 }
