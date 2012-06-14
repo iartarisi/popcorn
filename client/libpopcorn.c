@@ -74,10 +74,10 @@ char *getSystemID() {
 }
 
 /** Post data from a file to a given server */
-int popcornPostData(char *server_name, char *file_name) {
+long popcornPostData(char *server_name, char *file_name) {
     CURL *curl;
     CURLcode curl_code;
-    int http_code = 0;
+    long http_code = 0;
 
     struct curl_httppost *formpost = NULL;
     struct curl_httppost *lastptr = NULL;
