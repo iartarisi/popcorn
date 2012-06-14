@@ -24,13 +24,15 @@
  */
 
 #include <stdio.h>
+#include <err.h>
 
 #include <rpm/rpmlib.h>
 #include <rpm/rpmdb.h>
 #include <rpm/rpmts.h>
 #include <rpm/header.h>
 
-void getPkgNVREA(Header header, FILE *output_f);
+void writePkgNVREA(Header header, FILE *output_f);
+char *getSystemID();
 int popcornPostData(char *server_name, char *file_name);
 
 int main(int argc, char **argv) {
@@ -42,15 +44,31 @@ int main(int argc, char **argv) {
     Header header;
     FILE *output_f = fopen("/tmp/popcorn.txt", "w");
     while ( (header = rpmdbNextIterator(iter) ) != NULL) {
-        getPkgNVREA(header, output_f);
+        writePkgNVREA(header, output_f);
     }
 
     /* Cleanup*/
     fclose(output_f);
     rpmts rpmtsFree(rpmts ts);
 
+    /* Get the UUID */
+    char *system_id;
+    system_id = getSystemID();
+    if (system_id != NULL) {
+        printf("UUID: %s\n", system_id);
+    } else {
+        err(1, "UUID not found");
+    }
+
     /* Upload data to the server */
-    popcornPostData("http://popcorn.mapleoin.eu", "/tmp/popcorn.txt");
+    long http_code;
+    http_code = popcornPostData("http://popcorn.mapleoin.eu", "/tmp/popcorn.txt");
+    if (http_code == 200) {
+        printf("Success: %li\n", http_code);
+    } else {
+        fprintf(stderr, "Error: %li\n", http_code);
+        exit(1);
+    }
 
     return(0);
 }
