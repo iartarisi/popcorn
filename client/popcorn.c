@@ -30,7 +30,7 @@
 #include <rpm/rpmts.h>
 #include <rpm/header.h>
 
-void getPkgNVREA(Header header, FILE *output_f);
+void writePkgNVREA(Header header, FILE *output_f);
 int popcornPostData(char *server_name, char *file_name);
 
 int main(int argc, char **argv) {
@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
     Header header;
     FILE *output_f = fopen("/tmp/popcorn.txt", "w");
     while ( (header = rpmdbNextIterator(iter) ) != NULL) {
-        getPkgNVREA(header, output_f);
+        writePkgNVREA(header, output_f);
     }
 
     /* Cleanup*/
