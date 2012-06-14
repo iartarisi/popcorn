@@ -24,6 +24,7 @@
  */
 
 #include <stdio.h>
+#include <err.h>
 
 #include <rpm/rpmlib.h>
 #include <rpm/rpmdb.h>
@@ -56,7 +57,7 @@ int main(int argc, char **argv) {
     if (system_id != NULL) {
         printf("UUID: %s\n", system_id);
     } else {
-        perror("UUID not found");
+        err(1, "UUID not found");
     }
 
     /* Upload data to the server */
@@ -66,6 +67,7 @@ int main(int argc, char **argv) {
         printf("Success: %li\n", http_code);
     } else {
         fprintf(stderr, "Error: %li\n", http_code);
+        exit(1);
     }
 
     return(0);
