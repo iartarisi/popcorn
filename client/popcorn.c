@@ -33,6 +33,7 @@
 
 void writePkgLine(Header header, FILE *output_f);
 char *getSystemID();
+void writeHeading(FILE *output_f);
 int popcornPostData(char *server_name, char *file_name);
 
 int main(int argc, char **argv) {
@@ -43,6 +44,7 @@ int main(int argc, char **argv) {
 
     Header header;
     FILE *output_f = fopen("/tmp/popcorn.txt", "w");
+    writeHeading(output_f);
     while ( (header = rpmdbNextIterator(iter) ) != NULL) {
         writePkgLine(header, output_f);
     }
