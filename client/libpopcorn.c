@@ -75,8 +75,8 @@ void writePkgLine(Header header, FILE *output_f) {
     static char status;
     status = getPkgStatus(header, name);
 
-    fprintf(output_f, "%c %s-%s-%s.%s %s\n",
-            status, name, version, release, arch, vendor);
+    fprintf(output_f, "%c %s %s %s %s %s %s\n",
+            status, name, version, release, epoch, arch, vendor);
 }
 
 /* Read the system ID and return it */
