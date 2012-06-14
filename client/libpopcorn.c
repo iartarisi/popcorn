@@ -94,6 +94,23 @@ char *getSystemID() {
     return system_id;
 }
 
+char *getOSName() {
+    return "openSUSE";
+}
+
+char *getOSVersion() {
+    return "12.1";
+}
+
+char *getOSArch() {
+    return "x86_64";
+}
+
+void writeHeading(FILE *output_f) {
+    fprintf(output_f, "POPCORN 0.1 %s %s %s %s\n", getOSName(), getOSVersion(),
+            getOSArch(), getSystemID());
+}
+
 /** Post data from a file to a given server */
 long popcornPostData(char *server_name, char *file_name) {
     CURL *curl;
