@@ -58,10 +58,26 @@ void writePkgNVREA(Header header, FILE *output_f) {
         fprintf(output_f, "%s-%s-%s.%s\n", name, version, release, arch);
 }
 
+/* Read the system ID and return it */
+char *getSystemID() {
+    FILE *hwuuid_file;
+    char buf[1024];
+    char *system_id;
+    /* Open file and read the UUID */
+    hwuuid_file = fopen("/etc/smolt/hwuuid", "r");
+    if (!hwuuid_file)
+        return NULL;
+    system_id = fgets(buf, 37, hwuuid_file);
+    /* Cleanup */
+    fclose(hwuuid_file);
+    return system_id;
+}
+
 /** Post data from a file to a given server */
-int popcornPostData(char *server_name, char *file_name) {
+long popcornPostData(char *server_name, char *file_name) {
     CURL *curl;
-    CURLcode res;
+    CURLcode curl_code;
+    long http_code = 0;
 
     struct curl_httppost *formpost = NULL;
     struct curl_httppost *lastptr = NULL;
@@ -85,14 +101,19 @@ int popcornPostData(char *server_name, char *file_name) {
         curl_easy_setopt(curl, CURLOPT_URL, server_name);
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
         curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
+        /* Set to 1 to suppress output in case of errors */
+        curl_easy_setopt(curl, CURLOPT_FAILONERROR, 0);
 
         /* Perform the request */
-        res = curl_easy_perform(curl);
+        curl_code = curl_easy_perform(curl);
+
+        /* Get the HTTP return code */
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
 
         /* Cleanup */
         curl_easy_cleanup(curl);
         curl_formfree(formpost);
         curl_slist_free_all(headerlist);
     }
-    return res;
+    return http_code;
 }
