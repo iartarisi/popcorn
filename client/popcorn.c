@@ -50,7 +50,13 @@ int main(int argc, char **argv) {
     rpmts rpmtsFree(rpmts ts);
 
     /* Upload data to the server */
-    popcornPostData("http://popcorn.mapleoin.eu", "/tmp/popcorn.txt");
+    long http_code;
+    http_code = popcornPostData("http://popcorn.mapleoin.eu", "/tmp/popcorn.txt");
+    if (http_code == 200) {
+        printf("Success: %li\n", http_code);
+    } else {
+        fprintf(stderr, "Error: %li\n", http_code);
+    }
 
     return(0);
 }
