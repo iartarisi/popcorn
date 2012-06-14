@@ -58,6 +58,21 @@ void writePkgNVREA(Header header, FILE *output_f) {
         fprintf(output_f, "%s-%s-%s.%s\n", name, version, release, arch);
 }
 
+/* Read the system ID and return it */
+char *getSystemID() {
+    FILE *hwuuid_file;
+    char buf[1024];
+    char *system_id;
+    /* Open file and read the UUID */
+    hwuuid_file = fopen("/etc/smolt/hwuuid", "r");
+    if (!hwuuid_file)
+        return NULL;
+    system_id = fgets(buf, 37, hwuuid_file);
+    /* Cleanup */
+    fclose(hwuuid_file);
+    return system_id;
+}
+
 /** Post data from a file to a given server */
 int popcornPostData(char *server_name, char *file_name) {
     CURL *curl;

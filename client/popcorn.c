@@ -31,6 +31,7 @@
 #include <rpm/header.h>
 
 void writePkgNVREA(Header header, FILE *output_f);
+char *getSystemID();
 int popcornPostData(char *server_name, char *file_name);
 
 int main(int argc, char **argv) {
@@ -48,6 +49,15 @@ int main(int argc, char **argv) {
     /* Cleanup*/
     fclose(output_f);
     rpmts rpmtsFree(rpmts ts);
+
+    /* Get the UUID */
+    char *system_id;
+    system_id = getSystemID();
+    if (system_id != NULL) {
+        printf("UUID: %s\n", system_id);
+    } else {
+        perror("UUID not found");
+    }
 
     /* Upload data to the server */
     long http_code;
