@@ -31,7 +31,17 @@
 #include <curl/curl.h>
 
 
-void writePkgNVREA(Header header, FILE *output_f) {
+/* Return the popcorn status of a package, by looking at the status of
+ * the files contained in the rpm. The return status is a char. which
+ * can be: v (voted), o (old), n (nofiles), r (recent) */
+char getPkgStatus(Header header, const char* pkg_name) {
+    return 'v';
+}
+
+/* Write a line of information corresponding to the package whose header
+ * has been passed in as the first argument to the file passed as the
+ * second argument. */
+void writePkgLine(Header header, FILE *output_f) {
     static const char *name;
     static const char *version;
     static const char *release;
@@ -44,18 +54,21 @@ void writePkgNVREA(Header header, FILE *output_f) {
     if (!strcmp(name, "gpg-pubkey"))
         return ;
         
-    /* headerNEVRA doesn't return the epoch,
-       so we have to get it manually */
-    int type;
-    int count;
-    if (!(headerGetEntry(header, RPMTAG_EPOCH, &type, (void **) epoch, &count)
+    /* headerNEVRA doesn't return the epoch, so we have to get it manually */
+    static int type;
+    static int count;
+    if (!(headerGetEntry(header, RPMTAG_EPOCH, &type, (void **) &epoch, &count)
           && type == RPM_STRING_TYPE && count == 1))
         epoch = NULL;
 
+    static char status;
+    status = getPkgStatus(header, name);
     if (epoch != NULL)
-        fprintf(output_f, "%s-%s-%s-%s.%s\n", name, epoch, version, release, arch);
+        fprintf(output_f, "%c %s-%s-%s-%s.%s\n",
+                status, name, epoch, version, release, arch);
     else
-        fprintf(output_f, "%s-%s-%s.%s\n", name, version, release, arch);
+        fprintf(output_f, "%c %s-%s-%s.%s\n",
+                status, name, version, release, arch);
 }
 
 /* Read the system ID and return it */
