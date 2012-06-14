@@ -38,6 +38,18 @@ char getPkgStatus(Header header, const char* pkg_name) {
     return 'v';
 }
 
+/* Get a header string value */
+char* headerGetS(Header header, int rpmTag,
+                 const char *defvalue) {
+    static int type;
+    static int count;
+    static const char *value;
+    if (!(headerGetEntry(header, rpmTag, &type, (void **) &value, &count)
+          && type == RPM_STRING_TYPE && count == 1))
+        value = defvalue;
+    return value;
+}
+    
 /* Write a line of information corresponding to the package whose header
  * has been passed in as the first argument to the file passed as the
  * second argument. */
@@ -47,6 +59,7 @@ void writePkgLine(Header header, FILE *output_f) {
     static const char *release;
     static const char *arch;
     static const char *epoch;
+    static const char *vendor;
 
     headerNEVRA(header, &name, NULL, &version, &release, &arch);
 
@@ -55,20 +68,15 @@ void writePkgLine(Header header, FILE *output_f) {
         return ;
         
     /* headerNEVRA doesn't return the epoch, so we have to get it manually */
-    static int type;
-    static int count;
-    if (!(headerGetEntry(header, RPMTAG_EPOCH, &type, (void **) &epoch, &count)
-          && type == RPM_STRING_TYPE && count == 1))
-        epoch = NULL;
+    epoch = headerGetS(header, RPMTAG_EPOCH, "None");
 
+    vendor = headerGetS(header, RPMTAG_VENDOR, "Unknown");
+    
     static char status;
     status = getPkgStatus(header, name);
-    if (epoch != NULL)
-        fprintf(output_f, "%c %s-%s-%s-%s.%s\n",
-                status, name, epoch, version, release, arch);
-    else
-        fprintf(output_f, "%c %s-%s-%s.%s\n",
-                status, name, version, release, arch);
+
+    fprintf(output_f, "%c %s-%s-%s.%s %s\n",
+            status, name, version, release, arch, vendor);
 }
 
 /* Read the system ID and return it */
