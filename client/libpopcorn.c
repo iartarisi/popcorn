@@ -39,8 +39,8 @@ char getPkgStatus(Header header, const char* pkg_name) {
 }
 
 /* Get a header string value */
-char* headerGetS(Header header, int rpmTag,
-                 const char *defvalue) {
+const char* headerGetS(Header header, int rpmTag,
+                       const char *defvalue) {
     static int type;
     static int count;
     static const char *value;
