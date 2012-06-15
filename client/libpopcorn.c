@@ -79,12 +79,12 @@ void writePkgLine(Header header, FILE *output_f) {
             status, name, version, release, epoch, arch, vendor);
 }
 
-/* Read the system ID and return it */
+/* Read the system ID from a file and return it */
 char *getSystemID() {
     FILE *hwuuid_file;
     char buf[1024];
     char *system_id;
-    /* Open file and read the UUID */
+    /* Open file and read the ID */
     hwuuid_file = fopen("/etc/smolt/hwuuid", "r");
     if (!hwuuid_file)
         return NULL;
@@ -94,24 +94,29 @@ char *getSystemID() {
     return system_id;
 }
 
+/* Determine the OS name and return it */
 char *getOSName() {
-    return "openSUSE";
+    return "SLES";
 }
 
+/* Determine the OS version and return it */
 char *getOSVersion() {
-    return "12.1";
+    return "11 SP2";
 }
 
+/* Determine the OS arch and return it */
 char *getOSArch() {
     return "x86_64";
 }
 
+/* Write the heading to a given file handle */
 void writeHeading(FILE *output_f) {
-    fprintf(output_f, "POPCORN 0.1 %s %s %s %s\n", getOSName(), getOSVersion(),
-            getOSArch(), getSystemID());
+    fprintf(output_f, "POPCORN 0.1 %s %s %s %s\n",
+            getOSName(), getOSVersion(), getOSArch(), getSystemID());
 }
 
-/** Post data from a file to a given server */
+/* Post data from a file given by the second argument to a server given by the
+ * first argument */
 long popcornPostData(char *server_name, char *file_name) {
     CURL *curl;
     CURLcode curl_code;
