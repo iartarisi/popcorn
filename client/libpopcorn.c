@@ -101,7 +101,7 @@ char *getOSName() {
 
 /* Determine the OS version and return it */
 char *getOSVersion() {
-    return "11 SP2";
+    return "11SP1";
 }
 
 /* Determine the OS arch and return it */
