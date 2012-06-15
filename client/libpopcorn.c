@@ -30,6 +30,7 @@
 #include <rpm/header.h>
 #include <curl/curl.h>
 
+#define MAX_DATA 100 /* upper limit when reading from files */
 
 /* Return the popcorn status of a package, by looking at the status of
  * the files contained in the rpm. The return status is a char. which
@@ -104,15 +105,32 @@ char *getOSVersion() {
     return "11SP1";
 }
 
-/* Determine the OS arch and return it */
-char *getOSArch() {
-    return "x86_64";
+/* Determine the OS arch and write it to the 'arch' parameter */
+void getOSArch(char *arch) {
+    FILE *parch;
+
+    /* Use the 'arch' system utility to get the system's arch */
+    parch = popen("arch", "r");
+    if (parch == NULL) {
+        printf("Failed to read system architecture.\n");
+        exit(1);
+    }
+
+    int rc = fscanf(parch, "%s", arch);
+    if (rc != 1) {
+        printf("Failed to read system architecture.\n");
+        exit(rc);
+    }
+    pclose(parch);
 }
 
 /* Write the heading to a given file handle */
 void writeHeading(FILE *output_f) {
+    char arch[MAX_DATA];
+
+    getOSArch(arch);
     fprintf(output_f, "POPCORN 0.1 %s %s %s %s\n",
-            getOSName(), getOSVersion(), getOSArch(), getSystemID());
+            getOSName(), getOSVersion(), arch, getSystemID());
 }
 
 /* Post data from a file given by the second argument to a server given by the
