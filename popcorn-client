@@ -39,7 +39,7 @@ import cStringIO
 POST_SERVER = 'localhost:5000'
 POST_URI = '/'
 VERSION = '0.1'
-HWUUID_FILE = '/etc/smolt/hw-uuid'
+HWUUID_FILE = '/var/lib/dbus/machine-id'
 
 days_recent = 30
 days_voted = 30
