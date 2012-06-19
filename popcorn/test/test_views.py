@@ -114,7 +114,7 @@ class PopcornTestCase(unittest.TestCase):
                     "distro_name": "openSUSE",
                     "systems": [{
                         "sys_hwuuid":
-                            "677ec7c2-3b9e-4b25-8f45-b651d8bbb701",
+                            "43557fe2680t8cg60f4e5d4b000604f1",
                             "arch": "x86_64",
                             "distro_version": "12.1",
                             "distro_name": "openSUSE"
@@ -142,18 +142,18 @@ class PopcornTestCase(unittest.TestCase):
     def test_system_json(self):
         self.submit(compress=False, header=False)
         with app.test_request_context(
-                path='/system/677ec7c2-3b9e-4b25-8f45-b651d8bbb701',
+                path='/system/43557fe2680t8cg60f4e5d4b000604f1',
                 method='GET', headers=[('Accept', 'application/json')]):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                 "system": {
                     "arch": "x86_64",
                     "sys_hwuuid":
-                        "677ec7c2-3b9e-4b25-8f45-b651d8bbb701",
+                        "43557fe2680t8cg60f4e5d4b000604f1",
                     "submissions": [{
                         "sub_date": today.strftime("%Y-%m-%d"),
                         "sys_hwuuid":
-                            "677ec7c2-3b9e-4b25-8f45-b651d8bbb701",
+                            "43557fe2680t8cg60f4e5d4b000604f1",
                         "popcorn_version": "0.1"
                         }],
                     "distro_name": "openSUSE",
@@ -170,7 +170,7 @@ class PopcornTestCase(unittest.TestCase):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                 "packages": [{
-                    "sys_hwuuid": "677ec7c2-3b9e-4b25-8f45-b651d8bbb701",
+                    "sys_hwuuid": "43557fe2680t8cg60f4e5d4b000604f1",
                     "sub_date": today.strftime("%Y-%m-%d"),
                     "pkg_status": "voted",
                     "pkg_name": "sed",
@@ -182,7 +182,7 @@ class PopcornTestCase(unittest.TestCase):
                   }],
                 "voted": 1,
                 "generic_package": {
-                    "sys_hwuuid": "677ec7c2-3b9e-4b25-8f45-b651d8bbb701",
+                    "sys_hwuuid": "43557fe2680t8cg60f4e5d4b000604f1",
                     "sub_date": today.strftime("%Y-%m-%d"),
                     "pkg_status": "voted",
                     "pkg_name": "sed",
@@ -206,7 +206,7 @@ class PopcornTestCase(unittest.TestCase):
                     "distro_name": "openSUSE",
                     "systems": [{
                         "sys_hwuuid":
-                            "677ec7c2-3b9e-4b25-8f45-b651d8bbb701",
+                            "43557fe2680t8cg60f4e5d4b000604f1",
                         "arch": "x86_64",
                         "distro_version": "12.1",
                         "distro_name": "openSUSE"
