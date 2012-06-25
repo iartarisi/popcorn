@@ -36,6 +36,7 @@ from popcorn.database import db_session, Base
 from popcorn.models import Arch, PackageStatus
 
 today = date.today()
+SYS_HWUUID = '33d08e56f1d2748bc7d056375042dcd1336a7635fdc1cec159bedacfce9c2c4f'
 
 
 # we need to explicitly enable foreign key constraints for sqlite
@@ -113,8 +114,7 @@ class PopcornTestCase(unittest.TestCase):
                 "distros": [{
                     "distro_name": "openSUSE",
                     "systems": [{
-                        "sys_hwuuid":
-                            "43557fe2680t8cg60f4e5d4b000604f1",
+                        "sys_hwuuid": SYS_HWUUID,
                             "arch": "x86_64",
                             "distro_version": "12.1",
                             "distro_name": "openSUSE"
@@ -142,18 +142,16 @@ class PopcornTestCase(unittest.TestCase):
     def test_system_json(self):
         self.submit(compress=False, header=False)
         with app.test_request_context(
-                path='/system/43557fe2680t8cg60f4e5d4b000604f1',
+                path='/system/%s' % SYS_HWUUID,
                 method='GET', headers=[('Accept', 'application/json')]):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                 "system": {
                     "arch": "x86_64",
-                    "sys_hwuuid":
-                        "43557fe2680t8cg60f4e5d4b000604f1",
+                    "sys_hwuuid": SYS_HWUUID,
                     "submissions": [{
                         "sub_date": today.strftime("%Y-%m-%d"),
-                        "sys_hwuuid":
-                            "43557fe2680t8cg60f4e5d4b000604f1",
+                        "sys_hwuuid": SYS_HWUUID,
                         "popcorn_version": "0.1"
                         }],
                     "distro_name": "openSUSE",
@@ -170,7 +168,7 @@ class PopcornTestCase(unittest.TestCase):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                 "packages": [{
-                    "sys_hwuuid": "43557fe2680t8cg60f4e5d4b000604f1",
+                    "sys_hwuuid": SYS_HWUUID,
                     "sub_date": today.strftime("%Y-%m-%d"),
                     "pkg_status": "voted",
                     "pkg_name": "sed",
@@ -182,7 +180,7 @@ class PopcornTestCase(unittest.TestCase):
                   }],
                 "voted": 1,
                 "generic_package": {
-                    "sys_hwuuid": "43557fe2680t8cg60f4e5d4b000604f1",
+                    "sys_hwuuid": SYS_HWUUID,
                     "sub_date": today.strftime("%Y-%m-%d"),
                     "pkg_status": "voted",
                     "pkg_name": "sed",
@@ -205,8 +203,7 @@ class PopcornTestCase(unittest.TestCase):
                 "distro": {
                     "distro_name": "openSUSE",
                     "systems": [{
-                        "sys_hwuuid":
-                            "43557fe2680t8cg60f4e5d4b000604f1",
+                        "sys_hwuuid": SYS_HWUUID,
                         "arch": "x86_64",
                         "distro_version": "12.1",
                         "distro_name": "openSUSE"
