@@ -37,7 +37,7 @@ class SubmissionError(Exception):
 class Submission(Base):
     __tablename__ = 'submissions'
     sub_date = Column(Date(), primary_key=True)
-    sys_hwuuid = Column(String(32), ForeignKey('systems.sys_hwuuid'),
+    sys_hwuuid = Column(String(64), ForeignKey('systems.sys_hwuuid'),
                         primary_key=True)
     popcorn_version = Column(String(30), nullable=False)
 
