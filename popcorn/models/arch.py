@@ -40,7 +40,7 @@ class Arch(Base):
     @property
     def _flat_attrs(self):
         return {
-           'arch': self.arch,
+            'arch': self.arch,
         }
 
     @property

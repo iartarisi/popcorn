@@ -61,8 +61,8 @@ class PackageStatus(Base):
     @property
     def _flat_attrs(self):
         return {
-           'pkg_status': self.pkg_status,
-           'short_status': self.short_status,
+            'pkg_status': self.pkg_status,
+            'short_status': self.short_status,
         }
 
     @property

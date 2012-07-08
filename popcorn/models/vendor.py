@@ -43,8 +43,8 @@ class Vendor(Base):
     @property
     def _flat_attrs(self):
         return {
-           'vendor_name': self.vendor_name,
-           'vendor_url': self.vendor_url,
+            'vendor_name': self.vendor_name,
+            'vendor_url': self.vendor_url
         }
 
     @property

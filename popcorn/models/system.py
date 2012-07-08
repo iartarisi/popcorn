@@ -61,10 +61,10 @@ class System(Base):
     @property
     def _flat_attrs(self):
         return {
-           'sys_hwuuid': self.sys_hwuuid,
-           'distro_name': self.distro_name,
-           'distro_version': self.distro_version,
-           'arch': self.arch,
+            'sys_hwuuid': self.sys_hwuuid,
+            'distro_name': self.distro_name,
+            'distro_version': self.distro_version,
+            'arch': self.arch,
         }
 
     @property

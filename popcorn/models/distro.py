@@ -44,8 +44,8 @@ class Distro(Base):
     @property
     def _flat_attrs(self):
         return {
-           'distro_name': self.distro_name,
-           'distro_version': self.distro_version,
+            'distro_name': self.distro_name,
+            'distro_version': self.distro_version,
         }
 
     @property

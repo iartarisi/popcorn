@@ -55,9 +55,9 @@ class Submission(Base):
     @property
     def _flat_attrs(self):
         return {
-           'sub_date': self.sub_date.strftime("%Y-%m-%d"),
-           'sys_hwuuid': self.sys_hwuuid,
-           'popcorn_version': self.popcorn_version,
+            'sub_date': self.sub_date.strftime("%Y-%m-%d"),
+            'sys_hwuuid': self.sys_hwuuid,
+            'popcorn_version': self.popcorn_version,
         }
 
     @property
