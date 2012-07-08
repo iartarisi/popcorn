@@ -22,7 +22,6 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-
 Name:      popcorn
 Version:   0.1
 Release:   0
@@ -54,6 +53,7 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-, root, root, -)
+%doc README LICENSE
 %{_bindir}/popcorn
 %{_sysconfdir}/popcorn.conf
 %config(noreplace) %{_sysconfdir}/cron.monthly/popcorn
