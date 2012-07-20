@@ -50,8 +50,13 @@ def index():
     # XXX think about moving this to the model
     distro_packages = db_session.query(
         Distro.distro_name, func.count(SubmissionPackage.pkg_name)
-        ).select_from(SubmissionPackage).join(System).join(Distro
-        ).group_by(Distro.distro_name).all()
+    ).select_from(
+        SubmissionPackage
+    ).join(
+        System
+    ).join(
+        Distro
+    ).group_by(Distro.distro_name).all()
 
     # transform the list of tuples returned by SQLA into a nested JS array
     distro_packages = json.dumps(distro_packages)
@@ -140,19 +145,20 @@ def package(name, version, release, arch, epoch=''):
         abort(404)
 
     pkg_statuses = db_session.query(
-        SubmissionPackage.pkg_status, func.count(SubmissionPackage.pkg_status)
-        ).filter_by(
+        SubmissionPackage.pkg_status,
+        func.count(SubmissionPackage.pkg_status)
+    ).filter_by(
         pkg_name=name, pkg_version=version, pkg_release=release,
         pkg_epoch=epoch, pkg_arch=arch
-        ).group_by(
-            SubmissionPackage.pkg_status).all()
+    ).group_by(
+        SubmissionPackage.pkg_status).all()
     statuses = dict()
     for k, v in pkg_statuses:
         statuses[k] = v
     print statuses
 
-    return dict(generic_package=pkgs[0].serialize, packages=[i.serialize
-        for i in pkgs], **statuses)
+    return dict(generic_package=pkgs[0].serialize,
+                packages=[i.serialize for i in pkgs], **statuses)
 
 
 @app.route('/distro/<name>_<version>')

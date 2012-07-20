@@ -75,7 +75,7 @@ class PopcornTestCase(unittest.TestCase):
         f_in = open(submission_file, 'rb')
         if compress:
             f = cStringIO.StringIO()
-            g = gzip.GzipFile(mode='wb',  fileobj=f)
+            g = gzip.GzipFile(mode='wb', fileobj=f)
             g.writelines(f_in)
             g.close()
             f_in.close()
@@ -84,7 +84,7 @@ class PopcornTestCase(unittest.TestCase):
             f = f_in
         if header:
             return self.app.post('/', data=dict(popcorn=(f, 'popcorn.txt.gz')),
-                    headers={'Content-Encoding': 'gzip', })
+                                 headers={'Content-Encoding': 'gzip', })
         else:
             return self.app.post('/', data=dict(popcorn=(f, 'popcorn.txt')))
 
@@ -103,7 +103,8 @@ class PopcornTestCase(unittest.TestCase):
     def test_index_json(self):
         self.submit(compress=False, header=False)
         with app.test_request_context(
-            path='/', method='GET', headers=[('Accept', 'application/json')]):
+                path='/', method='GET',
+                headers=[('Accept', 'application/json')]):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                 "distro_packages": "[[\"openSUSE\", 1285]]",
@@ -128,14 +129,14 @@ class PopcornTestCase(unittest.TestCase):
     def test_vendor_json(self):
         self.submit(compress=False, header=False)
         with app.test_request_context(
-            path='/vendor/openSUSE', method='GET',
-            headers=[('Accept', 'application/json')]):
+                path='/vendor/openSUSE', method='GET',
+                headers=[('Accept', 'application/json')]):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
-                    "vendor": {
-                        "vendor_name": "openSUSE",
-                        "vendor_url": "openSUSE"
-                        }})
+                "vendor": {
+                    "vendor_name": "openSUSE",
+                    "vendor_url": "openSUSE"
+                    }})
             self.assertEqual(response.headers['Content-Type'],
                              'application/json')
 
@@ -164,7 +165,9 @@ class PopcornTestCase(unittest.TestCase):
     def test_package_json(self):
         self.submit(compress=False, header=False)
         with app.test_request_context(path='/package/sed/4.2.1/5.1.2/x86_64',
-                method='GET', headers=[('Accept', 'application/json')]):
+                                      method='GET',
+                                      headers=[('Accept', 'application/json')]
+                                      ):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                 "packages": [{
@@ -197,7 +200,9 @@ class PopcornTestCase(unittest.TestCase):
     def test_distro_json(self):
         self.submit(compress=False, header=False)
         with app.test_request_context(path='/distro/openSUSE_12.1',
-                method='GET', headers=[('Accept', 'application/json')]):
+                                      method='GET',
+                                      headers=[('Accept', 'application/json')]
+                                      ):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                 "distro": {

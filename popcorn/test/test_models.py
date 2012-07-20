@@ -115,11 +115,10 @@ class ModelsSimpleTests(ModelsTest):
 
     def test_system_last_submission(self):
         sub1 = Submission('hw_uuid1', 'P1', date.today())
-        sub2 = Submission('hw_uuid2', 'P1', date.today() -
-                timedelta(days=31 * 2))
-        sub3 = Submission('hw_uuid1', 'P1', date.today() -
-                timedelta(days=31 * 3))
-
+        sub2 = Submission('hw_uuid2', 'P1',
+                          date.today() - timedelta(days=31 * 2))
+        sub3 = Submission('hw_uuid1', 'P1',
+                          date.today() - timedelta(days=31 * 3))
         s1 = System.query.first()
         self.assertIsNone(s1.last_submission)
 

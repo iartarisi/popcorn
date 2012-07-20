@@ -61,10 +61,10 @@ class Pagination(object):
         """ Generates page numbers for navigation """
         last = 0
         for num in xrange(1, self.pages + 1):
-            if (num <= left_edge or
-                (num > self.page - left_current - 1 and
-                num < self.page + right_current) or
-                num > self.pages - right_edge):
+            if (num <= left_edge
+                    or (num > self.page - left_current - 1
+                        and num < self.page + right_current)
+                    or (num > self.pages - right_edge)):
                 if last + 1 != num:
                     yield None
                 yield num
