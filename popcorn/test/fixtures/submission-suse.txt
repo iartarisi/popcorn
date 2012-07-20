@@ -1,4 +1,4 @@
-POPCORN 0.1 openSUSE  12.1 x86_64 43557fe2680t8cg60f4e5d4b000604f1
+POPCORN 0.1 openSUSE  12.1 x86_64 33d08e56f1d2748bc7d056375042dcd1336a7635fdc1cec159bedacfce9c2c4f
 o xorg-x11-libXprintUtil 7.6 5.1.2 None x86_64 openSUSE
 o libquadmath46 4.6.2_20111026 1.1.4 None x86_64 openSUSE
 o PackageKit-gtk-module 0.6.19 2.1.3 None x86_64 openSUSE

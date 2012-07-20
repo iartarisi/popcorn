@@ -33,7 +33,7 @@ class SubmissionPackage(Base):
     __tablename__ = 'submission_packages'
 
     # primary key
-    sys_hwuuid = Column(String(32), ForeignKey('systems.sys_hwuuid'),
+    sys_hwuuid = Column(String(64), ForeignKey('systems.sys_hwuuid'),
                         primary_key=True,)
     sub_date = Column(Date(), primary_key=True)
     pkg_name = Column(String(50), primary_key=True)

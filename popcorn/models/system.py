@@ -31,7 +31,7 @@ from popcorn.models import Distro, Submission
 
 class System(Base):
     __tablename__ = 'systems'
-    sys_hwuuid = Column(String(32), primary_key=True)
+    sys_hwuuid = Column(String(64), primary_key=True)
     distro_name = Column(String(20), nullable=False)
     distro_version = Column(String(10), nullable=False)
     arch = Column(String(10), ForeignKey('arches.arch'), nullable=False)
