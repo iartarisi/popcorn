@@ -1,0 +1,134 @@
+/* ------------------------------------------------------------------------------
+ * Copyright (c) 2006 Novell, Inc. All Rights Reserved.
+ *
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of version 2 of the GNU General Public License as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, contact Novell, Inc.
+ *
+ * To contact Novell about this file by physical or electronic mail, you may find
+ * current contact information at www.novell.com.
+ * ------------------------------------------------------------------------------
+ */
+
+/**
+ * File:	clients/popcorn_auto.ycp
+ * Package:	Configuration of popcorn
+ * Summary:	Client for autoinstallation
+ * Authors:	Akshit Khurana <axitkhurana@gmail.com>
+ *
+ * $Id: popcorn_auto.ycp 41350 2007-10-10 16:59:00Z dfiser $
+ *
+ * This is a client for autoinstallation. It takes its arguments,
+ * goes through the configuration and return the setting.
+ * Does not do any changes to the configuration.
+ */
+
+/**
+ * @param function to execute
+ * @param map/list of popcorn settings
+ * @return map edited settings, Summary or boolean on success depending on called function
+ * @example map mm = $[ "FAIL_DELAY" : "77" ];
+ * @example map ret = WFM::CallFunction ("popcorn_auto", [ "Summary", mm ]);
+ */
+
+{
+
+textdomain "popcorn";
+
+y2milestone("----------------------------------------");
+y2milestone("Popcorn auto started");
+
+import "Popcorn";
+include "popcorn/wizards.ycp";
+
+any ret = nil;
+string func = "";
+map param = $[];
+
+/* Check arguments */
+if(size(WFM::Args()) > 0 && is(WFM::Args(0), string)) {
+    func = (string)WFM::Args(0);
+    if(size(WFM::Args()) > 1 && is(WFM::Args(1), map))
+	param = (map) WFM::Args(1);
+}
+y2debug("func=%1", func);
+y2debug("param=%1", param);
+
+/* Create a summary*/
+if(func == "Summary") {
+    ret = select(Popcorn::Summary(), 0, "");
+}
+/* Reset configuration */
+else if (func == "Reset") {
+    Popcorn::Import($[]);
+    ret = $[];
+}
+/* Change configuration (run AutoSequence) */
+else if (func == "Change") {
+    ret = PopcornAutoSequence();
+}
+/* Import configuration */
+else if (func == "Import") {
+    ret = Popcorn::Import(param);
+}
+/* Return actual state */
+else if (func == "Export") {
+    ret = Popcorn::Export();
+}
+/* Return needed packages */
+else if (func == "Packages") {
+    ret = Popcorn::AutoPackages();
+}
+/* Read current state */
+else if (func == "Read") {
+    import "Progress";
+    boolean progress_orig = Progress::set (false);
+    ret = Popcorn::Read();
+    Progress::set (progress_orig);
+}
+/* Write givven settings */
+else if (func == "Write") {
+    import "Progress";
+    boolean progress_orig = Progress::set (false);
+    Popcorn::SetWriteOnly (true);
+    ret = Popcorn::Write();
+    Progress::set (progress_orig);
+}
+/**
+ * did configuration changed
+ * return boolean
+ */
+else if (func == "GetModified") {
+    ret = Popcorn::Modified ();
+}
+/**
+ * set configuration as changed
+ * return boolean
+ */
+else if (func == "SetModified") {
+    Popcorn::SetModified (true);
+    ret = true;
+}
+
+/* Unknown function */
+else {
+    y2error("Unknown function: %1", func);
+    ret = false;
+}
+
+y2debug("ret=%1", ret);
+y2milestone("Popcorn auto finished");
+y2milestone("----------------------------------------");
+
+return ret;
+
+/* EOF */
+}
