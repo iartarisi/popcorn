@@ -1,0 +1,29 @@
+/**
+ * File:
+ *   popcorn.scr
+ * Summary:
+ *   SCR Agent for reading/writing /etc/pocorn.conf
+ *   using the ini-agent
+ * Access:
+ *   read/write
+ * Authors:
+ *   Akshit Khurana <axitkhurana@gmail.com>
+ * Example:
+ *   Dir(.popcorn)
+ *   (["popcorn_enabled", "post_server", "post_uri", "hwuuid_file"])
+ *
+ *   Read(.popcorn.popcorn_enabled)
+ *   (["yes"])
+ *
+ *   Write(.popcorn.popcorn_enabled, "yes")
+ *   (true)
+ *
+ * $Id: popcorn.scr 11113 2005-10-20 14:15:16Z jtf $
+ *
+ */
+
+.popcorn
+
+`ag_ini(
+  `SysConfigFile("/etc/popcorn.conf")
+)
