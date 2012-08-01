@@ -1,0 +1,83 @@
+/* ------------------------------------------------------------------------------
+ * Copyright (c) 2006 Novell, Inc. All Rights Reserved.
+ *
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of version 2 of the GNU General Public License as published by the
+ * Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, contact Novell, Inc.
+ *
+ * To contact Novell about this file by physical or electronic mail, you may find
+ * current contact information at www.novell.com.
+ * ------------------------------------------------------------------------------
+ */
+
+/**
+ * File:	include/popcorn/dialogs.ycp
+ * Package:	Configuration of popcorn
+ * Summary:	Dialogs definitions
+ * Authors:	Akshit Khurana <axitkhurana@gmail.com>
+ *
+ * $Id: dialogs.ycp 27914 2006-02-13 14:32:08Z locilka $
+ */
+
+{
+
+textdomain "popcorn";
+
+import "Label";
+import "Wizard";
+import "Popcorn";
+
+
+/**
+ * Settings dialog
+ * @return dialog result
+ */
+any SettingsDialog() {
+
+    /* Popcorn settings dialog caption */
+    string caption = _("Popcorn Configuration");
+
+    /* Popcorn configure1 dialog contents */
+    term contents = `Label (_("Change popcorn settings"));
+
+    string help_text = _("<p><b><big>change popcorn configuration</big></b><br>
+Enable/Disable sending package data.
+<br></p>");
+
+    term fields = Popcorn::configWidgets( Popcorn::popcorn_config, Popcorn::popcorn_config_path );
+
+    Wizard::OpenAcceptDialog();
+    Wizard::SetContents( "Popcorn Configuration",  // Dialog title
+                         `MarginBox( 10, 0, fields ),   // Dialog contents
+                         help_text,
+                         true,          // "Cancel" button enabled?
+                         true );        // "Accept" button enabled?
+
+    // Dialog input loop
+    any ret = nil;
+
+    repeat
+    {
+        ret = UI::UserInput();
+
+    } until ( ret == `accept ||
+              ret == `cancel );
+
+    if ( ret == `accept )
+    {
+        Popcorn::writeConfig( Popcorn::popcorn_config, Popcorn::popcorn_config_path );
+    }
+
+    return ret;
+}
+
+/* EOF */
+}

@@ -1,0 +1,13 @@
+{
+
+// testedfiles: Popcorn.ycp
+
+include "testsuite.ycp";
+TESTSUITE_INIT([], nil);
+
+import "Popcorn";
+
+DUMP("Popcorn::Modified");
+TEST(``(Popcorn::Modified()), [], nil);
+
+}

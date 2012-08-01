@@ -1,0 +1,31 @@
+@HEADER-COMMENT@
+
+@HEADER@
+Requires:	yast2
+BuildRequires:	perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite
+
+BuildArchitectures:	noarch
+
+Summary:	Configuration of popcorn
+
+%description
+-
+
+@PREP@
+
+@BUILD@
+
+@INSTALL@
+
+@CLEAN@
+
+%files
+%defattr(-,root,root)
+%dir @yncludedir@/popcorn
+@yncludedir@/popcorn/*
+@clientdir@/popcorn.ycp
+@clientdir@/popcorn_*.ycp
+@moduledir@/Popcorn.*
+@moduledir@/Popcorn2.*
+@desktopdir@/popcorn.desktop
+%doc @docdir@
