@@ -3,23 +3,17 @@
 yncludedir = @yncludedir@/popcorn
 
 client_DATA =			\
-	popcorn.ycp		\
-	popcorn_auto.ycp	\
-	popcorn_proposal.ycp
+	popcorn.ycp
 
 ynclude_DATA =			\
-	helps.ycp		\
 	wizards.ycp		\
-	dialogs.ycp		\
-	complex.ycp
+	dialogs.ycp
 
 desktop_DATA =			\
 	popcorn.desktop
 
 module_DATA =			\
-	Popcorn.ycp		\
-	Popcorn2.pm		\
-	Popcorn3.py
+	Popcorn.ycp
 
 # create a symlink for local build, #145327
 popcorn:
