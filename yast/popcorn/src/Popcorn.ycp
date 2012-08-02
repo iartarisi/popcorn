@@ -39,6 +39,7 @@ import "Progress";
 import "Report";
 import "Summary";
 import "Message";
+import "SCR";
 
 /**
  * Prototypes
@@ -121,21 +122,132 @@ global void SetAbortFunction(boolean() function) {
     AbortFunction = function;
 }
 
+typedef map<string, any> ConfigEntry;
 
-// Settings: Define all variables needed for configuration of popcorn
-// TODO FIXME: Define all the variables necessary to hold
-// TODO FIXME: the configuration here (with the appropriate
-// TODO FIXME: description)
-// TODO FIXME: For example:
-//   /**
-//    * List of the configured cards.
-//    */
-//   list cards = [];
-//
-//   /**
-//    * Some additional parameter needed for the configuration.
-//    */
-//   boolean additional_parameter = true;
+// Settings: Variables needed for configuration of popcorn
+global list<ConfigEntry> popcorn_config =
+    [
+     $[ "name": "POPCORN_ENABLED", "type": "bool", "def": true ],
+    ];
+
+global path popcorn_config_path = .popcorn;
+
+// Mapping from config entry names to widget captions
+// (in a real life example this would go to the ConfigEntry map, too)
+
+global map<string, string> widget_caption =
+    $[
+      "POPCORN_ENABLED"     : "Enable Popcorn",
+      ];
+
+
+/**
+ * Create a widget for a config entry
+ *
+ * Parameters:
+ *     entry                map describing the config entry
+ *     scr_base_path        SCR path to use (entry["name"] will be added)
+ *
+ * Return:
+ *     term describing the widget
+ **/
+global term entryWidget( ConfigEntry entry, path scr_base_path )
+{
+    string name     = (string) entry[ "name" ]:nil;
+    string type     = (string) entry[ "type" ]:"string";
+    string caption  = widget_caption[ name ]:name;
+
+    // Read current value from config file
+
+    any value = SCR::Read( add( scr_base_path, name ) );
+    y2debug("Read value %1", value);
+
+    // Create corresponding widget
+
+    term widget = nil;
+
+    if ( type == "string" )
+    {
+        widget = `TextEntry( `id( name ), caption, value != nil ? value : "" );
+    }
+    else if ( type == "password" )
+    {
+        widget = `Password( `id( name ), caption, value != nil ? value : "" );
+    }
+    else if ( type == "bool" )
+    {
+        widget = `Left( `CheckBox( `id( name ), caption, value == "yes" ) );
+    }
+    else if ( type == "int" )
+    {
+        integer min = tointeger( entry[ "min" ]:0 );
+        integer max = tointeger( entry[ "max" ]:65535 );
+        widget = `IntField( `id( name ), caption, min, max,
+                            value != nil ? tointeger( value ) : min );
+    }
+    else
+    {
+        y2error( "Unknown type in config entry: %1", entry );
+    }
+
+    return widget;
+}
+
+
+/**
+ * Create widgets in a VBox for a list of config entries
+ *
+ * Parameters:
+ *     scr_base_path        SCR path to use (entry["name"] will be added)
+ *     entries              list of maps describing the config entries
+ *
+ * Return:
+ *     widget term
+ **/
+global term configWidgets( list<ConfigEntry> entry_list, path scr_base_path )
+{
+    term vbox = `VBox();
+
+    foreach( ConfigEntry entry, entry_list,
+    {
+        term widget = entryWidget( entry, scr_base_path );
+
+        if ( widget != nil )
+            vbox = add( vbox, widget );
+    });
+
+    return vbox;
+}
+
+
+/**
+ * Write a list of configuration entries to file.
+ * Get the current value for each entry from a widget in the current dialog.
+ **/
+global void writeConfig( list<ConfigEntry> entry_list, path scr_base_path )
+{
+    foreach( ConfigEntry entry, entry_list,
+    {
+        string name = (string) entry[ "name" ]:nil;
+
+        if ( name == nil )
+        {
+            y2error( "Entry without name in entry list: %1", entry );
+        }
+        else
+        {
+            any value = UI::QueryWidget(`id( name ), `Value );
+
+            if ( is( value, boolean ) )
+                value = ( (boolean) value ) ? "yes" : "no";
+
+            SCR::Write( add( scr_base_path, name ), value );
+        }
+    });
+}
+
+
+// XXX Remove unused functions
 
 /**
  * Read all popcorn settings

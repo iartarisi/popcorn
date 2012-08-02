@@ -34,73 +34,7 @@ textdomain "popcorn";
 import "Sequencer";
 import "Wizard";
 
-include "popcorn/complex.ycp";
 include "popcorn/dialogs.ycp";
-
-/**
- * Add a configuration of popcorn
- * @return sequence result
- */
-any AddSequence() {
-
-    /* FIXME: adapt to your needs */
-    map aliases = $[
-	"config1"	: ``(Configure1Dialog()),
-	"config2"	: ``(Configure2Dialog()),
-    ];
-
-    /* FIXME: adapt to your needs */
-    map sequence = $[
-	"ws_start" : "config1",
-	"config1" : $[
-	    `abort	: `abort,
-	    `next	: "config2"
-	],
-	"config2" : $[
-	    `abort	: `abort,
-	    `next	: `next
-	]
-    ];
-
-    return Sequencer::Run(aliases, sequence);
-}
-
-/**
- * Main workflow of the popcorn configuration
- * @return sequence result
- */
-any MainSequence() {
-
-    /* FIXME: adapt to your needs */
-    map aliases = $[
-	"overview"	:   ``( OverviewDialog() ),
-	"add"		: [ ``( AddSequence() ), true ],
-	"edit"		: [ ``( AddSequence() ), true ]
-    ];
-
-    /* FIXME: adapt to your needs */
-    map sequence = $[
-	"ws_start" : "overview",
-	"overview" : $[
-	    `abort	: `abort,
-	    `next	: `next,
-	    `add	: "add",
-	    `edit	: "edit",
-	],
-	"add" : $[
-	    `abort	: `abort,
-	    `next	: "overview",
-	],
-	"edit" : $[
-	    `abort	: `abort,
-	    `next	: "overview",
-	]
-    ];
-
-    any ret = Sequencer::Run(aliases, sequence);
-
-    return ret;
-}
 
 /**
  * Whole configuration of popcorn
@@ -109,22 +43,12 @@ any MainSequence() {
 any PopcornSequence() {
 
     map aliases = $[
-	"read"	: [ ``( ReadDialog() ), true ],
-	"main"	:   ``( MainSequence() ),
-	"write"	: [ ``( WriteDialog() ), true ]
+	"main"	:   ``( SettingsDialog() ),
     ];
 
     map sequence = $[
-	"ws_start" : "read",
-	"read" : $[
-	    `abort	: `abort,
-	    `next	: "main"
-	],
+	"ws_start" : "main",
 	"main" : $[
-	    `abort	: `abort,
-	    `next	: "write"
-	],
-	"write" : $[
 	    `abort	: `abort,
 	    `next	: `next
 	]
@@ -135,28 +59,6 @@ any PopcornSequence() {
     Wizard::SetDesktopTitleAndIcon("popcorn");
 
     any ret = Sequencer::Run(aliases, sequence);
-
-    UI::CloseDialog();
-    return ret;
-}
-
-/**
- * Whole configuration of popcorn but without reading and writing.
- * For use with autoinstallation.
- * @return sequence result
- */
-any PopcornAutoSequence() {
-
-    /* Initialization dialog caption */
-    string caption = _("Popcorn Configuration");
-    /* Initialization dialog contents */
-    term contents = `Label(_("Initializing..."));
-
-    Wizard::CreateDialog();
-    Wizard::SetContentsButtons(caption, contents, "",
-	    Label::BackButton(), Label::NextButton());
-
-    any ret = MainSequence();
 
     UI::CloseDialog();
     return ret;

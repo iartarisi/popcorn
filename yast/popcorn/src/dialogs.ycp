@@ -35,77 +35,45 @@ import "Label";
 import "Wizard";
 import "Popcorn";
 
-include "popcorn/helps.ycp";
 
 /**
- * Configure1 dialog
+ * Settings dialog
  * @return dialog result
  */
-any Configure1Dialog () {
+any SettingsDialog() {
 
-    /* Popcorn configure1 dialog caption */
+    /* Popcorn settings dialog caption */
     string caption = _("Popcorn Configuration");
 
     /* Popcorn configure1 dialog contents */
-    term contents = `Label (_("First part of configuration of popcorn"));
+    term contents = `Label (_("Change popcorn settings"));
 
-    Wizard::SetContentsButtons(caption, contents, HELPS["c1"]:"",
-	    Label::BackButton(), Label::NextButton());
+    string help_text = _("<p><b><big>change popcorn configuration</big></b><br>
+Enable/Disable sending package data.
+<br></p>");
 
+    term fields = Popcorn::configWidgets( Popcorn::popcorn_config, Popcorn::popcorn_config_path );
+
+    Wizard::OpenAcceptDialog();
+    Wizard::SetContents( "Popcorn Configuration",  // Dialog title
+                         `MarginBox( 10, 0, fields ),   // Dialog contents
+                         help_text,
+                         true,          // "Cancel" button enabled?
+                         true );        // "Accept" button enabled?
+
+    // Dialog input loop
     any ret = nil;
-    while(true) {
 
-	ret = UI::UserInput();
+    repeat
+    {
+        ret = UI::UserInput();
 
-	/* abort? */
-	if(ret == `abort || ret == `cancel) {
-	    if(ReallyAbort()) break;
-	    else continue;
-	}
-        else if(ret == `next || ret == `back) {
-            break;
-        }
-        else {
-            y2error("unexpected retcode: %1", ret);
-            continue;
-        }
-    }
+    } until ( ret == `accept ||
+              ret == `cancel );
 
-    return ret;
-}
-
-/**
- * Configure2 dialog
- * @return dialog result
- */
-any Configure2Dialog () {
-
-    /* Popcorn configure2 dialog caption */
-    string caption = _("Popcorn Configuration");
-
-    /* Popcorn configure2 dialog contents */
-    term contents = `Label (_("Second part of configuration of popcorn"));
-
-    Wizard::SetContentsButtons(caption, contents, HELPS["c2"]:"",
-	    Label::BackButton(), Label::NextButton());
-
-    any ret = nil;
-    while(true) {
-
-	ret = UI::UserInput();
-
-	/* abort? */
-	if(ret == `abort || ret == `cancel) {
-	    if(ReallyAbort()) break;
-	    else continue;
-	}
-        else if(ret == `next || ret == `back) {
-            break;
-        }
-        else {
-            y2error("unexpected retcode: %1", ret);
-            continue;
-        }
+    if ( ret == `accept )
+    {
+        Popcorn::writeConfig( Popcorn::popcorn_config, Popcorn::popcorn_config_path );
     }
 
     return ret;
