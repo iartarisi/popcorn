@@ -25,7 +25,7 @@
 Name:      popcorn
 Version:   0.1
 Release:   0
-Summary:   Client for opensuse popcorn project
+Summary:   Client for popularity contest for RPMs
 License:   MIT
 Url:       http://github.com/opensuse/popcorn
 Group:     System/Packages
@@ -55,7 +55,7 @@ rm -rf %{buildroot}
 %defattr(-, root, root, -)
 %doc README LICENSE
 %{_bindir}/popcorn
-%{_sysconfdir}/popcorn.conf
+%config(noreplace) %{_sysconfdir}/popcorn.conf
 %config(noreplace) %{_sysconfdir}/cron.monthly/popcorn
 %{_localstatedir}/log/popcorn.log
 
