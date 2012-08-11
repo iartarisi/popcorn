@@ -25,5 +25,21 @@
 .popcorn
 
 `ag_ini(
-  `SysConfigFile("/etc/popcorn.conf")
+  `IniAgent(
+    "/etc/popcorn.conf",
+    $[
+      "comments": [ "^[ \t]*#.*", "#.*", "^[ \t]*$" ],
+      "sections" : [
+        $[
+        "begin" : [ "^[ \t]*\\[[ \t]*(.*[^ \t])[ \t]*\\][ \t]*", "[%s]" ],
+        ],
+      ],
+      "params" : [
+        $[
+        "match" : [ "^[ \t]*([^=]*[^ \t=])[ \t]*=[ \t]*(.*[^ \t]|)[ \t]*$" ,
+        "%s = %s"],
+	],
+      ],
+    ]
+  )
 )

@@ -127,17 +127,17 @@ typedef map<string, any> ConfigEntry;
 // Settings: Variables needed for configuration of popcorn
 global list<ConfigEntry> popcorn_config =
     [
-     $[ "name": "POPCORN_ENABLED", "type": "bool", "def": true ],
+     $[ "name": "popcorn_enabled", "type": "bool", "def": true ],
     ];
 
-global path popcorn_config_path = .popcorn;
+global path popcorn_config_path = .popcorn.value.settings;
 
 // Mapping from config entry names to widget captions
 // (in a real life example this would go to the ConfigEntry map, too)
 
 global map<string, string> widget_caption =
     $[
-      "POPCORN_ENABLED"     : "Enable Popcorn",
+      "popcorn_enabled"     : "Enable Popcorn",
       ];
 
 
