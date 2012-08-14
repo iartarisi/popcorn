@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 {% block body %}
-<h2>System {{ system.hwuuid }}</h2>
+<h2>System {{ system.subid }}</h2>
 <p>Arch: {{ system.arch }}</p>
 <p>Distro: {{ system.distro_name }} {{ system.distro_version }}</p>
 <ul>
   {% for sub in system.submissions %}
   <li>
-    <a href="/system/{{ system.sys_hwuuid }}/submission/{{ sub.sub_date }}">
+    <a href="/system/{{ system.submission_id }}/submission/{{ sub.sub_date }}">
       {{ sub.sub_date }}
     </a>
   </li>

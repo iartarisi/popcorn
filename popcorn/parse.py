@@ -60,12 +60,12 @@ class EarlySubmissionError(Exception):
 def parse_text(data):
     """Parse a plaintext submission, recording everything in the database"""
     datalines = data.splitlines()
-    (popcorn, version, distro, distrover, arch, hw_uuid) = datalines[0].split()
+    (popcorn, version, distro, distrover, arch, subid) = datalines[0].split()
 
     try:  # TEST THIS
-        system = System.query.filter_by(sys_hwuuid=hw_uuid).one()
+        system = System.query.filter_by(submission_id=subid).one()
     except NoResultFound:
-        system = System(hw_uuid, arch, distro, distrover)
+        system = System(subid, arch, distro, distrover)
         try:
             Arch.query.filter_by(arch=arch).one()
         except NoResultFound:
@@ -84,7 +84,7 @@ def parse_text(data):
         raise EarlySubmissionError(system.last_submission.sub_date)
 
     today = date.today()
-    sub = Submission(system.sys_hwuuid, version, today)
+    sub = Submission(system.submission_id, version, today)
     db_session.add(sub)
     for line in datalines[1:]:
         try:
@@ -111,7 +111,7 @@ def parse_text(data):
             except DataError:  # TODO mail this to the admins
                 raise
 
-        sp = SubmissionPackage(hw_uuid, today, name, version, release,
+        sp = SubmissionPackage(subid, today, name, version, release,
                                epoch, arch, vendor.vendor_name, status)
         db_session.add(sp)
 

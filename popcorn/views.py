@@ -97,12 +97,12 @@ def vendor(vendor_name):
     return dict(vendor=vendor.serialize)
 
 
-@app.route('/system/<hwuuid>/submission/<sub_date>/')
-def submission(hwuuid, sub_date):
+@app.route('/system/<subid>/submission/<sub_date>/')
+def submission(subid, sub_date):
     """Return a Submission object"""
     try:
         sub = Submission.query.filter_by(
-            sys_hwuuid=hwuuid, sub_date=sub_date).one()
+            submission_id=subid, sub_date=sub_date).one()
     except NoResultFound:
         abort(404)
     page = request.args.get('page', 0, type=int)
@@ -117,12 +117,12 @@ def submission(hwuuid, sub_date):
                            pagination=pagination, packages=packages)
 
 
-@app.route('/system/<hwuuid>')
+@app.route('/system/<subid>')
 @render(template='system.html')
-def system(hwuuid):
+def system(subid):
     """Return a System object"""
     try:
-        system = System.query.filter_by(sys_hwuuid=hwuuid).one()
+        system = System.query.filter_by(submission_id=subid).one()
     except NoResultFound:
         abort(404)
     return dict(system=system.serialize)

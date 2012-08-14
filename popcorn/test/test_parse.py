@@ -36,15 +36,15 @@ from popcorn.test.test_models import ModelsTest
 
 class TestParsePopcorn(ModelsTest):
     def test_parse_popcorn_success(self):
-        self.assertEqual(System.query.filter_by(sys_hwuuid='TEST_HW_UUID'
+        self.assertEqual(System.query.filter_by(submission_id='TEST_SUBID'
                                                 ).count(), 0)
         self.assertEqual(SubmissionPackage.query.all(), [])
-        subm_text = ("POPCORN 0.1 openSUSE 12.1 i586 TEST_HW_UUID\n"
+        subm_text = ("POPCORN 0.1 openSUSE 12.1 i586 TEST_SUBID\n"
                      "v python 2.5 1.1 None x86_64 http://repo.url\n"
                      "o python-lint 1.1 1 None noarch http://repo.url\n")
         parse_text(subm_text)
 
-        system = System.query.filter_by(sys_hwuuid='TEST_HW_UUID').one()
+        system = System.query.filter_by(submission_id='TEST_SUBID').one()
 
         self.assertEqual(len(system.submissions), 1)
 
@@ -62,20 +62,20 @@ class TestParsePopcorn(ModelsTest):
         self.assertEqual(p1.pkg_status, "voted")
 
     def test_parse_unknown_arch_error(self):
-        subm_text = ("POPCORN 0.1 Fedora 12 unknown-arch TEST_HW_UUID\n")
+        subm_text = ("POPCORN 0.1 Fedora 12 unknown-arch TEST_SUBID\n")
 
         self.assertRaises(FormatError, parse_text, subm_text)
 
     def test_parse_early_submission_error(self):
         system = System.query.first()
 
-        sub = Submission(system.sys_hwuuid, '0.1', date.today())
+        sub = Submission(system.submission_id, '0.1', date.today())
         self.db_session.add(sub)
         self.db_session.commit()
         self.assertEqual(system.submissions, [sub])
 
         submission = ("POPCORN 0.1 openSUSE 11.4 x86_64 %s\n"
-                      % system.sys_hwuuid)
+                      % system.submission_id)
 
         self.assertRaises(EarlySubmissionError, parse_text, submission)
         self.assertEqual(system.submissions, [sub])
@@ -97,7 +97,7 @@ class TestCanSubmit(ModelsTest):
         system = System.query.first()
 
         # make a submission 400 days ago
-        sub1 = Submission(system.sys_hwuuid, 'POPCORN1',
+        sub1 = Submission(system.submission_id, 'POPCORN1',
                           date.today() - timedelta(days=400))
         self.db_session.add(sub1)
         self.db_session.commit()
@@ -115,7 +115,7 @@ class TestCanSubmit(ModelsTest):
         system = System.query.first()
 
         # 1 day ago should be too early for another submission
-        sub1 = Submission(system.sys_hwuuid, 'POPCORN 1',
+        sub1 = Submission(system.submission_id, 'POPCORN 1',
                           date.today() - timedelta(1))
         self.db_session.add(sub1)
         self.db_session.commit()

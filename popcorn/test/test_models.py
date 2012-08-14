@@ -62,8 +62,8 @@ class ModelsTest(unittest.TestCase):
 
         # system is dependent on both arches and distros already being
         # in the db
-        db_session.add_all([System('hw_uuid1', 'i586', 'Fedora', '16'),
-                            System('hw_uuid2', 'i586', 'openSUSE', '12.1')])
+        db_session.add_all([System('subid1', 'i586', 'Fedora', '16'),
+                            System('subid2', 'i586', 'openSUSE', '12.1')])
         db_session.commit()
 
         self.db_session = db_session
@@ -83,7 +83,7 @@ class ModelsSimpleTests(ModelsTest):
         self.assertRaises(IntegrityError, db_session.flush)
 
     def test_submission_creation(self):
-        sub = Submission('hw_uuid1', 'POPCORN v0.0.1')
+        sub = Submission('subid1', 'POPCORN v0.0.1')
 
         s1 = System.query.first()
         self.assertEqual(s1.submissions, [])
@@ -101,9 +101,9 @@ class ModelsSimpleTests(ModelsTest):
         self.assertRaises(IntegrityError, db_session.commit)
 
     def test_submission_package_creation(self):
-        sub = Submission('hw_uuid1', 'POPCORN v0.0.1')
+        sub = Submission('subid1', 'POPCORN v0.0.1')
         vendor = Vendor('repo1')
-        subp = SubmissionPackage('hw_uuid1', date.today(), 'python', '2.7',
+        subp = SubmissionPackage('subid1', date.today(), 'python', '2.7',
                                  '3', '', 'i586', 'repo1', 'voted')
         db_session.add(sub)
         db_session.add(vendor)
@@ -114,10 +114,10 @@ class ModelsSimpleTests(ModelsTest):
         self.assertEqual(SubmissionPackage.query.first(), subp)
 
     def test_system_last_submission(self):
-        sub1 = Submission('hw_uuid1', 'P1', date.today())
-        sub2 = Submission('hw_uuid2', 'P1',
+        sub1 = Submission('subid1', 'P1', date.today())
+        sub2 = Submission('subid2', 'P1',
                           date.today() - timedelta(days=31 * 2))
-        sub3 = Submission('hw_uuid1', 'P1',
+        sub3 = Submission('subid1', 'P1',
                           date.today() - timedelta(days=31 * 3))
         s1 = System.query.first()
         self.assertIsNone(s1.last_submission)
@@ -129,4 +129,4 @@ class ModelsSimpleTests(ModelsTest):
         self.assertEqual(sub1, s1.last_submission)
 
     def test_submission_package_no_epoch(self):
-        sub = Submission("hw_uuid1", "P1", date.today())
+        sub = Submission("subid1", "P1", date.today())
