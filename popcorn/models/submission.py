@@ -37,26 +37,26 @@ class SubmissionError(Exception):
 class Submission(Base):
     __tablename__ = 'submissions'
     sub_date = Column(Date(), primary_key=True)
-    sys_hwuuid = Column(String(64), ForeignKey('systems.sys_hwuuid'),
+    submission_id = Column(String(64), ForeignKey('systems.submission_id'),
                         primary_key=True)
     popcorn_version = Column(String(30), nullable=False)
 
     submission_packages = relationship('SubmissionPackage')
 
-    def __init__(self, sys_hwuuid, popcorn_version, date=date.today()):
+    def __init__(self, submission_id, popcorn_version, date=date.today()):
         self.sub_date = date
-        self.sys_hwuuid = sys_hwuuid
+        self.submission_id = submission_id
         self.popcorn_version = popcorn_version
 
     def __repr__(self):
-        return '<Submission from %s at %s>' % (self.sys_hwuuid,
+        return '<Submission from %s at %s>' % (self.submission_id,
                                                self.sub_date)
 
     @property
     def _flat_attrs(self):
         return {
             'sub_date': self.sub_date.strftime("%Y-%m-%d"),
-            'sys_hwuuid': self.sys_hwuuid,
+            'submission_id': self.submission_id,
             'popcorn_version': self.popcorn_version,
         }
 

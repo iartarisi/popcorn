@@ -33,7 +33,7 @@ class SubmissionPackage(Base):
     __tablename__ = 'submission_packages'
 
     # primary key
-    sys_hwuuid = Column(String(64), ForeignKey('systems.sys_hwuuid'),
+    submission_id = Column(String(64), ForeignKey('systems.submission_id'),
                         primary_key=True,)
     sub_date = Column(Date(), primary_key=True)
     pkg_name = Column(String(50), primary_key=True)
@@ -49,14 +49,14 @@ class SubmissionPackage(Base):
 
     __table_args__ = (
         ForeignKeyConstraint(
-            [sys_hwuuid, sub_date],
-            [Submission.sys_hwuuid, Submission.sub_date]
+            [submission_id, sub_date],
+            [Submission.submission_id, Submission.sub_date]
             ),
         )
 
-    def __init__(self, sys_hwuuid, sub_date, pkg_name, pkg_version,
+    def __init__(self, submission_id, sub_date, pkg_name, pkg_version,
                  pkg_release, pkg_epoch, pkg_arch, vendor_name, pkg_status):
-        self.sys_hwuuid = sys_hwuuid
+        self.submission_id = submission_id
         self.sub_date = sub_date
         self.pkg_name = pkg_name
         self.pkg_version = pkg_version
@@ -68,11 +68,11 @@ class SubmissionPackage(Base):
 
     def __repr__(self):
         if self.pkg_epoch:
-            output = ("<SubmissionPackage: %(sys_hwuuid)s %(sub_date)s "
+            output = ("<SubmissionPackage: %(submission_id)s %(sub_date)s "
                       "%(name)s-%(ver)s-%(rel)s-%(epoch)s.%(arch)s - "
                       "%(status)s")
         else:
-            output = ("<SubmissionPackage: %(sys_hwuuid)s %(sub_date)s "
+            output = ("<SubmissionPackage: %(submission_id)s %(sub_date)s "
                       "%(name)s-%(ver)s-%(rel)s.%(arch)s - %(status)s")
         return output % dict(name=self.pkg_name,
                              ver=self.pkg_version,
@@ -98,7 +98,7 @@ class SubmissionPackage(Base):
     @property
     def _flat_attrs(self):
         return {
-            'sys_hwuuid': self.sys_hwuuid,
+            'submission_id': self.submission_id,
             'sub_date': self.sub_date.strftime("%Y-%m-%d"),
             'pkg_name': self.pkg_name,
             'pkg_version': self.pkg_version,

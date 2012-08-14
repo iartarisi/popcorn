@@ -31,7 +31,7 @@ from popcorn.models import Distro, Submission
 
 class System(Base):
     __tablename__ = 'systems'
-    sys_hwuuid = Column(String(64), primary_key=True)
+    submission_id = Column(String(64), primary_key=True)
     distro_name = Column(String(20), nullable=False)
     distro_version = Column(String(10), nullable=False)
     arch = Column(String(10), ForeignKey('arches.arch'), nullable=False)
@@ -44,24 +44,24 @@ class System(Base):
                              [Distro.distro_name, Distro.distro_version]),
         {})
 
-    def __init__(self, sys_hwuuid, arch, distro_name, distro_version):
-        self.sys_hwuuid = sys_hwuuid
+    def __init__(self, submission_id, arch, distro_name, distro_version):
+        self.submission_id = submission_id
         self.arch = arch
         self.distro_name = distro_name
         self.distro_version = distro_version
 
     def __repr__(self):
-        return "<System: %s>" % self.sys_hwuuid
+        return "<System: %s>" % self.submission_id
 
     @property
     def last_submission(self):
-        return Submission.query.filter_by(sys_hwuuid=self.sys_hwuuid).order_by(
+        return Submission.query.filter_by(submission_id=self.submission_id).order_by(
             Submission.sub_date.desc()).first()
 
     @property
     def _flat_attrs(self):
         return {
-            'sys_hwuuid': self.sys_hwuuid,
+            'submission_id': self.submission_id,
             'distro_name': self.distro_name,
             'distro_version': self.distro_version,
             'arch': self.arch,
