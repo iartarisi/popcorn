@@ -57,6 +57,6 @@ rm -rf %{buildroot}
 %{_bindir}/popcorn
 %config(noreplace) %{_sysconfdir}/popcorn.conf
 %config(noreplace) %{_sysconfdir}/cron.monthly/popcorn
-%{_localstatedir}/log/popcorn.log
+%ghost %{_localstatedir}/log/popcorn.log
 
 %changelog
