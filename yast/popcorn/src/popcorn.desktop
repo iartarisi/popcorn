@@ -16,7 +16,7 @@ X-SuSE-YaST-SortKey=
 X-SuSE-YaST-AutoInstResource=popcorn
 
 Icon=yast-popcorn
-Exec=/usr/bin/xdg-su -c '/sbin/yast2 popcorn'
+Exec=/usr/bin/xdg-su -c "/sbin/yast2 popcorn"
 
 Name=Popcorn
 GenericName=popcorn
