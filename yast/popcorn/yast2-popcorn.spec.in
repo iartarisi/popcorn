@@ -1,31 +1,73 @@
-@HEADER-COMMENT@
+# -*- coding: utf-8 -*-
+# Copyright (c) 2012 Akshit Khurana <axitkhurana@gmail.com>
+#
+# Permission is hereby granted, free of charge, to any person
+# obtaining a copy of this software and associated documentation
+# files (the "Software"), to deal in the Software without
+# restriction, including without limitation the rights to use,
+# copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following
+# conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+# HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
 
-@HEADER@
-Requires:	yast2
+Name:           yast2-popcorn
+Version:        0.1
+Release:        0
+Summary:        YaST2 - Popcorn Client Configuration
+License:        GPLv2+
+Url:            http://github.com/opensuse/popcorn
+Group:          System/YaST
+Source:         %{name}.tar.gz
+Prefix:         /usr
+Requires:       yast2, popcorn
 BuildRequires:	perl-XML-Writer update-desktop-files yast2 yast2-devtools yast2-testsuite
-
-BuildArchitectures:	noarch
-
-Summary:	Configuration of popcorn
+BuildRoot: %{_tmppath}/%{name}-%{version}-build
+BuildArch:	    noarch
 
 %description
--
+This package contains the YaST2 component for Popcorn client 
+configuration.
 
-@PREP@
+%prep
+%setup -q -c -n %{name}
 
-@BUILD@
+%build
+make -f Makefile.cvs
+make
 
-@INSTALL@
+%check
+make check
 
-@CLEAN@
+%install
+make install DESTDIR="%{buildroot}"
+for f in `find %{buildroot}/%{prefix}/share/applications/YaST2/ -name "*.desktop"` ; do
+    d=${f##*/}
+    %suse_update_desktop_file -d ycc_${d%.desktop} ${d%.desktop}
+done
+
+%clean
+rm -rf %{buildroot}
 
 %files
 %defattr(-,root,root)
-%dir @yncludedir@/popcorn
-@yncludedir@/popcorn/*
-@clientdir@/popcorn.ycp
-@clientdir@/popcorn_*.ycp
-@moduledir@/Popcorn.*
-@moduledir@/Popcorn2.*
-@desktopdir@/popcorn.desktop
-%doc @docdir@
+%dir /usr/share/YaST2/include/popcorn
+/usr/share/YaST2/include/popcorn/*
+/usr/share/YaST2/clients/popcorn.ycp
+/usr/share/YaST2/modules/Popcorn.*
+/usr/share/YaST2/scrconf/popcorn.scr
+%{prefix}/share/applications/YaST2/popcorn.desktop
+%doc %{prefix}/share/doc/packages/yast2-popcorn
+
+%changelog
