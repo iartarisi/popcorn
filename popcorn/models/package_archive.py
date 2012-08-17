@@ -23,7 +23,7 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 from sqlalchemy import (Column, ForeignKey, String, Integer,
-                        ForeignKeyConstraint)
+                        ForeignKeyConstraint, Date)
 
 from popcorn.database import Base
 from popcorn.models import Distro
@@ -36,15 +36,13 @@ class PackageArchive(Base):
     pkg_version = Column(String(50), primary_key=True)
     pkg_release = Column(String(50), primary_key=True)
     pkg_arch = Column(String(10), ForeignKey('arches.arch'), primary_key=True)
-    distro_name = Column(String(20), ForeignKey('distros.distro_name'),
-            primary_key=True)
-    distro_version = Column(String(20),
-            ForeignKey('distros.distro_version'), primary_key=True)
     vendor_name = Column(String(20), ForeignKey('vendors.vendor_name'),
-            primary_key=True),
+                         primary_key=True),
     pkg_status = Column(String(10), ForeignKey('package_statuses.pkg_status'),
                         primary_key=True)
-    month = Column(String(10), primary_key=True)
+    distro_name = Column(String(20), primary_key=True)
+    distro_version = Column(String(10), primary_key=True)
+    month = Column(Date(), primary_key=True)
     count = Column(Integer)
 
     __table_args__ = (
@@ -55,7 +53,7 @@ class PackageArchive(Base):
         )
 
     def __init__(self, pkg_name, pkg_version, pkg_release, pkg_arch,
-                 distro_name, distro_version, vendor_name, pkg_status, month,
+                 vendor_name, pkg_status, distro_name, distro_version, month,
                  count):
         self.pkg_name = pkg_name
         self.pkg_version = pkg_version
