@@ -24,7 +24,7 @@
 
 from datetime import date
 
-from sqlalchemy import Column, Date, ForeignKey, String
+from sqlalchemy import Column, Date, ForeignKey, String, Integer
 from sqlalchemy.orm import relationship
 
 from popcorn.database import Base
@@ -37,7 +37,7 @@ class SubmissionError(Exception):
 class Submission(Base):
     __tablename__ = 'submissions'
     sub_date = Column(Date(), primary_key=True)
-    submission_id = Column(String(64), ForeignKey('systems.submission_id'),
+    submission_id = Column(Integer, ForeignKey('systems.submission_id'),
                         primary_key=True)
     popcorn_version = Column(String(30), nullable=False)
 

@@ -22,7 +22,8 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-from sqlalchemy import Column, ForeignKey, ForeignKeyConstraint, String
+from sqlalchemy import (Column, ForeignKey, ForeignKeyConstraint, String,
+                        Integer)
 from sqlalchemy.orm import relationship
 
 from popcorn.database import Base
@@ -31,7 +32,7 @@ from popcorn.models import Distro, Submission
 
 class System(Base):
     __tablename__ = 'systems'
-    submission_id = Column(String(64), primary_key=True)
+    submission_id = Column(Integer, primary_key=True, autoincrement=True)
     distro_name = Column(String(20), nullable=False)
     distro_version = Column(String(10), nullable=False)
     arch = Column(String(10), ForeignKey('arches.arch'), nullable=False)
@@ -55,8 +56,9 @@ class System(Base):
 
     @property
     def last_submission(self):
-        return Submission.query.filter_by(submission_id=self.submission_id).order_by(
-            Submission.sub_date.desc()).first()
+        return Submission.query.filter_by(
+                submission_id=self.submission_id).order_by(
+                Submission.sub_date.desc()).first()
 
     @property
     def _flat_attrs(self):

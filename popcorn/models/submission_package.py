@@ -22,7 +22,8 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-from sqlalchemy import Column, Date, ForeignKey, ForeignKeyConstraint, String
+from sqlalchemy import (Column, Date, ForeignKey, ForeignKeyConstraint,
+                        String, Integer)
 from sqlalchemy.orm import relationship
 
 from popcorn.database import Base
@@ -33,7 +34,7 @@ class SubmissionPackage(Base):
     __tablename__ = 'submission_packages'
 
     # primary key
-    submission_id = Column(String(64), ForeignKey('systems.submission_id'),
+    submission_id = Column(Integer, ForeignKey('systems.submission_id'),
                         primary_key=True,)
     sub_date = Column(Date(), primary_key=True)
     pkg_name = Column(String(50), primary_key=True)
