@@ -33,7 +33,8 @@ from sqlalchemy.exc import IntegrityError
 
 from popcorn.database import db_session, Base
 from popcorn.models import (Arch, Distro, System, Submission,
-                            PackageStatus, SubmissionPackage, Vendor)
+                            PackageStatus, SubmissionPackage, Vendor,
+                            PackageArchive)
 
 
 # we need to explicitly enable foreign key constraints for sqlite
@@ -108,3 +109,22 @@ class ModelsSimpleTests(ModelsTest):
 
     def test_submission_package_no_epoch(self):
         sub = Submission('openSUSE', '12.1', 'i586', 'POPCORN v0.0.1')
+
+    def test_package_archives_foreign_key_constraint(self):
+        vendor = Vendor('repo1')
+        archive = PackageArchive('firefox', 'v1', 'r1', 'i586', 'dummy',
+                                 '12.1', 'vendor', 'voted', date.today(), 1)
+        db_session.add(archive)
+
+        self.assertRaises(IntegrityError, db_session.commit)
+
+    def test_package_archive_creation(self):
+        vendor = Vendor('repo1')
+        archive = PackageArchive('firefox', 'v1', 'r1', 'i586',
+                                 'http://repo.url', 'voted', 'openSUSE',
+                                 '12.1', date.today(), 1)
+        db_session.add(vendor)
+        db_session.flush()
+        db_session.add(archive)
+        db_session.flush()
+        self.assertEqual(PackageArchive.query.first(), archive)
