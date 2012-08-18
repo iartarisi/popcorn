@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2012 Ionuț Arțăriși <iartarisi@suse.cz>
+# Copyright (c) 2012 Akshit Khurana <axitkhurana@gmail.com>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -22,13 +22,33 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-# import the models in the order in which their tables need to be
-# created; init_db will break otherwise
-from arch import Arch
-from distro import Distro
-from submission import Submission
-from system import System
-from vendor import Vendor
-from package_status import PackageStatus
-from submission_package import SubmissionPackage
-from unique_system import UniqueSystem
+from datetime import date
+
+from sqlalchemy import Column, Date, String
+
+from popcorn.database import Base
+
+
+class UniqueSystem(Base):
+    __tablename__ = 'unique_systems'
+    sys_hwuuid = Column(String(64), primary_key=True)
+    sub_date = Column(Date())
+
+    def __init__(self, sys_hwuuid, date=date.today()):
+        self.sys_hwuuid = sys_hwuuid
+        self.sub_date = date
+
+    def __repr__(self):
+        return '<Unique System %s: Last submission at %s>' % (self.sys_hwuuid,
+                                                                self.sub_date)
+
+    @property
+    def _flat_attrs(self):
+        return {
+            'sys_hwuuid': self.sys_hwuuid,
+            'sub_date': self.sub_date.strftime("%Y-%m-%d"),
+        }
+
+    @property
+    def serialize(self):
+        return dict(**self._flat_attrs)
