@@ -40,7 +40,7 @@ class UniqueSystem(Base):
 
     def __repr__(self):
         return '<Unique System %s: Last submission at %s>' % (self.sys_hwuuid,
-                                                                self.sub_date)
+                                                              self.sub_date)
 
     @property
     def _flat_attrs(self):

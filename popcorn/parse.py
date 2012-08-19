@@ -120,7 +120,8 @@ def parse_text(data):
                 print str(e)
 
         sp = SubmissionPackage(system.submission_id, today, name, version,
-                            release, epoch, arch, vendor.vendor_name, status)
+                               release, epoch, arch, vendor.vendor_name,
+                               status)
         db_session.add(sp)
 
     try:

@@ -55,9 +55,9 @@ class System(Base):
 
     @property
     def last_submission(self):
-        return Submission.query.filter_by(
-                submission_id=self.submission_id).order_by(
-                Submission.sub_date.desc()).first()
+        return Submission.query.filter_by(submission_id=self.submission_id
+                                          ).order_by(Submission.sub_date.desc()
+                                                     ).first()
 
     @property
     def _flat_attrs(self):

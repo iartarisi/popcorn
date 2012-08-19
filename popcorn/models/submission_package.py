@@ -35,7 +35,7 @@ class SubmissionPackage(Base):
 
     # primary key
     submission_id = Column(Integer, ForeignKey('systems.submission_id'),
-                        primary_key=True,)
+                           primary_key=True,)
     sub_date = Column(Date(), primary_key=True)
     pkg_name = Column(String(50), primary_key=True)
     pkg_version = Column(String(50), primary_key=True)

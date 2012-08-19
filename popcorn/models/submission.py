@@ -38,7 +38,7 @@ class Submission(Base):
     __tablename__ = 'submissions'
     sub_date = Column(Date(), primary_key=True)
     submission_id = Column(Integer, ForeignKey('systems.submission_id'),
-                        primary_key=True)
+                           primary_key=True)
     popcorn_version = Column(String(30), nullable=False)
 
     submission_packages = relationship('SubmissionPackage')
