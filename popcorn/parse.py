@@ -32,7 +32,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from popcorn.configs import SUBMISSION_INTERVAL
 from popcorn.database import db_session
 from popcorn.models import (Arch, Distro, SubmissionPackage, Submission,
-                            System, Vendor)
+                            System, Vendor, UniqueSystem)
 
 
 class FormatError(Exception):
@@ -60,28 +60,32 @@ class EarlySubmissionError(Exception):
 def parse_text(data):
     """Parse a plaintext submission, recording everything in the database"""
     datalines = data.splitlines()
-    (popcorn, version, distro, distrover, arch, subid) = datalines[0].split()
+    (popcorn, version, distro, distrover, arch, hw_uuid) = datalines[0].split()
 
-    try:  # TEST THIS
-        system = System.query.filter_by(submission_id=subid).one()
+    try:
+        uniq_sys = UniqueSystem.query.filter_by(sys_hwuuid=hw_uuid).one()
     except NoResultFound:
-        system = System(subid, arch, distro, distrover)
-        try:
-            Arch.query.filter_by(arch=arch).one()
-        except NoResultFound:
-            raise FormatError("unknown arch - " + arch)
+        new_system = UniqueSystem(hw_uuid)
+        db_session.add(new_system)
 
-        try:
-            Distro.query.filter_by(distro_name=distro,
-                                   distro_version=distrover).one()
-        except NoResultFound:
-            distro = Distro(distro, distrover)
-            db_session.add(distro)
-        db_session.add(system)
+    system = System(arch, distro, distrover)
+
+    try:
+        Arch.query.filter_by(arch=arch).one()
+    except NoResultFound:
+        raise FormatError("unknown arch - " + arch)
+
+    try:
+        Distro.query.filter_by(distro_name=distro,
+                               distro_version=distrover).one()
+    except NoResultFound:
+        distro = Distro(distro, distrover)
+        db_session.add(distro)
+    db_session.add(system)
 
     # TODO: think about moving this to the model
-    if not _can_submit(system):
-        raise EarlySubmissionError(system.last_submission.sub_date)
+    if not _can_submit(uniq_sys):
+        raise EarlySubmissionError(uniq_sys.sub_date)
 
     today = date.today()
     sub = Submission(system.submission_id, version, today)
@@ -115,13 +119,14 @@ def parse_text(data):
                                epoch, arch, vendor.vendor_name, status)
         db_session.add(sp)
 
+    uniq_sys.sub_date = date.today()
     try:
         db_session.commit()
     except DataError:  # TODO mail this to the admins
         raise
 
 
-def _can_submit(system):
+def _can_submit(uniq_sys):
     """Checks the Submission interval for this System
 
     :system: a System object
@@ -130,10 +135,7 @@ def _can_submit(system):
     will return True, otherwise returns False.
 
     """
-    last_sub = system.last_submission
-    if not last_sub:
-        return True
-    delta = date.today() - last_sub.sub_date
+    delta = date.today() - uniq_sys.sub_date
     if SUBMISSION_INTERVAL < delta.days:
         return True
     else:
