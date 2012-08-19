@@ -62,8 +62,8 @@ class ModelsTest(unittest.TestCase):
 
         # system is dependent on both arches and distros already being
         # in the db
-        db_session.add_all([System('subid1', 'i586', 'Fedora', '16'),
-                            System('subid2', 'i586', 'openSUSE', '12.1')])
+        db_session.add_all([System('i586', 'Fedora', '16'),
+                            System('i586', 'openSUSE', '12.1')])
         db_session.commit()
 
         self.db_session = db_session
@@ -74,18 +74,18 @@ class ModelsTest(unittest.TestCase):
 
 class ModelsSimpleTests(ModelsTest):
     def test_system_foreign_key_constraint(self):
-        db_session.add(System('hw_uu', 'i586', 'bogus', 'bogus'))
+        db_session.add(System('i586', 'bogus', 'bogus'))
 
         self.assertRaises(IntegrityError, db_session.flush)
         db_session.rollback()
 
-        db_session.add(System('hw_uu', 'bogus', 'Fedora', '16'))
+        db_session.add(System('bogus', 'Fedora', '16'))
         self.assertRaises(IntegrityError, db_session.flush)
 
     def test_submission_creation(self):
-        sub = Submission('subid1', 'POPCORN v0.0.1')
-
         s1 = System.query.first()
+        sub = Submission(s1.submission_id, 'POPCORN v0.0.1')
+
         self.assertEqual(s1.submissions, [])
 
         db_session.add(sub)
@@ -101,10 +101,11 @@ class ModelsSimpleTests(ModelsTest):
         self.assertRaises(IntegrityError, db_session.commit)
 
     def test_submission_package_creation(self):
-        sub = Submission('subid1', 'POPCORN v0.0.1')
+        s1 = System.query.first()
+        sub = Submission(s1.submission_id, 'POPCORN v0.0.1')
         vendor = Vendor('repo1')
-        subp = SubmissionPackage('subid1', date.today(), 'python', '2.7',
-                                 '3', '', 'i586', 'repo1', 'voted')
+        subp = SubmissionPackage(s1.submission_id, date.today(), 'python',
+                                 '2.7', '3', '', 'i586', 'repo1', 'voted')
         db_session.add(sub)
         db_session.add(vendor)
         db_session.flush()
@@ -113,20 +114,6 @@ class ModelsSimpleTests(ModelsTest):
 
         self.assertEqual(SubmissionPackage.query.first(), subp)
 
-    def test_system_last_submission(self):
-        sub1 = Submission('subid1', 'P1', date.today())
-        sub2 = Submission('subid2', 'P1',
-                          date.today() - timedelta(days=31 * 2))
-        sub3 = Submission('subid1', 'P1',
-                          date.today() - timedelta(days=31 * 3))
-        s1 = System.query.first()
-        self.assertIsNone(s1.last_submission)
-
-        db_session.add_all([sub1, sub2, sub3])
-        db_session.commit()
-
-        self.assertEqual([sub1, sub3], s1.submissions)
-        self.assertEqual(sub1, s1.last_submission)
-
     def test_submission_package_no_epoch(self):
-        sub = Submission("subid1", "P1", date.today())
+        s1 = System.query.first()
+        sub = Submission(s1.submission_id, "P1", date.today())
