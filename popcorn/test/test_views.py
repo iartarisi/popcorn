@@ -36,7 +36,6 @@ from popcorn.database import db_session, Base
 from popcorn.models import Arch, PackageStatus
 
 today = date.today()
-SUBMISSION_ID = '33d08e56f1d2748bc7d056375042dcd1336a7635fdc1cec159bedacfce9c2c4f'
 
 
 # we need to explicitly enable foreign key constraints for sqlite
@@ -115,7 +114,7 @@ class PopcornTestCase(unittest.TestCase):
                 "distros": [{
                     "distro_name": "openSUSE",
                     "systems": [{
-                        "submission_id": SUBMISSION_ID,
+                        "submission_id": 1,
                             "arch": "x86_64",
                             "distro_version": "12.1",
                             "distro_name": "openSUSE"
@@ -143,16 +142,16 @@ class PopcornTestCase(unittest.TestCase):
     def test_system_json(self):
         self.submit(compress=False, header=False)
         with app.test_request_context(
-                path='/system/%s' % SUBMISSION_ID,
+                path='/system/%s' % 1,
                 method='GET', headers=[('Accept', 'application/json')]):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                 "system": {
                     "arch": "x86_64",
-                    "submission_id": SUBMISSION_ID,
+                    "submission_id": 1,
                     "submissions": [{
                         "sub_date": today.strftime("%Y-%m-%d"),
-                        "submission_id": SUBMISSION_ID,
+                        "submission_id": 1,
                         "popcorn_version": "0.1"
                         }],
                     "distro_name": "openSUSE",
@@ -171,7 +170,7 @@ class PopcornTestCase(unittest.TestCase):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                 "packages": [{
-                    "submission_id": SUBMISSION_ID,
+                    "submission_id": 1,
                     "sub_date": today.strftime("%Y-%m-%d"),
                     "pkg_status": "voted",
                     "pkg_name": "sed",
@@ -183,7 +182,7 @@ class PopcornTestCase(unittest.TestCase):
                   }],
                 "voted": 1,
                 "generic_package": {
-                    "submission_id": SUBMISSION_ID,
+                    "submission_id": 1,
                     "sub_date": today.strftime("%Y-%m-%d"),
                     "pkg_status": "voted",
                     "pkg_name": "sed",
@@ -208,7 +207,7 @@ class PopcornTestCase(unittest.TestCase):
                 "distro": {
                     "distro_name": "openSUSE",
                     "systems": [{
-                        "submission_id": SUBMISSION_ID,
+                        "submission_id": 1,
                         "arch": "x86_64",
                         "distro_version": "12.1",
                         "distro_name": "openSUSE"
