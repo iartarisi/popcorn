@@ -26,7 +26,7 @@
 
 from datetime import date
 
-from sqlalchemy.exc import DataError
+from sqlalchemy.exc import DataError, IntegrityError
 from sqlalchemy.orm.exc import NoResultFound
 
 from popcorn.configs import SUBMISSION_INTERVAL
@@ -64,6 +64,10 @@ def parse_text(data):
 
     try:
         uniq_sys = UniqueSystem.query.filter_by(sys_hwuuid=hw_uuid).one()
+        uniq_sys.sub_date = date.today()
+        # TODO: think about moving this to the model
+        if not _can_submit(uniq_sys):
+            raise EarlySubmissionError(uniq_sys.sub_date)
     except NoResultFound:
         new_system = UniqueSystem(hw_uuid)
         db_session.add(new_system)
@@ -81,11 +85,9 @@ def parse_text(data):
     except NoResultFound:
         distro = Distro(distro, distrover)
         db_session.add(distro)
-    db_session.add(system)
 
-    # TODO: think about moving this to the model
-    if not _can_submit(uniq_sys):
-        raise EarlySubmissionError(uniq_sys.sub_date)
+    db_session.add(system)
+    db_session.flush()
 
     today = date.today()
     sub = Submission(system.submission_id, version, today)
@@ -114,12 +116,13 @@ def parse_text(data):
                 db_session.flush()
             except DataError:  # TODO mail this to the admins
                 raise
+            except IntegrityError, e:
+                print str(e)
 
-        sp = SubmissionPackage(subid, today, name, version, release,
-                               epoch, arch, vendor.vendor_name, status)
+        sp = SubmissionPackage(system.submission_id, today, name, version,
+                            release, epoch, arch, vendor.vendor_name, status)
         db_session.add(sp)
 
-    uniq_sys.sub_date = date.today()
     try:
         db_session.commit()
     except DataError:  # TODO mail this to the admins
