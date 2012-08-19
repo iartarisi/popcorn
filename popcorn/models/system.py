@@ -45,8 +45,7 @@ class System(Base):
                              [Distro.distro_name, Distro.distro_version]),
         {})
 
-    def __init__(self, submission_id, arch, distro_name, distro_version):
-        self.submission_id = submission_id
+    def __init__(self, arch, distro_name, distro_version):
         self.arch = arch
         self.distro_name = distro_name
         self.distro_version = distro_version
