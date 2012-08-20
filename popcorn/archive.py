@@ -23,7 +23,8 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 """Archive packages from SubmissionPackages model to PackageArchive
-model"""
+model
+"""
 from datetime import date
 
 from sqlalchemy import func
@@ -34,27 +35,31 @@ from popcorn.models import (SubmissionPackage as SubPac, System as Sys,
                             Submission, PackageArchive)
 
 TODAY = date.today()
+LAST_MONTH = TODAY.replace(month=TODAY.month - 1)
 
 
-def update_archives():
+def update_archives(arc_month=LAST_MONTH):
+    """Archives packages of a month, by default: last month"""
     query = db_session.query(SubPac.pkg_name, SubPac.pkg_version,
                              SubPac.pkg_release, SubPac.pkg_arch,
                              SubPac.vendor_name, SubPac.pkg_status,
                              Sys.distro_name, Sys.distro_version,
-                             SubPac.sub_date, func.count('*').label('count')
+                             func.min(SubPac.sub_date),
+                             func.count('*').label('count')
                              ).join(Submission).join(Sys)
 
-    archives = query.filter(extract('month', SubPac.sub_date) == TODAY.month
-                            ).group_by(SubPac.pkg_name, SubPac.pkg_version,
-                                       SubPac.pkg_release, SubPac.pkg_arch,
-                                       SubPac.vendor_name,
-                                       extract('month', SubPac.sub_date),
-                                       extract('year', SubPac.sub_date),
-                                       SubPac.pkg_status, Sys.distro_name,
-                                       Sys.distro_version).all()
+    arcs = query.filter(extract('month', SubPac.sub_date) == arc_month.month,
+                        extract('year', SubPac.sub_date) == arc_month.year
+                        ).group_by(extract('month', SubPac.sub_date),
+                                   extract('year', SubPac.sub_date),
+                                   SubPac.pkg_name, SubPac.pkg_version,
+                                   SubPac.pkg_release, SubPac.pkg_arch,
+                                   SubPac.vendor_name,
+                                   SubPac.pkg_status, Sys.distro_name,
+                                   Sys.distro_version).all()
 
     pkg_archives = []
-    for pkg in archives:
+    for pkg in arcs:
         pkg_archives.append(PackageArchive(*pkg))
 
     for pkg_archive in pkg_archives:
