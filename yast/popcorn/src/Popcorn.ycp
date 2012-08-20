@@ -208,6 +208,9 @@ global term configWidgets( list<ConfigEntry> entry_list, path scr_base_path )
 {
     term vbox = `VBox();
 
+    string comment = _("Popcorn lists system packages and for each package it reads
+    access time of its watched files.");
+    vbox = add( vbox, `Label(comment) );
     foreach( ConfigEntry entry, entry_list,
     {
         term widget = entryWidget( entry, scr_base_path );
