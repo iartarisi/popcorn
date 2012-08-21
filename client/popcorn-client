@@ -36,11 +36,11 @@ import time
 import gzip
 import cStringIO
 import hashlib
+import ConfigParser
+import datetime
 
-POST_SERVER = 'localhost:5000'
-POST_URI = '/'
 VERSION = '0.1'
-HWUUID_FILE = '/var/lib/dbus/machine-id'
+TODAY = datetime.date.today()
 
 days_recent = 30
 days_voted = 30
@@ -51,6 +51,10 @@ pathre = ('^/(bin|boot|lib|lib64|sbin|usr/bin|usr/games|usr/include|usr/lib|'
 system_mounts = ['binfmt_misc', 'debugfs', 'devpts', 'fuse.gvfs-fuse-daemon',
                  'fusectl', 'nfs', 'nfs4', 'proc', 'rootfs', 'rpc_pipefs',
                  'securityfs', 'sysfs']
+
+config = ConfigParser.ConfigParser()
+with open('/etc/popcorn.conf') as fp:
+    config.readfp(fp)
 
 
 class Statistics:  # TODO break this class into functions
@@ -138,7 +142,7 @@ class Statistics:  # TODO break this class into functions
 
 
 def get_system_id():
-    with open(HWUUID_FILE) as f:
+    with open(config.get('settings', 'hwuuid_file')) as f:
         return f.read().strip()
 
 
@@ -148,8 +152,13 @@ class Client:
         stats.fill_packages()
         self.data = stats.serialize()
         # write the submission text to a file so it can be inspected easily
-        with open('/tmp/submission.txt', 'w') as f:
+        with open('/var/log/popcorn.log', 'a') as f:
             f.write(self.data)
+            url = config.get('settings', 'post_server') + config.get(
+                    'settings', 'post_uri')
+            params = {'url': url, 'date': TODAY.isoformat()}
+            f.write('\nPopcorn submitting data to %(url)s at %(date)s \n\n'
+                    % params)
 
     def post(self, compress=True):
         """Send a POST request to the default server
@@ -165,9 +174,10 @@ class Client:
             headers['Content-Type'] = content_type
         except NameError:
             headers = {'Content-Type': content_type, }
-        conn = httplib.HTTPConnection(POST_SERVER)
+        conn = httplib.HTTPConnection(config.get('settings', 'post_server'))
         try:
-            conn.request("POST", POST_URI, body, headers)
+            conn.request("POST", config.get('settings', 'post_uri'), body,
+                         headers)
         except socket.error, e:
             sys.exit("Could not connect to the Popcorn server. %s" % e)
         response = conn.getresponse()
@@ -204,6 +214,7 @@ def gzip_compress(data):
     f.close()
     return buf.getvalue()
 
-if __name__ == '__main__':
+enabled = config.getboolean('settings', 'popcorn_enabled')
+if __name__ == '__main__' and enabled:
     client = Client()
     client.post()
