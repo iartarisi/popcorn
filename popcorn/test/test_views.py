@@ -36,6 +36,7 @@ from popcorn.database import db_session, Base
 from popcorn.models import Arch, PackageStatus
 
 today = date.today()
+SYS_HWUUID = '33d08e56f1d2748bc7d056375042dcd1336a7635fdc1cec159bedacfce9c2c4f'
 
 
 # we need to explicitly enable foreign key constraints for sqlite
@@ -113,13 +114,16 @@ class PopcornTestCase(unittest.TestCase):
                         }],
                 "distros": [{
                     "distro_name": "openSUSE",
-                    "systems": [{
+                    "submissions": [{
                         "sub_id": 1,
-                            "arch": "x86_64",
-                            "distro_version": "12.1",
-                            "distro_name": "openSUSE"
-                            }],
-                        "distro_version": "12.1"
+                        "sub_date": today.strftime("%Y-%m-%d"),
+                        "distro_version": "12.1",
+                        "popcorn_version": "0.1",
+                        "distro_name": "openSUSE",
+                        "arch": "x86_64"
+                        }],
+                    "distro_version": "12.1",
+                    "distro_name": "openSUSE"
                     }]
                 })
             self.assertEqual(response.headers['Content-Type'],
@@ -142,20 +146,13 @@ class PopcornTestCase(unittest.TestCase):
     def test_system_json(self):
         self.submit(compress=False, header=False)
         with app.test_request_context(
-                path='/system/%s' % 1,
+                path='/system/%s' % SYS_HWUUID,
                 method='GET', headers=[('Accept', 'application/json')]):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                 "system": {
-                    "arch": "x86_64",
-                    "sub_id": 1,
-                    "submissions": [{
-                        "sub_date": today.strftime("%Y-%m-%d"),
-                        "sub_id": 1,
-                        "popcorn_version": "0.1"
-                        }],
-                    "distro_name": "openSUSE",
-                    "distro_version": "12.1"
+                    "last_sub_date": today.strftime("%Y-%m-%d"),
+                    "sys_hwuuid": SYS_HWUUID
                     }
                 })
             self.assertEqual(response.headers['Content-Type'],
@@ -205,13 +202,15 @@ class PopcornTestCase(unittest.TestCase):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                 "distro": {
-                    "distro_name": "openSUSE",
-                    "systems": [{
+                    "submissions": [{
                         "sub_id": 1,
-                        "arch": "x86_64",
+                        "sub_date": today.strftime("%Y-%m-%d"),
                         "distro_version": "12.1",
-                        "distro_name": "openSUSE"
+                        "popcorn_version": "0.1",
+                        "distro_name": "openSUSE",
+                        "arch": "x86_64"
                         }],
+                    "distro_name": "openSUSE",
                     "distro_version": "12.1"
                     }
                 })

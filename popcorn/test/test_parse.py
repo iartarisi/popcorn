@@ -29,28 +29,26 @@ from sqlalchemy.orm.exc import NoResultFound
 from popcorn.parse import (parse_text, _can_submit, EarlySubmissionError,
                            FormatError)
 from popcorn.models import (Distro, System, Submission, SubmissionPackage,
-                            Vendor, UniqueSystem)
+                            Vendor)
 
 from popcorn.test.test_models import ModelsTest
 
 
 class TestParsePopcorn(ModelsTest):
     def test_parse_popcorn_success(self):
-        self.assertEqual(UniqueSystem.query.filter_by(sys_hwuuid='TEST_SUBID'
-                                                      ).count(), 0)
+        self.assertEqual(System.query.filter_by(sys_hwuuid='TEST_SYSID'
+                                                ).count(), 0)
         self.assertEqual(SubmissionPackage.query.all(), [])
 
-        subm_text = ("POPCORN 0.1 openSUSE 12.1 i586 TEST_SUBID\n"
+        subm_text = ("POPCORN 0.1 openSUSE 12.1 i586 TEST_SYSID\n"
                      "v python 2.5 1.1 None x86_64 http://repo.url\n"
                      "o python-lint 1.1 1 None noarch http://repo.url\n")
         parse_text(subm_text)
 
-        uniq_sys = UniqueSystem.query.filter_by(sys_hwuuid='TEST_SUBID').one()
+        sys = System.query.filter_by(sys_hwuuid='TEST_SYSID').one()
 
-        system = System.query.order_by('-sub_id').first()
-        self.assertEqual(len(system.submissions), 1)
+        sub = Submission.query.order_by('-sub_id').first()
 
-        sub = system.last_submission
         self.assertEqual(len(sub.submission_packages), 2)
         self.assertEqual(SubmissionPackage.query.count(), 2)
         self.assertEqual(Vendor.query.first().vendor_name, "http://repo.url")
@@ -69,14 +67,13 @@ class TestParsePopcorn(ModelsTest):
         self.assertRaises(FormatError, parse_text, subm_text)
 
     def test_parse_early_submission_error(self):
-        uniq_sys = UniqueSystem("TEST_HWUUID")
-        self.db_session.add(uniq_sys)
+        sys = System("TEST_HWUUID")
+        self.db_session.add(sys)
         self.db_session.commit()
 
-        submission = ("POPCORN 0.1 openSUSE 11.4 x86_64 %s\n"
-                      % uniq_sys.sys_hwuuid)
+        sub = ("POPCORN 0.1 openSUSE 11.4 x86_64 %s\n" % sys.sys_hwuuid)
 
-        self.assertRaises(EarlySubmissionError, parse_text, submission)
+        self.assertRaises(EarlySubmissionError, parse_text, sub)
 
     def test_parse_distro_doesnt_exist_gets_created(self):
         self.assertRaises(NoResultFound,
@@ -93,24 +90,22 @@ class TestParsePopcorn(ModelsTest):
 class TestCanSubmit(ModelsTest):
     def test_can_submit(self):
         # make last submission 400 days ago
-        uniq_sys = UniqueSystem("TEST_HWUUID", date.today() -
-                                timedelta(days=400))
-        self.db_session.add(uniq_sys)
+        sys = System("TEST_HWUUID", date.today() - timedelta(days=400))
+        self.db_session.add(sys)
         self.db_session.commit()
 
-        self.assertTrue(_can_submit(uniq_sys))
+        self.assertTrue(_can_submit(sys))
 
     def test_can_submit_no_last_submission(self):
-        uniq_sys = UniqueSystem.query.first()
+        sys = System.query.first()
 
         # No entry in UniqueSystem model if no last submission
-        self.assertIsNone(uniq_sys)
+        self.assertIsNone(sys)
 
     def test_can_submit_too_early(self):
         # 1 day ago should be too early for another submission
-        uniq_sys = UniqueSystem("TEST_HWUUID", date.today() -
-                                timedelta(days=1))
-        self.db_session.add(uniq_sys)
+        sys = System("TEST_HWUUID", date.today() - timedelta(days=1))
+        self.db_session.add(sys)
         self.db_session.commit()
 
-        self.assertFalse(_can_submit(uniq_sys))
+        self.assertFalse(_can_submit(sys))
