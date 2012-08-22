@@ -53,7 +53,7 @@ def index():
     ).select_from(
         SubmissionPackage
     ).join(
-        System
+        Submission
     ).join(
         Distro
     ).group_by(Distro.distro_name).all()
@@ -97,12 +97,11 @@ def vendor(vendor_name):
     return dict(vendor=vendor.serialize)
 
 
-@app.route('/system/<subid>/submission/<sub_date>/')
-def submission(subid, sub_date):
+@app.route('/submission/<subid>/')
+def submission(subid):
     """Return a Submission object"""
     try:
-        sub = Submission.query.filter_by(
-            sub_id=subid, sub_date=sub_date).one()
+        sub = Submission.query.filter_by(sub_id=subid).one()
     except NoResultFound:
         abort(404)
     page = request.args.get('page', 0, type=int)
@@ -117,12 +116,12 @@ def submission(subid, sub_date):
                            pagination=pagination, packages=packages)
 
 
-@app.route('/system/<subid>')
+@app.route('/system/<hwuuid>')
 @render(template='system.html')
-def system(subid):
+def system(hwuuid):
     """Return a System object"""
     try:
-        system = System.query.filter_by(sub_id=subid).one()
+        system = System.query.filter_by(sys_hwuuid=hwuuid).one()
     except NoResultFound:
         abort(404)
     return dict(system=system.serialize)

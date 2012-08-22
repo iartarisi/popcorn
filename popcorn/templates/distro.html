@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 {% block body %}
 <h2>Distro {{ distro.distro_name }}-{{ distro.distro_version }}</h2>
-<p>Systems:</p>
+<p>Submissions:</p>
 <ul>
-  {% for sys in distro.systems %}
-  <li><a href="/system/{{ sys.sub_id }}">{{sys.sub_id}}</a></li>
+  {% for sub in distro.submissions %}
+  <li><a href="/submission/{{ sub.sub_id }}">{{sub.sub_id}}</a></li>
   {% endfor %}
 </ul>
 {% endblock %}
