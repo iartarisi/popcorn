@@ -60,12 +60,6 @@ class ModelsTest(unittest.TestCase):
         db_session.add(Vendor('http://repo.url'))
         db_session.flush()
 
-        # system is dependent on both arches and distros already being
-        # in the db
-        db_session.add_all([System('i586', 'Fedora', '16'),
-                            System('i586', 'openSUSE', '12.1')])
-        db_session.commit()
-
         self.db_session = db_session
 
     def tearDown(self):
@@ -73,47 +67,44 @@ class ModelsTest(unittest.TestCase):
 
 
 class ModelsSimpleTests(ModelsTest):
-    def test_system_foreign_key_constraint(self):
-        db_session.add(System('i586', 'bogus', 'bogus'))
+    def test_system_creation(self):
+        self.assertEqual(System.query.all(), [])
 
-        self.assertRaises(IntegrityError, db_session.flush)
-        db_session.rollback()
+        sys = System('hwuuid')
+        db_session.add(sys)
+        db_session.commit()
 
-        db_session.add(System('bogus', 'Fedora', '16'))
-        self.assertRaises(IntegrityError, db_session.flush)
+        self.assertEqual(System.query.all(), [sys])
 
     def test_submission_creation(self):
-        s1 = System.query.first()
-        sub = Submission(s1.sub_id, 'POPCORN v0.0.1')
+        self.assertEqual(Submission.query.all(), [])
 
-        self.assertEqual(s1.submissions, [])
-
+        sub = Submission('openSUSE', '12.1', 'i586', 'POPCORN v0.0.1')
         db_session.add(sub)
         db_session.commit()
 
         self.assertEqual(Submission.query.all(), [sub])
-        self.assertEqual(s1.submissions, [sub])
 
     def test_submission_foreign_key_constraint(self):
-        sub = Submission('bogus', 'POPCORN v0.0.1')
+        sub = Submission('bogus', '12.1', 'i586', 'POPCORN v0.0.1')
         db_session.add(sub)
 
         self.assertRaises(IntegrityError, db_session.commit)
 
     def test_submission_package_creation(self):
-        s1 = System.query.first()
-        sub = Submission(s1.sub_id, 'POPCORN v0.0.1')
+        sub = Submission('openSUSE', '12.1', 'i586', 'POPCORN v0.0.1')
         vendor = Vendor('repo1')
-        subp = SubmissionPackage(s1.sub_id, date.today(), 'python',
-                                 '2.7', '3', '', 'i586', 'repo1', 'voted')
+
         db_session.add(sub)
         db_session.add(vendor)
         db_session.flush()
+
+        subp = SubmissionPackage(sub.sub_id, date.today(), 'python',
+                                 '2.7', '3', '', 'i586', 'repo1', 'voted')
         db_session.add(subp)
         db_session.flush()
 
         self.assertEqual(SubmissionPackage.query.first(), subp)
 
     def test_submission_package_no_epoch(self):
-        s1 = System.query.first()
-        sub = Submission(s1.sub_id, "P1", date.today())
+        sub = Submission('openSUSE', '12.1', 'i586', 'POPCORN v0.0.1')
