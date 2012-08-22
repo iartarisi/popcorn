@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (c) 2012 Ionuț Arțăriși <iartarisi@suse.cz>
+# Copyright (c) 2012 Akshit Khurana <axitkhurana@gmail.com>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -22,53 +22,33 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-from sqlalchemy import (Column, ForeignKey, ForeignKeyConstraint, String,
-                        Integer)
-from sqlalchemy.orm import relationship
+from datetime import date
+
+from sqlalchemy import Column, Date, String
 
 from popcorn.database import Base
-from popcorn.models import Distro, Submission
 
 
 class System(Base):
     __tablename__ = 'systems'
-    submission_id = Column(Integer, primary_key=True, autoincrement=True)
-    distro_name = Column(String(20), nullable=False)
-    distro_version = Column(String(10), nullable=False)
-    arch = Column(String(10), ForeignKey('arches.arch'), nullable=False)
+    sys_hwuuid = Column(String(64), primary_key=True)
+    sub_date = Column(Date())
 
-    submissions = relationship('Submission', backref='system',
-                               order_by=Submission.sub_date.desc())
-
-    __table_args__ = (
-        ForeignKeyConstraint([distro_name, distro_version],
-                             [Distro.distro_name, Distro.distro_version]),
-        {})
-
-    def __init__(self, arch, distro_name, distro_version):
-        self.arch = arch
-        self.distro_name = distro_name
-        self.distro_version = distro_version
+    def __init__(self, sys_hwuuid, date=date.today()):
+        self.sys_hwuuid = sys_hwuuid
+        self.sub_date = date
 
     def __repr__(self):
-        return "<System: %s>" % self.submission_id
-
-    @property
-    def last_submission(self):
-        return Submission.query.filter_by(submission_id=self.submission_id
-                                          ).order_by(Submission.sub_date.desc()
-                                                     ).first()
+        return '<System %s: Last submission at %s>' % (self.sys_hwuuid,
+                                                       self.sub_date)
 
     @property
     def _flat_attrs(self):
         return {
-            'submission_id': self.submission_id,
-            'distro_name': self.distro_name,
-            'distro_version': self.distro_version,
-            'arch': self.arch,
+            'sys_hwuuid': self.sys_hwuuid,
+            'sub_date': self.sub_date.strftime("%Y-%m-%d"),
         }
 
     @property
     def serialize(self):
-        return dict({'submissions': [sub._flat_attrs for sub in
-                    self.submissions]}, **self._flat_attrs)
+        return dict(**self._flat_attrs)

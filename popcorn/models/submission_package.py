@@ -34,8 +34,8 @@ class SubmissionPackage(Base):
     __tablename__ = 'submission_packages'
 
     # primary key
-    submission_id = Column(Integer, ForeignKey('systems.submission_id'),
-                           primary_key=True,)
+    sub_id = Column(Integer, ForeignKey('submissions.sub_id'),
+                    primary_key=True,)
     sub_date = Column(Date(), primary_key=True)
     pkg_name = Column(String(50), primary_key=True)
     pkg_version = Column(String(50), primary_key=True)

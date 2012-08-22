@@ -32,7 +32,7 @@ class Distro(Base):
     __tablename__ = 'distros'
     distro_name = Column(String(20), primary_key=True)
     distro_version = Column(String(10), primary_key=True)
-    systems = relationship('System')
+    submissions = relationship('Submission')
 
     def __init__(self, distro_name, distro_version):
         self.distro_name = distro_name
@@ -50,5 +50,5 @@ class Distro(Base):
 
     @property
     def serialize(self):
-        return dict({'systems': [sys._flat_attrs for sys in self.systems]},
-                    **self._flat_attrs)
+        return dict({'submissions': [sub._flat_attrs for sub in
+                     self.submissions]}, **self._flat_attrs)

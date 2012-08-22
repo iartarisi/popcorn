@@ -31,4 +31,3 @@ from system import System
 from vendor import Vendor
 from package_status import PackageStatus
 from submission_package import SubmissionPackage
-from unique_system import UniqueSystem

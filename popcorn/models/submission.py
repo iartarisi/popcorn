@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2012 Ionuț Arțăriși <iartarisi@suse.cz>
+# Copyright (c) 2012 Akshit Khurana <axitkhurana@gmail.com>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -24,10 +25,12 @@
 
 from datetime import date
 
-from sqlalchemy import Column, Date, ForeignKey, String, Integer
+from sqlalchemy import (Column, Date, ForeignKey, String, Integer,
+                        ForeignKeyConstraint)
 from sqlalchemy.orm import relationship
 
 from popcorn.database import Base
+from popcorn.models import Distro
 
 
 class SubmissionError(Exception):
@@ -36,28 +39,41 @@ class SubmissionError(Exception):
 
 class Submission(Base):
     __tablename__ = 'submissions'
-    sub_date = Column(Date(), primary_key=True)
-    submission_id = Column(Integer, ForeignKey('systems.submission_id'),
-                           primary_key=True)
+    sub_id = Column(Integer, primary_key=True, autoincrement=True)
+    sub_date = Column(Date())
+    distro_name = Column(String(20), nullable=False)
+    distro_version = Column(String(10), nullable=False)
+    arch = Column(String(10), ForeignKey('arches.arch'), nullable=False)
     popcorn_version = Column(String(30), nullable=False)
 
     submission_packages = relationship('SubmissionPackage')
 
-    def __init__(self, submission_id, popcorn_version, date=date.today()):
+    __table_args__ = (
+        ForeignKeyConstraint([distro_name, distro_version],
+                             [Distro.distro_name, Distro.distro_version]),
+        {})
+
+    def __init__(self, distro_name, distro_version, arch, popcorn_version,
+                 date=date.today()):
         self.sub_date = date
-        self.submission_id = submission_id
+        self.distro_name = distro_name
+        self.distro_version = distro_version
+        self.arch = arch
         self.popcorn_version = popcorn_version
 
     def __repr__(self):
-        return '<Submission from %s at %s>' % (self.submission_id,
-                                               self.sub_date)
+        return '<Submission id %s at %s>' % (self.sub_id,
+                                             self.sub_date)
 
     @property
     def _flat_attrs(self):
         return {
-            'sub_date': self.sub_date.strftime("%Y-%m-%d"),
-            'submission_id': self.submission_id,
-            'popcorn_version': self.popcorn_version,
+            "sub_id": self.sub_id,
+            "sub_date": self.sub_date.strftime("%Y-%m-%d"),
+            "popcorn_version": self.popcorn_version,
+            "arch": self.arch,
+            "distro_name": self.distro_name,
+            "distro_version": self.distro_version,
         }
 
     @property
