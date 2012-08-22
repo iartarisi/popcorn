@@ -47,7 +47,7 @@ class TestParsePopcorn(ModelsTest):
 
         uniq_sys = UniqueSystem.query.filter_by(sys_hwuuid='TEST_SUBID').one()
 
-        system = System.query.order_by('-submission_id').first()
+        system = System.query.order_by('-sub_id').first()
         self.assertEqual(len(system.submissions), 1)
 
         sub = system.last_submission

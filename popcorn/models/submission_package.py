@@ -50,14 +50,14 @@ class SubmissionPackage(Base):
 
     __table_args__ = (
         ForeignKeyConstraint(
-            [submission_id, sub_date],
-            [Submission.submission_id, Submission.sub_date]
+            [sub_id, sub_date],
+            [Submission.sub_id, Submission.sub_date]
             ),
         )
 
-    def __init__(self, submission_id, sub_date, pkg_name, pkg_version,
+    def __init__(self, sub_id, sub_date, pkg_name, pkg_version,
                  pkg_release, pkg_epoch, pkg_arch, vendor_name, pkg_status):
-        self.submission_id = submission_id
+        self.sub_id = sub_id
         self.sub_date = sub_date
         self.pkg_name = pkg_name
         self.pkg_version = pkg_version
@@ -69,11 +69,11 @@ class SubmissionPackage(Base):
 
     def __repr__(self):
         if self.pkg_epoch:
-            output = ("<SubmissionPackage: %(submission_id)s %(sub_date)s "
+            output = ("<SubmissionPackage: %(sub_id)s %(sub_date)s "
                       "%(name)s-%(ver)s-%(rel)s-%(epoch)s.%(arch)s - "
                       "%(status)s")
         else:
-            output = ("<SubmissionPackage: %(submission_id)s %(sub_date)s "
+            output = ("<SubmissionPackage: %(sub_id)s %(sub_date)s "
                       "%(name)s-%(ver)s-%(rel)s.%(arch)s - %(status)s")
         return output % dict(name=self.pkg_name,
                              ver=self.pkg_version,
@@ -99,7 +99,7 @@ class SubmissionPackage(Base):
     @property
     def _flat_attrs(self):
         return {
-            'submission_id': self.submission_id,
+            'sub_id': self.sub_id,
             'sub_date': self.sub_date.strftime("%Y-%m-%d"),
             'pkg_name': self.pkg_name,
             'pkg_version': self.pkg_version,

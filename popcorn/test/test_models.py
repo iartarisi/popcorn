@@ -84,7 +84,7 @@ class ModelsSimpleTests(ModelsTest):
 
     def test_submission_creation(self):
         s1 = System.query.first()
-        sub = Submission(s1.submission_id, 'POPCORN v0.0.1')
+        sub = Submission(s1.sub_id, 'POPCORN v0.0.1')
 
         self.assertEqual(s1.submissions, [])
 
@@ -102,9 +102,9 @@ class ModelsSimpleTests(ModelsTest):
 
     def test_submission_package_creation(self):
         s1 = System.query.first()
-        sub = Submission(s1.submission_id, 'POPCORN v0.0.1')
+        sub = Submission(s1.sub_id, 'POPCORN v0.0.1')
         vendor = Vendor('repo1')
-        subp = SubmissionPackage(s1.submission_id, date.today(), 'python',
+        subp = SubmissionPackage(s1.sub_id, date.today(), 'python',
                                  '2.7', '3', '', 'i586', 'repo1', 'voted')
         db_session.add(sub)
         db_session.add(vendor)
@@ -116,4 +116,4 @@ class ModelsSimpleTests(ModelsTest):
 
     def test_submission_package_no_epoch(self):
         s1 = System.query.first()
-        sub = Submission(s1.submission_id, "P1", date.today())
+        sub = Submission(s1.sub_id, "P1", date.today())

@@ -90,7 +90,7 @@ def parse_text(data):
     db_session.flush()
 
     today = date.today()
-    sub = Submission(system.submission_id, version, today)
+    sub = Submission(system.sub_id, version, today)
     db_session.add(sub)
     for line in datalines[1:]:
         try:
@@ -119,7 +119,7 @@ def parse_text(data):
             except IntegrityError, e:
                 print str(e)
 
-        sp = SubmissionPackage(system.submission_id, today, name, version,
+        sp = SubmissionPackage(system.sub_id, today, name, version,
                                release, epoch, arch, vendor.vendor_name,
                                status)
         db_session.add(sp)

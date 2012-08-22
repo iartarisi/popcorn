@@ -114,7 +114,7 @@ class PopcornTestCase(unittest.TestCase):
                 "distros": [{
                     "distro_name": "openSUSE",
                     "systems": [{
-                        "submission_id": 1,
+                        "sub_id": 1,
                             "arch": "x86_64",
                             "distro_version": "12.1",
                             "distro_name": "openSUSE"
@@ -148,10 +148,10 @@ class PopcornTestCase(unittest.TestCase):
             self.assertEqual(json.loads(response.data), {
                 "system": {
                     "arch": "x86_64",
-                    "submission_id": 1,
+                    "sub_id": 1,
                     "submissions": [{
                         "sub_date": today.strftime("%Y-%m-%d"),
-                        "submission_id": 1,
+                        "sub_id": 1,
                         "popcorn_version": "0.1"
                         }],
                     "distro_name": "openSUSE",
@@ -170,7 +170,7 @@ class PopcornTestCase(unittest.TestCase):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
                 "packages": [{
-                    "submission_id": 1,
+                    "sub_id": 1,
                     "sub_date": today.strftime("%Y-%m-%d"),
                     "pkg_status": "voted",
                     "pkg_name": "sed",
@@ -182,7 +182,7 @@ class PopcornTestCase(unittest.TestCase):
                   }],
                 "voted": 1,
                 "generic_package": {
-                    "submission_id": 1,
+                    "sub_id": 1,
                     "sub_date": today.strftime("%Y-%m-%d"),
                     "pkg_status": "voted",
                     "pkg_name": "sed",
@@ -207,7 +207,7 @@ class PopcornTestCase(unittest.TestCase):
                 "distro": {
                     "distro_name": "openSUSE",
                     "systems": [{
-                        "submission_id": 1,
+                        "sub_id": 1,
                         "arch": "x86_64",
                         "distro_version": "12.1",
                         "distro_name": "openSUSE"

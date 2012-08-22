@@ -102,7 +102,7 @@ def submission(subid, sub_date):
     """Return a Submission object"""
     try:
         sub = Submission.query.filter_by(
-            submission_id=subid, sub_date=sub_date).one()
+            sub_id=subid, sub_date=sub_date).one()
     except NoResultFound:
         abort(404)
     page = request.args.get('page', 0, type=int)
@@ -122,7 +122,7 @@ def submission(subid, sub_date):
 def system(subid):
     """Return a System object"""
     try:
-        system = System.query.filter_by(submission_id=subid).one()
+        system = System.query.filter_by(sub_id=subid).one()
     except NoResultFound:
         abort(404)
     return dict(system=system.serialize)
