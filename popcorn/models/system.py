@@ -32,21 +32,21 @@ from popcorn.database import Base
 class System(Base):
     __tablename__ = 'systems'
     sys_hwuuid = Column(String(64), primary_key=True)
-    sub_date = Column(Date())
+    last_sub_date = Column(Date())
 
     def __init__(self, sys_hwuuid, date=date.today()):
         self.sys_hwuuid = sys_hwuuid
-        self.sub_date = date
+        self.last_sub_date = date
 
     def __repr__(self):
         return '<System %s: Last submission at %s>' % (self.sys_hwuuid,
-                                                       self.sub_date)
+                                                       self.last_sub_date)
 
     @property
     def _flat_attrs(self):
         return {
             'sys_hwuuid': self.sys_hwuuid,
-            'sub_date': self.sub_date.strftime("%Y-%m-%d"),
+            'last_sub_date': self.last_sub_date.strftime("%Y-%m-%d"),
         }
 
     @property

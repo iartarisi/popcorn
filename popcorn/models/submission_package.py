@@ -22,7 +22,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-from sqlalchemy import (Column, Date, ForeignKey, ForeignKeyConstraint,
+from sqlalchemy import (Column, Date, ForeignKey,
                         String, Integer)
 from sqlalchemy.orm import relationship
 
@@ -35,7 +35,7 @@ class SubmissionPackage(Base):
 
     # primary key
     sub_id = Column(Integer, ForeignKey('submissions.sub_id'),
-                    primary_key=True,)
+                    primary_key=True)
     sub_date = Column(Date(), primary_key=True)
     pkg_name = Column(String(50), primary_key=True)
     pkg_version = Column(String(50), primary_key=True)
@@ -47,13 +47,6 @@ class SubmissionPackage(Base):
     # not primary key
     pkg_status = Column(String(10), ForeignKey('package_statuses.pkg_status'),
                         nullable=False)
-
-    __table_args__ = (
-        ForeignKeyConstraint(
-            [sub_id, sub_date],
-            [Submission.sub_id, Submission.sub_date]
-            ),
-        )
 
     def __init__(self, sub_id, sub_date, pkg_name, pkg_version,
                  pkg_release, pkg_epoch, pkg_arch, vendor_name, pkg_status):
