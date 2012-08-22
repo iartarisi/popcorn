@@ -32,7 +32,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from popcorn.configs import SUBMISSION_INTERVAL
 from popcorn.database import db_session
 from popcorn.models import (Arch, Distro, SubmissionPackage, Submission,
-                            System, Vendor, UniqueSystem)
+                            System, Vendor)
 
 
 class FormatError(Exception):
@@ -63,16 +63,16 @@ def parse_text(data):
     (popcorn, version, distro, distrover, arch, hw_uuid) = datalines[0].split()
 
     try:
-        uniq_sys = UniqueSystem.query.filter_by(sys_hwuuid=hw_uuid).one()
-        uniq_sys.sub_date = date.today()
+        system = System.query.filter_by(sys_hwuuid=hw_uuid).one()
+        system.last_sub_date = date.today()
         # TODO: think about moving this to the model
-        if not _can_submit(uniq_sys):
-            raise EarlySubmissionError(uniq_sys.sub_date)
+        if not _can_submit(system):
+            raise EarlySubmissionError(system.last_sub_date)
     except NoResultFound:
-        new_system = UniqueSystem(hw_uuid)
-        db_session.add(new_system)
+        system = System(hw_uuid)
+        db_session.add(system)
 
-    system = System(arch, distro, distrover)
+    submission = Submission(distro, distrover, arch, version)
 
     try:
         Arch.query.filter_by(arch=arch).one()
@@ -86,12 +86,9 @@ def parse_text(data):
         distro = Distro(distro, distrover)
         db_session.add(distro)
 
-    db_session.add(system)
+    db_session.add(submission)
     db_session.flush()
 
-    today = date.today()
-    sub = Submission(system.sub_id, version, today)
-    db_session.add(sub)
     for line in datalines[1:]:
         try:
             (status, name, version, release,
@@ -119,7 +116,7 @@ def parse_text(data):
             except IntegrityError, e:
                 print str(e)
 
-        sp = SubmissionPackage(system.sub_id, today, name, version,
+        sp = SubmissionPackage(submission.sub_id, date.today(), name, version,
                                release, epoch, arch, vendor.vendor_name,
                                status)
         db_session.add(sp)
@@ -130,7 +127,7 @@ def parse_text(data):
         raise
 
 
-def _can_submit(uniq_sys):
+def _can_submit(system):
     """Checks the Submission interval for this System
 
     :system: a System object
@@ -139,7 +136,7 @@ def _can_submit(uniq_sys):
     will return True, otherwise returns False.
 
     """
-    delta = date.today() - uniq_sys.sub_date
+    delta = date.today() - system.last_sub_date
     if SUBMISSION_INTERVAL < delta.days:
         return True
     else:
