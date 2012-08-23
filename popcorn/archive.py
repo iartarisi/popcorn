@@ -31,8 +31,8 @@ from sqlalchemy import func
 from sqlalchemy.sql.expression import extract
 
 from popcorn.database import db_session
-from popcorn.models import (SubmissionPackage as SubPac, System as Sys,
-                            Submission, PackageArchive)
+from popcorn.models import (SubmissionPackage as SubPac, Submission as Sub,
+                            PackageArchive)
 
 TODAY = date.today()
 LAST_MONTH = TODAY.replace(month=TODAY.month - 1)
@@ -43,10 +43,10 @@ def update_archives(arc_month=LAST_MONTH):
     query = db_session.query(SubPac.pkg_name, SubPac.pkg_version,
                              SubPac.pkg_release, SubPac.pkg_arch,
                              SubPac.vendor_name, SubPac.pkg_status,
-                             Sys.distro_name, Sys.distro_version,
+                             Sub.distro_name, Sub.distro_version,
                              func.min(SubPac.sub_date),
                              func.count('*').label('count')
-                             ).join(Submission).join(Sys)
+                             ).join(Sub)
 
     arcs = query.filter(extract('month', SubPac.sub_date) == arc_month.month,
                         extract('year', SubPac.sub_date) == arc_month.year
@@ -55,8 +55,8 @@ def update_archives(arc_month=LAST_MONTH):
                                    SubPac.pkg_name, SubPac.pkg_version,
                                    SubPac.pkg_release, SubPac.pkg_arch,
                                    SubPac.vendor_name,
-                                   SubPac.pkg_status, Sys.distro_name,
-                                   Sys.distro_version).all()
+                                   SubPac.pkg_status, Sub.distro_name,
+                                   Sub.distro_version).all()
 
     pkg_archives = []
     for pkg in arcs:

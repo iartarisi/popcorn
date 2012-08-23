@@ -37,18 +37,17 @@ class TestArchivePackages(ModelsTest):
         self.old_date = date.today() - timedelta(days=400)
         self.today = date.today()
 
-        s1 = System('i586', 'Fedora', '16')
-        db_session.add(s1)
-        db_session.flush()
-        sub1 = Submission(s1.submission_id, 'v1', self.old_date)
-        subp1 = SubmissionPackage(s1.submission_id, self.old_date, 'python',
-                                  '2.7', '3', '', 'i586', 'http://repo.url',
-                                  'voted')
-        subp2 = SubmissionPackage(s1.submission_id, self.old_date, 'chrome',
-                                  '2.7', '3', '', 'i586', 'http://repo.url',
-                                  'voted')
+        sub1 = Submission('openSUSE', '12.1', 'i586', 'POPCORN v0.0.1',
+                          self.old_date)
         db_session.add(sub1)
         db_session.flush()
+
+        subp1 = SubmissionPackage(sub1.sub_id, self.old_date, 'python',
+                                  '2.7', '3', '', 'i586', 'http://repo.url',
+                                  'voted')
+        subp2 = SubmissionPackage(sub1.sub_id, self.old_date, 'chrome',
+                                  '2.7', '3', '', 'i586', 'http://repo.url',
+                                  'voted')
         db_session.add_all([subp1, subp2])
         db_session.flush()
         update_archives(self.old_date)
@@ -59,33 +58,27 @@ class TestArchivePackages(ModelsTest):
         self.assertEqual(month, self.old_date.replace(day=1))
 
     def test_archive_package_count(self):
-        s2 = System('i586', 'Fedora', '16')
-        db_session.add(s2)
-        db_session.flush()
-
-        sub2 = Submission(s2.submission_id, 'v1', self.today)
-        subp3 = SubmissionPackage(s2.submission_id, self.today, 'python',
-                                  '2.7', '3', '', 'i586', 'http://repo.url',
-                                  'voted')
-        subp4 = SubmissionPackage(s2.submission_id, self.today, 'chrome',
-                                  '2.7', '3', '', 'i586', 'http://repo.url',
-                                  'voted')
+        sub2 = Submission('Fedora', '16', 'i586', 'v1')
         db_session.add(sub2)
         db_session.flush()
+
+        subp3 = SubmissionPackage(sub2.sub_id, self.today, 'python',
+                                  '2.7', '3', '', 'i586', 'http://repo.url',
+                                  'voted')
+        subp4 = SubmissionPackage(sub2.sub_id, self.today, 'chrome',
+                                  '2.7', '3', '', 'i586', 'http://repo.url',
+                                  'voted')
+
         db_session.add_all([subp3, subp4])
         db_session.flush()
 
-        s3 = System('i586', 'Fedora', '16')
-        db_session.add(s3)
-        db_session.flush()
-
-        sub3 = Submission(s3.submission_id, 'v1', self.today)
-        subp5 = SubmissionPackage(s3.submission_id, self.today, 'python',
-                                  '2.7', '3', '', 'i586', 'http://repo.url',
-                                  'voted')
-
+        sub3 = Submission('Fedora', '16', 'i586', 'v1')
         db_session.add(sub3)
         db_session.flush()
+
+        subp5 = SubmissionPackage(sub3.sub_id, self.today, 'python',
+                                  '2.7', '3', '', 'i586', 'http://repo.url',
+                                  'voted')
 
         db_session.add(subp5)
         db_session.flush()
