@@ -57,13 +57,11 @@ def update_archives(arc_month=LAST_MONTH):
                                    SubPac.vendor_name,
                                    SubPac.pkg_status, Sub.distro_name,
                                    Sub.distro_version).all()
-
     pkg_archives = []
     for pkg in arcs:
-        pkg_archives.append(PackageArchive(*pkg))
-
-    for pkg_archive in pkg_archives:
+        pkg_archive = PackageArchive(*pkg)
         pkg_archive.month = pkg_archive.month.replace(day=1)
+        pkg_archives.append(pkg_archive)
 
     db_session.add_all(pkg_archives)
     db_session.commit()
