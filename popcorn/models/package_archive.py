@@ -37,7 +37,7 @@ class PackageArchive(Base):
     pkg_release = Column(String(50), primary_key=True)
     pkg_arch = Column(String(10), ForeignKey('arches.arch'), primary_key=True)
     vendor_name = Column(String(20), ForeignKey('vendors.vendor_name'),
-                         primary_key=True),
+                         primary_key=True)
     pkg_status = Column(String(10), ForeignKey('package_statuses.pkg_status'),
                         primary_key=True)
     distro_name = Column(String(20), primary_key=True)
