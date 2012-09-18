@@ -62,6 +62,10 @@ def parse_text(data):
     datalines = data.splitlines()
     (popcorn, version, distro, distrover, arch, hw_uuid) = datalines[0].split()
 
+    # we only use the underscore to make transporting easier, they
+    # shouldn't be there otherwise
+    distro = distro.replace('_', ' ')
+
     try:
         system = System.query.filter_by(sys_hwuuid=hw_uuid).one()
         system.last_sub_date = date.today()
