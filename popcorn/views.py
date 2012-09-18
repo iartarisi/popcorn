@@ -58,10 +58,20 @@ def index():
         Distro
     ).group_by(Distro.distro_name).all()
 
+    # number of submissions per distribution
+    submissions_distrover = db_session.query(
+        func.concat(Submission.distro_name, ' ', Submission.distro_version),
+        func.count(Submission.sub_id)
+        ).group_by(Submission.distro_name, Submission.distro_version).all()
+
     # transform the list of tuples returned by SQLA into a nested JS array
     distro_packages = json.dumps(distro_packages)
-    return dict(distros=[i.serialize for i in distros], vendors=[i.serialize
-                for i in vendors], distro_packages=distro_packages)
+    submissions_distrover = json.dumps(submissions_distrover)
+
+    return dict(distros=[i.serialize for i in distros],
+                vendors=[i.serialize for i in vendors],
+                distro_packages=distro_packages,
+                submissions_distrover=submissions_distrover)
 
 
 @app.route('/', methods=['POST'])

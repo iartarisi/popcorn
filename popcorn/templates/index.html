@@ -6,31 +6,10 @@
   // all the future graphs as well
 
   // Load the Visualization API and the piechart package.
-  google.load('visualization', '1.0', {'packages':['corechart']});
+  google.load('visualization', '1', {'packages':['corechart']});
 
-  // Set a callback to run when the Google Visualization API is loaded.
-  google.setOnLoadCallback(drawChart);
-
-  // Callback that creates and populates a data table,
-  // instantiates the pie chart, passes in the data and
-  // draws it.
-  function drawChart() {
-
-    // Create the data table.
-    var data = new google.visualization.DataTable();
-    data.addColumn('string', 'Distro');
-    data.addColumn('number', 'Packages');
-    data.addRows({{ distro_packages|safe }});
-
-    // Set chart options
-    var options = {'title':'Packages by Distro',
-                   'width':400,
-                   'height':300};
-
-    // Instantiate and draw our chart, passing in some options.
-    var chart = new google.visualization.PieChart(document.getElementById('distro_packages_chart'));
-    chart.draw(data, options);
-  }
+  {% include "js/packages_distro.js" %}
+  {% include "js/submissions_distrover.js" %}
 </script>
 {% endblock %}
 
@@ -71,10 +50,13 @@
 </div>     
 <div class="row-fluid">
   <div class="span5">
-    <h4>Packages by Distro</h4>
-    <div class="distro_packages_chart"></div>
+    <h4>Packages tracked by distribution</h4>
+    <div id="distro_packages_chart" style="width: 400px; height: 300px;"></div>
   </div>
-  <div class="span5 distro_packages_chart"></div>
+  <div class="span5">
+    <h4>Submissions for each distribution version</h4>
+    <div id="submissions_distrover" style="width: 400px; height: 300px;"></div>
+  </div>
 </div>
 <div class="row">
   <div class="span5 distro_packages_chart"></div>
