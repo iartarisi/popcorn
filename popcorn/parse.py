@@ -68,13 +68,14 @@ def parse_text(data):
 
     try:
         system = System.query.filter_by(sys_hwuuid=hw_uuid).one()
-        system.last_sub_date = date.today()
-        # TODO: think about moving this to the model
-        if not _can_submit(system):
-            raise EarlySubmissionError(system.last_sub_date)
     except NoResultFound:
         system = System(hw_uuid)
         db_session.add(system)
+    else:
+        # TODO: think about moving this to the model
+        if not _can_submit(system):
+            raise EarlySubmissionError(system.last_sub_date)
+        system.last_sub_date = date.today()
 
     submission = Submission(distro, distrover, arch, version)
 

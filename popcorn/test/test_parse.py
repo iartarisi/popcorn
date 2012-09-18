@@ -66,6 +66,16 @@ class TestParsePopcorn(ModelsTest):
 
         self.assertRaises(FormatError, parse_text, subm_text)
 
+    def test_parse_no_early_submission_error(self):
+        sys = System("TEST_HWUUID", date.today() - timedelta(days=300))
+        self.db_session.add(sys)
+        self.db_session.commit()
+
+        sub = "POPCORN 0.1 openSUSE 11.4 x86_64 %s\n" % sys.sys_hwuuid
+        parse_text(sub)
+
+        self.assertEqual(sys.last_sub_date, date.today())
+
     def test_parse_early_submission_error(self):
         sys = System("TEST_HWUUID")
         self.db_session.add(sys)
