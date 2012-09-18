@@ -1,34 +1,7 @@
-body {
-    color: #595959;
-    padding: 0;
-    margin: 0;
-    background: white url(rainf.png);
+.container-fluid {
+    margin-top: 1em;
 }
 
-h1, h2, h3 {
-    font-family: 'Garamond', 'Georgia', serif;
-    font-weight: normal;
-}
-
-a {
-    color: #94BB07;
-}
-
-a:visited, a:hover {
-    color: #43913C;
-}
-
-#page {
-    padding: 5em 10em 5em;
-}
-
-#box {
-    background: white;
-    width: 90%;
-    margin: 0 auto;
-    border: #797979 solid;
-    border-width: 0 .2em .2em;
-}
 #footer {
     margin: 0 auto;
     text-align: center;

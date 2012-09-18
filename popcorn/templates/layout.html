@@ -1,14 +1,22 @@
 <!doctype html>
 <head>
-  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+  <link rel=stylesheet href='//netdna.bootstrapcdn.com/bootswatch/2.1.0/simplex/bootstrap.min.css'>
+
+  <link rel=stylesheet href="{{ url_for('static', filename='style.css') }}">
   <link rel="shortcut icon" href="/static/favicon.ico">
+
   <title>Popcorn eats you!</title>
 </head>
-<div id="box">
-  <div id="page">
-    <h1>Popcorn eats you!</h1>
-    {% block body %}{% endblock %}
-  </div>    
+<body>
+  <div class="container-fluid">
+    <div class="row-fluid">
+      <div class="span2">o</div>
+      <div class="span10">
+        {% block body %}{% endblock %}
+      </div>
+    </div>
+  </div>
   <div id="footer">The lizards say: <em>follow the <a href="http://github.com/mapleoin/popcorn">source</a>!</em></div>
   {% block javascript %}{% endblock %}
-</div>
+  <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/js/bootstrap.min.js"></script>
+</body>

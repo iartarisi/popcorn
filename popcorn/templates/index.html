@@ -35,26 +35,49 @@
 {% endblock %}
 
 {% block body %}
-<div id="systems">
-  <h2>Distros</h2>
-  <ul>
-    {% for distro in distros %}
-    <li>
-      <a href="/distro/{{ distro.distro_name }}_{{ distro.distro_version }}">
-        {{ distro.distro_name }} {{ distro.distro_version }}</a>
-    </li>
-    {% endfor %}
-  </ul>
+<div class="row-fluid">
+  <div class="span10">
+    <div class="hero-unit">
+      <h1>Popcorn eats you!</h1>
+      <p>Popcorn tracks the usage of RPM packages. This
+        website provides user contributed statistics about installed
+        packages and their metadata.</p>
+    </div>
+  </div>
 </div>
-<div id="vendors">
-  <h2>Vendors</h2>
-  <ul>
-    {% for vendor in vendors %}
-    <li>
-      <a href="/vendor/{{ vendor.vendor_name }}">{{ vendor.vendor_name }}</a>
-    </li>
-    {% endfor %}
-  </ul>
+
+<div class="row-fluid">
+  <div class="span5" id="systems">
+    <h2>Distros</h2>
+    <ul>
+      {% for distro in distros %}
+      <li>
+        <a href="/distro/{{ distro.distro_name }}_{{ distro.distro_version }}">
+          {{ distro.distro_name }} {{ distro.distro_version }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="span5" id="vendors">
+    <h2>Vendors</h2>
+    <ul>
+      {% for vendor in vendors %}
+      <li>
+        <a href="/vendor/{{ vendor.vendor_name }}">{{ vendor.vendor_name }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>     
+<div class="row-fluid">
+  <div class="span5">
+    <h4>Packages by Distro</h4>
+    <div class="distro_packages_chart"></div>
+  </div>
+  <div class="span5 distro_packages_chart"></div>
 </div>
-<div id="distro_packages_chart"></div>
+<div class="row">
+  <div class="span5 distro_packages_chart"></div>
+  <div class="span5 distro_packages_chart"></div>
+</div>
 {% endblock %}
