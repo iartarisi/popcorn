@@ -41,7 +41,7 @@ class Submission(Base):
     __tablename__ = 'submissions'
     sub_id = Column(Integer, primary_key=True, autoincrement=True)
     sub_date = Column(Date())
-    distro_name = Column(String(20), nullable=False)
+    distro_name = Column(String(30), nullable=False)
     distro_version = Column(String(10), nullable=False)
     arch = Column(String(10), ForeignKey('arches.arch'), nullable=False)
     popcorn_version = Column(String(30), nullable=False)

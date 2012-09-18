@@ -30,7 +30,7 @@ from popcorn.database import Base
 
 class Distro(Base):
     __tablename__ = 'distros'
-    distro_name = Column(String(20), primary_key=True)
+    distro_name = Column(String(30), primary_key=True)
     distro_version = Column(String(10), primary_key=True)
     submissions = relationship('Submission')
 

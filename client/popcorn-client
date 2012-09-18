@@ -131,6 +131,7 @@ class Statistics:  # TODO break this class into functions
 
     def serialize(self):
         distro, distro_ver, code = platform.linux_distribution()
+        distro = distro.strip().replace(" ", "_")
         arch = platform.machine()
         uuid_hash = hashlib.sha256(get_system_id()).hexdigest()
         ret = [('POPCORN %(version)s %(distro)s %(distro_ver)s %(arch)s '
