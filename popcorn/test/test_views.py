@@ -196,7 +196,7 @@ class PopcornTestCase(unittest.TestCase):
 
     def test_distro_json(self):
         self.submit(compress=False, header=False)
-        with app.test_request_context(path='/distro/openSUSE_12.1',
+        with app.test_request_context(path='/distro/openSUSE/12.1',
                                       method='GET',
                                       headers=[('Accept', 'application/json')]
                                       ):

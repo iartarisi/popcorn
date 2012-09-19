@@ -170,7 +170,7 @@ def package(name, version, release, arch, epoch=''):
                 packages=[i.serialize for i in pkgs], **statuses)
 
 
-@app.route('/distro/<name>_<version>')
+@app.route('/distro/<name>/<version>')
 @render(template='distro.html')
 def distro(name, version):
     """Return a Distro object"""
