@@ -109,23 +109,6 @@ class PopcornTestCase(unittest.TestCase):
             self.assertEqual(json.loads(response.data), {
                 "submissions_distrover": u'[["openSUSE 12.1", 1]]',
                 "distro_packages": "[[\"openSUSE\", 1285]]",
-                "vendors": [{
-                    "vendor_name": "openSUSE",
-                    "vendor_url": "openSUSE"
-                        }],
-                "distros": [{
-                    "distro_name": "openSUSE",
-                    "submissions": [{
-                        "sub_id": 1,
-                        "sub_date": today.strftime("%Y-%m-%d"),
-                        "distro_version": "12.1",
-                        "popcorn_version": "0.1",
-                        "distro_name": "openSUSE",
-                        "arch": "x86_64"
-                        }],
-                    "distro_version": "12.1",
-                    "distro_name": "openSUSE"
-                    }]
                 })
             self.assertEqual(response.headers['Content-Type'],
                              'application/json')
@@ -214,6 +197,18 @@ class PopcornTestCase(unittest.TestCase):
                     "distro_name": "openSUSE",
                     "distro_version": "12.1"
                     }
+                })
+            self.assertEqual(response.headers['Content-Type'],
+                             'application/json')
+
+    def test_distro_doc_json(self):
+        self.submit(compress=False, header=False)
+        with app.test_request_context(
+                path='/distro', method='GET',
+                headers=[('Accept', 'application/json')]):
+            response = app.dispatch_request()
+            self.assertEqual(json.loads(response.data), {
+                "submissions_distrover": u'[["openSUSE 12.1", 1]]',
                 })
             self.assertEqual(response.headers['Content-Type'],
                              'application/json')
