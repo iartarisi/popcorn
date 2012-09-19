@@ -180,6 +180,15 @@ def distro(name, version):
     except NoResultFound:
         abort(404)
     return dict(distro=distro.serialize)
+
+
+@app.route('/distro')
+@render(template='distro_doc.html')
+def distro_doc():
+    """Document the Distro related API functions"""
+    pass
+
+
 @app.route('/api')
 @render(template='api.html')
 def api():

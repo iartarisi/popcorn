@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2>Distribution</h2>
+
+<p>Information related to the distributions installed on the systems
+that popcorn submissions are received from.</p>
+
+<h3 id="show-a-distribution">Show a distribution</h3>
+
+<p>Information about a distribution, including all the submissions
+received for that distribution.</p>
+
+<code>GET /distro/&lt;distro_name&gt;/&lt;distro_version&gt;</code>
+
+<h4>Arguments:</h4>
+
+<dl class="dl-horizontal">
+  <dt>distro_name</dt>
+  <dd>Canonical distribution name (e.g. "openSUSE", "SUSE Linux
+  Enterprise Server") </dd>
+
+  <dt>distro_version</dt>
+  <dd>Distribution version (e.g. 12.1, 11)
+</dl>
+
+<h4>Response</h4>
+
+<pre>
+  HTTP/1.0 200 OK
+  Content-Type: application/json
+  Content-Length: 517
+</pre>
+<pre class="pre-scrollable">
+  {
+  "distro": {
+    "submissions": [
+      {
+        "sub_id": 2, 
+        "sub_date": "2012-08-01", 
+        "distro_version": "12.1", 
+        "popcorn_version": "0.1", 
+        "distro_name": "openSUSE", 
+        "arch": "i686"
+      }, 
+      {
+        "sub_id": 3, 
+        "sub_date": "2012-09-18", 
+        "distro_version": "12.1", 
+        "popcorn_version": "0.1", 
+        "distro_name": "openSUSE", 
+        "arch": "i686"
+      }
+    ], 
+    "distro_name": "openSUSE", 
+    "distro_version": "12.1"
+  }
+</pre>
+
+
+{% endblock %}
