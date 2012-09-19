@@ -9,7 +9,8 @@ function submissions_by_distrover() {
     var options = {
         backgroundColor: '#f7f7f7',
         chartArea: {width: '100%', height: '70%'},
-        legend: {position: 'in'}
+        legend: {position: 'in'},
+        vAxis: {textPosition: 'in'}
     };
 
     var chart = new google.visualization.ColumnChart(document.getElementById('submissions_distrover'));
