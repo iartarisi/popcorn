@@ -11,16 +11,29 @@
   <div class="container-fluid">
     <div class="row-fluid">
       <div class="span2"></div>
-      <div class="span8 well">
+      <div class="span9 well">
         <h1>Popcorn eats you!</h1>
         <p>Popcorn tracks the usage of RPM packages. This website
           provides user contributed statistics about installed packages
           and their metadata.</p>
       </div>
     </div>
-
     <div class="row-fluid">
-      <div class="span2"></div>
+      <div class="span2">
+        <ul class="nav nav-list">
+          <li><a href="/">Home</a></li>
+          <li class="nav-header"><a href="#">API Documentation</a></li>
+          <ul class="nav nav-list">
+            <li><a href="#">Distributions</a></li>
+            <li><a href="#">Packages</a></li>
+            <li><a href="#">Submissions</a></li>
+          </ul>
+          <li class="divider"></li>
+          <li><a href="#">FAQ</a></li>
+          <li><a href="#">Contribute</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
       <div class="span10">
         {% block body %}{% endblock %}
       </div>
