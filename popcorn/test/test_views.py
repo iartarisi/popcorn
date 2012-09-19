@@ -107,6 +107,7 @@ class PopcornTestCase(unittest.TestCase):
                 headers=[('Accept', 'application/json')]):
             response = app.dispatch_request()
             self.assertEqual(json.loads(response.data), {
+                "submissions_distrover": u'[["openSUSE 12.1", 1]]',
                 "distro_packages": "[[\"openSUSE\", 1285]]",
                 "vendors": [{
                     "vendor_name": "openSUSE",
