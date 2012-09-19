@@ -1,21 +1,24 @@
 {% extends "layout.html" %}
 {% from '_helpers.html' import render_pagination %}
 {% block body %}
-<h2>Submission id {{ submission.sub_id }}
-    on {{ submission.sub_date }}
-</h2>
-<p>Packages:</p>
-<ul>
-  {% for p in packages %}
-  <li>
-    {% if p.pkg_epoch %}
-    <a href="/package/{{ p.pkg_name }}/{{ p.pkg_version}}/{{ p.pkg_release }}/{{ p.pkg_epoch }}/{{ p.pkg_arch }}">{{ p.nvrea }}</a></li>
-    {% else %}
-    <a href="/package/{{ p.pkg_name }}/{{ p.pkg_version}}/{{ p.pkg_release }}/{{ p.pkg_arch }}">{{ p.nvrea }}</a></li>
-
-    {% endif %}
-  </li>
-  {% endfor %}
-</ul>
-{{ render_pagination(pagination) }}
+<div class="row-fluid">
+  <div class="span10">
+    <h2>Submission id {{ submission.sub_id }}
+      on {{ submission.sub_date }}
+    </h2>
+    <p>Packages:</p>
+    <ul>
+      {% for p in packages %}
+      <li>
+        {% if p.pkg_epoch %}
+        <a href="/package/{{ p.pkg_name }}/{{ p.pkg_version}}/{{ p.pkg_release }}/{{ p.pkg_epoch }}/{{ p.pkg_arch }}">{{ p.nvrea }}</a></li>
+        {% else %}
+        <a href="/package/{{ p.pkg_name }}/{{ p.pkg_version}}/{{ p.pkg_release }}/{{ p.pkg_arch }}">{{ p.nvrea }}</a></li>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {{ render_pagination(pagination) }}
+  </div>
+</div>
 {% endblock %}
