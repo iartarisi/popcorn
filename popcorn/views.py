@@ -180,3 +180,8 @@ def distro(name, version):
     except NoResultFound:
         abort(404)
     return dict(distro=distro.serialize)
+@app.route('/api')
+@render(template='api.html')
+def api():
+    """Document the popcorn API"""
+    pass
