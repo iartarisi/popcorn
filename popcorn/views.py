@@ -43,9 +43,6 @@ PER_PAGE = 50
 @app.route('/', methods=['GET'])
 @render(template='index.html')
 def index():
-    distros = Distro.query.all()
-    vendors = Vendor.query.all()
-
     # packages by distro
     # XXX think about moving this to the model
     distro_packages = db_session.query(
@@ -68,9 +65,7 @@ def index():
     distro_packages = json.dumps(distro_packages)
     submissions_distrover = json.dumps(submissions_distrover)
 
-    return dict(distros=[i.serialize for i in distros],
-                vendors=[i.serialize for i in vendors],
-                distro_packages=distro_packages,
+    return dict(distro_packages=distro_packages,
                 submissions_distrover=submissions_distrover)
 
 
