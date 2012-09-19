@@ -60,7 +60,7 @@ def index():
 
     # number of submissions per distribution
     submissions_distrover = db_session.query(
-        Submission.distro_name +' '+ Submission.distro_version,
+        Submission.distro_name + ' ' + Submission.distro_version,
         func.count(Submission.sub_id)
         ).group_by(Submission.distro_name, Submission.distro_version).all()
 
