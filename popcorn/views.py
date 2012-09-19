@@ -180,8 +180,21 @@ def distro(name, version):
 @app.route('/distro')
 @render(template='distro_doc.html')
 def distro_doc():
-    """Document the Distro related API functions"""
-    pass
+    """Document the Distro related API functions
+
+    Also returns a nested list of [distrovers, number of submissions] pairs.
+
+    """
+    # number of submissions per distribution
+    submissions_distrover = db_session.query(
+        Submission.distro_name + ' ' + Submission.distro_version,
+        func.count(Submission.sub_id)
+        ).group_by(Submission.distro_name, Submission.distro_version).all()
+
+    # transform the list of tuples returned by SQLA into a nested JS array
+    submissions_distrover = json.dumps(submissions_distrover)
+
+    return dict(submissions_distrover=submissions_distrover)
 
 
 @app.route('/api')
