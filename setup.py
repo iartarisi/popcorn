@@ -13,6 +13,6 @@ setup(
     packages=find_packages(exclude=["*.test", "test", "*.test.*"]),
     include_package_data=True,
     zip_safe=False,
-    install_requires=['Flask', 'sqlalchemy', 'psycopg2'],
+    install_requires=['Flask', 'sqlalchemy', 'psycopg2', 'textile'],
     test_suite="popcorn.test"
     )

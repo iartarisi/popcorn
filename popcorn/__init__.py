@@ -21,7 +21,9 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
+
 from flask import Flask, url_for, request
+from textile import textile
 
 from popcorn.database import db_session
 
@@ -43,3 +45,4 @@ def url_for_other_page(page=None):
     return url_for(request.endpoint, **args)
 
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
+app.jinja_env.filters['textile'] = lambda value: textile(value)
