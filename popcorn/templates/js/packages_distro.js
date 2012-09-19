@@ -9,7 +9,9 @@ function packages_by_distro() {
 
     // Set chart options
     var options = {
-                   'backgroundColor': '#f7f7f7'};
+        chartArea: {width: '100%', height: '70%'},
+        backgroundColor: '#f7f7f7'
+    };
 
     // Instantiate and draw our chart, passing in some options.
     var chart = new google.visualization.PieChart(document.getElementById('distro_packages_chart'));

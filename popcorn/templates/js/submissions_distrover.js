@@ -7,9 +7,9 @@ function submissions_by_distrover() {
     data.addRows({{submissions_distrover}});
 
     var options = {
-        vAxis: {title: 'Submissions',  titleTextStyle: {color: '#D9230F'}},
-        hAxis: {title: 'Distro', titleTextStyle: { color: '#D9230F'}},
-        backgroundColor: '#f7f7f7'
+        backgroundColor: '#f7f7f7',
+        chartArea: {width: '100%', height: '70%'},
+        legend: {position: 'in'}
     };
 
     var chart = new google.visualization.ColumnChart(document.getElementById('submissions_distrover'));
