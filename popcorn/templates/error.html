@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+{% filter textile %}
+
+h2. {{ error }}
+
+Try going to our "homepage":{{ url_for('index') }}.
+
+{% endfilter %}
+{% endblock %}

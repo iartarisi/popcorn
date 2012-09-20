@@ -216,3 +216,11 @@ def download():
 def faq():
     """Frequently asked questions"""
     pass
+
+
+@app.errorhandler(404)
+@render(template='error.html')
+def not_found(error):
+    """Handle page not found error"""
+    error_msg = "Not Found"
+    return dict(error=error_msg, code=404, request=request.path)
