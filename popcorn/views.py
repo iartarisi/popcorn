@@ -209,3 +209,10 @@ def api():
 def download():
     """Document the popcorn client installation procedure"""
     pass
+
+
+@app.route('/faq')
+@render(template='faq.html')
+def faq():
+    """Frequently asked questions"""
+    pass

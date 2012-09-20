@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+{% filter textile %}
+
+h2. Frequently Asked Questions
+
+h3(#anonymity). What about privacy? Is my data safe?
+
+Yes! Popcorn does not store any information about the submitting system except for the data described "below":/faq#what-track. No IPs are stored.
+
+We don't store the history of a system's submissions. In order to ensure that no system sends duplicate submissions, we store a hashed system id together with the date that the system last submitted data to us. Submissions are all independent. 
+
+h3(#what-track). What does popcorn track?
+
+Popcorn tracks the current distribution name and version, the user's architecture and various metadata about each of the packages in the system's RPM database. For each package we track: status (see "what does a package's status mean?":/faq#package-status below for more), name, version, release, epoch, architecture and vendor. The vendor is usually a repository name, URL or other identifier set by the original packager.
+
+h3(#package-status). What does a package's status mean?
+
+A package's status is determined by looking at all the files in that package's filesystem atime or time of last access. A package's last access time is then set to the access time of the most recently accessed time in that package.
+
+Some files are not tracked, such as tmp files for example. Only the files in the following directories are watched: /bin, /boot, /lib, /lib64, /sbin, /usr/bin, /usr/games, /usr/include, /usr/lib, /usr/lib64, /usr/libexec, /usr/sbin.
+
+After a package's atime is determined, packages are put into the following four categories:
+
+* (v) voted - package is older than 30 days and has been used in the last 30 days (these are the packages we care most about)
+* (r) recent - package has been recently installed (less than 30 days)
+* (o) old - package is older than 30 days and has not been used recently
+* (n) nofiles - there are no watched files present in this package
+
+Each package falls into exactly one category, so (n + r + v + o) is the total number of the installed packages.
+
+h3(#the-name). Why is it called popcorn?
+
+Popcorn is a <strong>pop</strong>ularity <strong>con</strong>test for <strong>R</strong>PMs. It was inspired and was born as a clone of Debian's popularity contest: "popcon.debian.org":http://popcon.debian.org, but it grew beyond that. Popcorn provides a REST API to make the data easy to process and available to all live.
+
+{% endfilter %}
+{% endblock %}
