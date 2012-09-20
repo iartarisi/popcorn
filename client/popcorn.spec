@@ -45,7 +45,7 @@ Popcorn tracks the collection of packages and repositories that users have insta
 %install
 install -Dm755 popcorn %{buildroot}%{_bindir}/popcorn
 install -Dm644 popcorn.conf   %{buildroot}%{_sysconfdir}/popcorn.conf
-install -Dm755 popcorn.cron   %{buildroot}%{_sysconfdir}/cron.monthly/popcorn
+install -Dm755 popcorn.cron   %{buildroot}%{_sysconfdir}/cron.weekly/popcorn
 install -Dm644 popcorn.log %{buildroot}%{_localstatedir}/log/popcorn.log
 
 %clean
