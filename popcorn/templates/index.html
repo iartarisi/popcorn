@@ -26,69 +26,39 @@
 </div>
 
 <div class="row-fluid">
-  <h3>How it works</h3>
-  <p>Users of RPM-based Linux distributions (such
-  as <a href="http://opensuse.org">openSUSE</a>
-  or <a href="http://fedoraproject.org">Fedora</a>) provide
-  weekly <a href="/FAQ#anonymity">anonymous</a> information about the
-  packages they have installed. This is done by simply installing the
-  <strong>popcorn-client</strong> package on their machines.</p>
+{% filter textile %}
 
-  <p><strong>popcorn-client</strong> collects basic metadata about a
-  participating user's system and all their installed packages. It also
-  figures out when those packages were last used and splits them into
-  four categories: <em>recent</em>, <em>old</em>, <em>voted</em>
-  or <em>nofiles</em>. Once a week it sends this data to the popcorn
-  server (here). Read more about the popcorn-client <a href="#">here</a>.
-  </p>
+h3(#how-it-works). How it works
 
-  <p>The <strong>Popcorn server</strong> receives the data sent
-  by <strong>popcorn-client</strong> and stores it in a database. We
-  don't track user IPs or even the history of a system's installed
-  packages over time. It then makes this data available to everyone
-  through <strong>charts</strong> (like the ones above and on the
-  various API documentation pages) and a <a href="/api">RESTful API</a>
-  (for other services to use).</p>
+Users of RPM-based Linux distributions (such as "openSUSE":http://opensuse.org or "Fedora":http://fedoraproject.org) provide weekly "anonymous":/FAQ#anonymity information about the packages they have installed. This is done by simply installing the *popcorn-client* package on their machines.
 
-  <h3>Why?</h3>
-  <p>Linux distributions are built from open source packages. But there
-  are a lot of them and people resources are often very
-  limited. Figuring out which packages our users really use would help a
-  lot with prioritising tasks. It's also good to know that someone uses
-  that package you were up all night trying to build.</p>
+*popcorn-client* collects basic metadata about a participating user's system and all their installed packages. It also figures out when those packages were last used and splits them into four categories: _recent_, _old_, _voted_ or _nofiles_. Once a week it sends this data to the popcorn server (here). Read more about the popcorn-client "here":#.
 
-  <p>There are a lot of questions that Linux distributions ask
-    themselves: from things as simple as figuring out what CPU
-    architectures people are using to more specialised questions like:
-  </p>
-  <ul>
-    <li>Should we bother to package gems as RPMs or is everyone installing
-      them as gems anyway?</li>
-    <li>Is anyone actually using python3 at this point?</li>
-    <li>How long do people use an old distribution release for after
-    we've declared it End of Life?</li>
-  </ul>
+The *Popcorn server* receives the data sent by *popcorn-client* and stores it in a database. We don't track user IPs or even the history of a system's installed packages over time. It then makes this data available to everyone through *charts* (like the ones above and on the various API documentation pages) and a "RESTful API":/api (for other services to use).
 
-  <h3>How you can help</h3>
-  <p>The best way to help right now (and the easiest) if you're an
-  RPM-based Linux distribution user is to <strong>install
-  popcorn-client</strong> and then forget about it. It will send us the
-  data we need to make your distribution better for you.</p>
 
-  <p>If you're a developer you might want to check
-  out <a href="http://github.com/opensuse/popcorn">the sources</a> and
-  hack something on the server. It's mostly python under an MIT
-  license. Look for bugs in our <a href="">issue tracker</a> or think up
-  new features.</p>
+h3(#why). Why?
 
-  <p>If you want to develop a third party service, go ahead and look at
-  the <a href="/api">API</a>.</p>
+Linux distributions are built from open source packages. But there are a lot of them and people resources are often very limited. Figuring out which packages our users really use would help a lot with prioritising tasks. It's also good to know that someone uses that package you were up all night trying to build.
 
-  <p>If you have a question that you think popcorn's data might be able
-  to answer and you can't find the answer by looking at all our crazy
-  graphs, <a href="/contact">contact us</a> and we'll try to figure out
-  an answer for you.</p>
+There are a lot of questions that Linux distributions ask themselves: from things as simple as figuring out what CPU architectures people are using to more specialised questions like:
 
+* Should we bother to package gems as RPMs or is everyone installing them as gems anyway?
+* Is anyone actually using python3 at this point?
+* How long do people use an old distribution release for after we've declared it End of Life?
+
+
+h3(#how-you-can-help). How you can help
+
+The best way to help right now (and the easiest) if you're an RPM-based Linux distribution user is to *install popcorn-client* and then forget about it. It will send us the data we need to make your distribution better for you.
+
+If you're a developer you might want to check out "the sources":http://github.com/opensuse/popcorn and hack something on the server. It's mostly python under an MIT License. Look for bugs in our "issue tracker"https://github.com/opensuse/popcorn/issues or think up new features. We're really open to contributions even if you're not so experienced.
+
+If you want to develop a third party service, go ahead and look at the "API":/api.
+
+If you have a question that you think popcorn's data might be able to answer and you can't find the answer by looking at all our crazy graphs, "contact us":/contact and we'll try to figure out an answer for you.
+
+{% endfilter %}  
 </div>     
 
 <div class="row">
