@@ -1,4 +1,9 @@
 -------------------------------------------------------------------
+Thu Sep 20 15:04:16 CEST 2012 - iartarisi@suse.cz
+
+- renamed 'popcorn-client' file to 'popcorn'
+
+-------------------------------------------------------------------
 Mon Aug  6 21:11:04 UTC 2012 - axitkhurana@gmail.com
 
 - initial version.
