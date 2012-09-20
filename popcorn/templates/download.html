@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% filter textile %}
+
+h2. Installing
+
+The popcorn client is a simple python script which runs on a pre-determined interval. It collects data from the local RPM database and then sends a POST request to the popcorn server.
+
+h3. openSUSE
+
+Downloading and installing the __popcorn__ is easy if you're an openSUSE user as we maintain an OBS repository with the packaged client.
+
+Add the repository for your openSUSE version:
+
+h4. Factory
+
+pre. zypper ar http://download.opensuse.org/repositories/home:/axitkhurana/openSUSE_Factory/home:axitkhurana.repo
+
+h4. 12.1
+
+pre. zypper ar http://download.opensuse.org/repositories/home:/axitkhurana/openSUSE_12.1/home:axitkhurana.repo
+
+h4. 11.4
+
+pre. zypper ar http://download.opensuse.org/repositories/home:/axitkhurana/openSUSE_11.4/home:axitkhurana.repo
+
+
+Then install popcorn:
+
+pre. zypper install popcorn
+
+The popcorn client will then run in the background and make new submissions once every 7 days.
+
+You can run it manually as well if you prefer; just run @popcorn@ from the command line. The output should look like this:
+
+pre. $ popcorn
+Submission received. Thanks!
+
+
+h3. Fedora, RHEL, Mandriva, SLES, CentOS
+
+We build packages in OBS for all the above distributions, but they are currently not as well tested as the openSUSE packages. You can choose your distribution package version from this "List of repositories":https://build.opensuse.org/project/repositories?project=home%3Aaxitkhurana and then *Go to download repository@ and add the repository to your system manually.
+
+You then have to install popcorn using your distribution's package manager. The package's name is *popcorn*. Then run the popcorn:
+
+pre. $ popcorn
+Submission received. Thanks!
+
+
+h3. Sources
+
+If you just want to run popcorn manually, that's also easy. You'll need to have the @rpm-python@ package installed first.
+
+Then just download the python script and the configuration script:
+
+pre. wget https://raw.github.com/openSUSE/popcorn/master/client/popcorn
+$ wget https://github.com/openSUSE/popcorn/blob/master/client/popcorn.conf
+
+Place the configuration script in the @/etc@ directory:
+
+pre. mv popcorn.conf /etc
+
+And run popcorn:
+
+pre. $ ./popcorn
+Submission received. Thanks!
+
+If you got an error, we'd like to "hear about it":https://github.com/openSUSE/popcorn/issues/new.
+
+You should be able to see the data which was sent to the popcorn server in popcorn's log at @/var/log/popcorn.log@.
+
+
+
+{% endfilter %}
+{% endblock %}

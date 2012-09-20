@@ -202,3 +202,10 @@ def distro_doc():
 def api():
     """Document the popcorn API"""
     pass
+
+
+@app.route('/download')
+@render(template='download.html')
+def download():
+    """Document the popcorn client installation procedure"""
+    pass
