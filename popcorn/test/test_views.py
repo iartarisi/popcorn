@@ -44,7 +44,7 @@ def _fk_pragma_on_connect(dbapi_con, con_record):
     dbapi_con.execute('pragma foreign_keys=ON')
 
 
-class PopcornTestCase(unittest.TestCase):
+class TestViews(unittest.TestCase):
 
     def setUp(self):
         engine = create_engine('sqlite:///:memory:')
@@ -102,54 +102,46 @@ class PopcornTestCase(unittest.TestCase):
 
     def test_index_json(self):
         self.submit(compress=False, header=False)
-        with app.test_request_context(
-                path='/', method='GET',
-                headers=[('Accept', 'application/json')]):
-            response = app.dispatch_request()
-            self.assertEqual(json.loads(response.data), {
+        
+        response = self.app.get('/', headers=[('Accept', 'application/json')])
+        self.assertEqual(json.loads(response.data), {
                 "submissions_distrover": u'[["openSUSE 12.1", 1]]',
                 "distro_packages": "[[\"openSUSE\", 1285]]",
                 })
-            self.assertEqual(response.headers['Content-Type'],
-                             'application/json')
+        self.assertEqual(response.headers['Content-Type'],
+                         'application/json')
 
     def test_vendor_json(self):
         self.submit(compress=False, header=False)
-        with app.test_request_context(
-                path='/vendor/openSUSE', method='GET',
-                headers=[('Accept', 'application/json')]):
-            response = app.dispatch_request()
-            self.assertEqual(json.loads(response.data), {
+
+        response = self.app.get('/vendor/openSUSE',
+                                headers=[('Accept', 'application/json')])
+        self.assertEqual(json.loads(response.data), {
                 "vendor": {
                     "vendor_name": "openSUSE",
                     "vendor_url": "openSUSE"
                     }})
-            self.assertEqual(response.headers['Content-Type'],
-                             'application/json')
+        self.assertEqual(response.headers['Content-Type'],
+                         'application/json')
 
     def test_system_json(self):
         self.submit(compress=False, header=False)
-        with app.test_request_context(
-                path='/system/%s' % SYS_HWUUID,
-                method='GET', headers=[('Accept', 'application/json')]):
-            response = app.dispatch_request()
-            self.assertEqual(json.loads(response.data), {
+        response = self.app.get('/system/' + SYS_HWUUID,
+                                headers=[('Accept', 'application/json')])
+        self.assertEqual(json.loads(response.data), {
                 "system": {
                     "last_sub_date": today.strftime("%Y-%m-%d"),
                     "sys_hwuuid": SYS_HWUUID
                     }
                 })
-            self.assertEqual(response.headers['Content-Type'],
-                             'application/json')
+        self.assertEqual(response.headers['Content-Type'],
+                         'application/json')
 
     def test_package_json(self):
         self.submit(compress=False, header=False)
-        with app.test_request_context(path='/package/sed/4.2.1/5.1.2/x86_64',
-                                      method='GET',
-                                      headers=[('Accept', 'application/json')]
-                                      ):
-            response = app.dispatch_request()
-            self.assertEqual(json.loads(response.data), {
+        response = self.app.get('/package/sed/4.2.1/5.1.2/x86_64',
+                                headers=[('Accept', 'application/json')])
+        self.assertEqual(json.loads(response.data), {
                 "packages": [{
                     "sub_id": 1,
                     "sub_date": today.strftime("%Y-%m-%d"),
@@ -174,17 +166,14 @@ class PopcornTestCase(unittest.TestCase):
                     "pkg_release": "5.1.2"
                 }
             })
-            self.assertEqual(response.headers['Content-Type'],
-                             'application/json')
+        self.assertEqual(response.headers['Content-Type'],
+                         'application/json')
 
     def test_distro_json(self):
         self.submit(compress=False, header=False)
-        with app.test_request_context(path='/distro/openSUSE/12.1',
-                                      method='GET',
-                                      headers=[('Accept', 'application/json')]
-                                      ):
-            response = app.dispatch_request()
-            self.assertEqual(json.loads(response.data), {
+        response = self.app.get('/distro/openSUSE/12.1',
+                                headers=[('Accept', 'application/json')])
+        self.assertEqual(json.loads(response.data), {
                 "distro": {
                     "submissions": [{
                         "sub_id": 1,
@@ -198,17 +187,15 @@ class PopcornTestCase(unittest.TestCase):
                     "distro_version": "12.1"
                     }
                 })
-            self.assertEqual(response.headers['Content-Type'],
-                             'application/json')
+        self.assertEqual(response.headers['Content-Type'],
+                         'application/json')
 
     def test_distro_doc_json(self):
         self.submit(compress=False, header=False)
-        with app.test_request_context(
-                path='/distro', method='GET',
-                headers=[('Accept', 'application/json')]):
-            response = app.dispatch_request()
-            self.assertEqual(json.loads(response.data), {
+        response = self.app.get('/distro',
+                                headers=[('Accept', 'application/json')])
+        self.assertEqual(json.loads(response.data), {
                 "submissions_distrover": u'[["openSUSE 12.1", 1]]',
                 })
-            self.assertEqual(response.headers['Content-Type'],
-                             'application/json')
+        self.assertEqual(response.headers['Content-Type'],
+                         'application/json')

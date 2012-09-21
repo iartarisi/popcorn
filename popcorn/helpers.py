@@ -43,9 +43,15 @@ def render(template=None):
                 ctx = {}
             elif not isinstance(ctx, dict):
                 return ctx
-            render_type = request_wants_json()
-            if render_type:
-                return jsonify(ctx)
-            return render_template(template, **ctx)
+
+            try:
+                status_code = ctx.pop('status_code')
+            except KeyError:
+                status_code = 200
+
+            if request_wants_json():
+                return jsonify(ctx), status_code
+
+            return render_template(template, **ctx), status_code
         return decorated_function
     return decorator
