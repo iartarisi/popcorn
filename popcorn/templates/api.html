@@ -23,8 +23,9 @@ h3. JSON API
 
 Aside from the submission receiving API function, all other API requests are HTTP GET requests which return JSON documents. You need to explicitly specify that you want a JSON document in your request's headers. e.g.
 
-pre. curl --header "Accept: application/json" http://popcorn.opensuse.org/distro/openSUSE_12.1
-{
+pre. $ curl --header "Accept: application/json" http://popcorn.opensuse.org/distro/openSUSE_12.1
+
+pre. {
   "distro": {
     "submissions": [
       {
@@ -46,7 +47,7 @@ pre. curl --header "Accept: application/json" http://popcorn.opensuse.org/distro
     ], 
     "distro_name": "openSUSE", 
     "distro_version": "12.1"
-  }
+}
 
 
 h3. Errors
