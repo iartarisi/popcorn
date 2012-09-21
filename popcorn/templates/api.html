@@ -51,5 +51,21 @@ pre. curl --header "Accept: application/json" http://popcorn.opensuse.org/distro
 
 h3. Errors
 
+Errors set the proper HTTP code and return a message stored in the @error@ field:
+
+pre. $ curl -i --header "Accept: application/json" http://popcorn.opensuse.org/NotFound
+
+pre.. 
+HTTP/1.0 404 NOT FOUND
+Content-Type: application/json
+Content-Length: 53
+Server: Werkzeug/0.8.3 Python/2.7.3
+Date: Fri, 21 Sep 2012 13:17:23 GMT
+
+{
+  "error": "Not Found"
+}
+
+
 {% endfilter %}
 {% endblock %}
