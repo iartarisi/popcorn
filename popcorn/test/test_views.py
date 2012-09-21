@@ -102,7 +102,7 @@ class TestViews(unittest.TestCase):
 
     def test_index_json(self):
         self.submit(compress=False, header=False)
-        
+
         response = self.app.get('/', headers=[('Accept', 'application/json')])
         self.assertEqual(json.loads(response.data), {
                 "submissions_distrover": u'[["openSUSE 12.1", 1]]',

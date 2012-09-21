@@ -29,6 +29,7 @@ import flask
 
 from popcorn.helpers import render
 
+
 class TestHelpers(unittest.TestCase):
 
     def test_render_html(self):
@@ -89,4 +90,4 @@ class TestHelpers(unittest.TestCase):
         self.assertEqual(response.status_code, 418)
         self.assertEqual(json.loads(response.data),
                          {'test_data': 'foo'})
-        self.assertEqual(response.headers['Content-Type'], 'application/json')        
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
