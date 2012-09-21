@@ -1,8 +1,10 @@
 {% extends "layout.html" %}
 
 {% block content %}
+{% filter textile %}
 
-<h2>The Popcorn API</h2>
+h2. The Popcorn API
+
 <div class="alert alert-block">
   <h4>Warning!</h4> The API is currently unstable and may change
   without prior notice. If you're looking to use Popcorn data in your
@@ -11,17 +13,17 @@
 </div>
 
 
-<h3>Making new package submissions</h3> 
-<p>Popcorn provides one API function for receiving submissions from users. This is available at the root (<code>'/'</code>) of the Popcorn website and accepts only HTTP POST requests. Gzip archived (<code>Content-Encoding: gzip</code>) requests are also accepted.</p>
+h3. Making new package submissions
 
-<p>The format of a submission is plaintext and contains general information about the system as well as information about each package installed on that system. The popcorn client is a python package which currently fills this role for rpm-based distros.</p>
+Popcorn provides one API function for receiving submissions from users. This is available at the root (@'/'@) of the Popcorn website and accepts only HTTP POST requests. Gzip archived (@Content-Encoding: gzip@) requests are also accepted.
 
-<h3>JSON API</h3>
+The format of a submission is plaintext and contains general information about the system as well as information about each package installed on that system. The popcorn client is a python package which currently fills this role for rpm-based distros.</p>
 
-<p>Aside from the submission receiving API function, all other API requests are HTTP GET requests which return JSON documents. You need to explicitly specify that you want a JSON document in your request's headers. e.g.</p>
+h3. JSON API
 
-<pre>
-curl --header "Accept: application/json" localhost:5000/distro/openSUSE_12.1
+Aside from the submission receiving API function, all other API requests are HTTP GET requests which return JSON documents. You need to explicitly specify that you want a JSON document in your request's headers. e.g.
+
+pre. curl --header "Accept: application/json" http://popcorn.opensuse.org/distro/openSUSE_12.1
 {
   "distro": {
     "submissions": [
@@ -45,9 +47,9 @@ curl --header "Accept: application/json" localhost:5000/distro/openSUSE_12.1
     "distro_name": "openSUSE", 
     "distro_version": "12.1"
   }
-</pre>
-
-<h3>Errors</h3>
 
 
+h3. Errors
+
+{% endfilter %}
 {% endblock %}
