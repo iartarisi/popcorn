@@ -105,9 +105,9 @@ class TestViews(unittest.TestCase):
 
         response = self.app.get('/', headers=[('Accept', 'application/json')])
         self.assertEqual(json.loads(response.data), {
-                "submissions_distrover": u'[["openSUSE 12.1", 1]]',
-                "distro_packages": "[[\"openSUSE\", 1285]]",
-                })
+            "submissions_distrover": u'[["openSUSE 12.1", 1]]',
+            "distro_packages": "[[\"openSUSE\", 1285]]",
+            })
         self.assertEqual(response.headers['Content-Type'],
                          'application/json')
 
@@ -117,10 +117,10 @@ class TestViews(unittest.TestCase):
         response = self.app.get('/vendor/openSUSE',
                                 headers=[('Accept', 'application/json')])
         self.assertEqual(json.loads(response.data), {
-                "vendor": {
-                    "vendor_name": "openSUSE",
-                    "vendor_url": "openSUSE"
-                    }})
+            "vendor": {
+                "vendor_name": "openSUSE",
+                "vendor_url": "openSUSE"
+                }})
         self.assertEqual(response.headers['Content-Type'],
                          'application/json')
 
@@ -129,11 +129,11 @@ class TestViews(unittest.TestCase):
         response = self.app.get('/system/' + SYS_HWUUID,
                                 headers=[('Accept', 'application/json')])
         self.assertEqual(json.loads(response.data), {
-                "system": {
-                    "last_sub_date": today.strftime("%Y-%m-%d"),
-                    "sys_hwuuid": SYS_HWUUID
-                    }
-                })
+            "system": {
+                "last_sub_date": today.strftime("%Y-%m-%d"),
+                "sys_hwuuid": SYS_HWUUID
+                }
+            })
         self.assertEqual(response.headers['Content-Type'],
                          'application/json')
 
@@ -142,30 +142,29 @@ class TestViews(unittest.TestCase):
         response = self.app.get('/package/sed/4.2.1/5.1.2/x86_64',
                                 headers=[('Accept', 'application/json')])
         self.assertEqual(json.loads(response.data), {
-                "packages": [{
-                    "sub_id": 1,
-                    "sub_date": today.strftime("%Y-%m-%d"),
-                    "pkg_status": "voted",
-                    "pkg_name": "sed",
-                    "pkg_version": "4.2.1",
-                    "pkg_arch": "x86_64",
-                    "vendor_name": "openSUSE",
-                    "pkg_epoch": "",
-                    "pkg_release": "5.1.2"
-                  }],
-                "voted": 1,
-                "generic_package": {
-                    "sub_id": 1,
-                    "sub_date": today.strftime("%Y-%m-%d"),
-                    "pkg_status": "voted",
-                    "pkg_name": "sed",
-                    "pkg_version": "4.2.1",
-                    "pkg_arch": "x86_64",
-                    "vendor_name": "openSUSE",
-                    "pkg_epoch": "",
-                    "pkg_release": "5.1.2"
-                }
-            })
+            "packages": [{
+                "sub_id": 1,
+                "sub_date": today.strftime("%Y-%m-%d"),
+                "pkg_status": "voted",
+                "pkg_name": "sed",
+                "pkg_version": "4.2.1",
+                "pkg_arch": "x86_64",
+                "vendor_name": "openSUSE",
+                "pkg_epoch": "",
+                "pkg_release": "5.1.2"
+                }],
+            "voted": 1,
+            "generic_package": {
+                "sub_id": 1,
+                "sub_date": today.strftime("%Y-%m-%d"),
+                "pkg_status": "voted",
+                "pkg_name": "sed",
+                "pkg_version": "4.2.1",
+                "pkg_arch": "x86_64",
+                "vendor_name": "openSUSE",
+                "pkg_epoch": "",
+                "pkg_release": "5.1.2"
+                }})
         self.assertEqual(response.headers['Content-Type'],
                          'application/json')
 
@@ -174,19 +173,19 @@ class TestViews(unittest.TestCase):
         response = self.app.get('/distro/openSUSE/12.1',
                                 headers=[('Accept', 'application/json')])
         self.assertEqual(json.loads(response.data), {
-                "distro": {
-                    "submissions": [{
-                        "sub_id": 1,
-                        "sub_date": today.strftime("%Y-%m-%d"),
-                        "distro_version": "12.1",
-                        "popcorn_version": "0.1",
-                        "distro_name": "openSUSE",
-                        "arch": "x86_64"
-                        }],
+            "distro": {
+                "submissions": [{
+                    "sub_id": 1,
+                    "sub_date": today.strftime("%Y-%m-%d"),
+                    "distro_version": "12.1",
+                    "popcorn_version": "0.1",
                     "distro_name": "openSUSE",
-                    "distro_version": "12.1"
-                    }
-                })
+                    "arch": "x86_64"
+                    }],
+                "distro_name": "openSUSE",
+                "distro_version": "12.1"
+                }
+            })
         self.assertEqual(response.headers['Content-Type'],
                          'application/json')
 
