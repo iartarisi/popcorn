@@ -223,4 +223,4 @@ def faq():
 def not_found(error):
     """Handle page not found error"""
     error_msg = "Not Found"
-    return dict(error=error_msg, code=404, request=request.path)
+    return dict(error=error_msg, status_code=404, request=request.path)
