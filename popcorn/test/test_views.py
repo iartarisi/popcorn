@@ -204,9 +204,7 @@ class TestViews(unittest.TestCase):
         response = self.app.get('/notFound',
                                 headers=[('Accept', 'application/json')])
 
-        self.assertEqual(json.loads(response.data), {
-                u'request': u'/notFound',
-                u'error': u'Not Found'})
+        self.assertEqual(json.loads(response.data), {u'error': u'Not Found'})
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, 404)
 
