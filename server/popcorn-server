@@ -27,7 +27,7 @@ import argparse
 import sys
 
 from popcorn import app
-from popcorn.database import init_db
+from popcorn.database import init_db, drop_db
 
 parser = argparse.ArgumentParser(description="Popcorn server")
 parser.add_argument('command', nargs='?', default=None)
@@ -37,6 +37,8 @@ args = parser.parse_args()
 
 if args.command == 'init_db':
     init_db()
+elif args.command == 'drop_db':
+    drop_db()
 else:
     if args.debug:
         app.run(debug=True)
