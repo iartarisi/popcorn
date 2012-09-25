@@ -11,7 +11,7 @@ Copyright (c) 2011-2012 Ionuț Arțăriși <iartarisi@suse.cz>
 Demo
 ----
 
-Note: A test/demo instance is currently available at http://popcorn.mapleoin.eu.
+Note: A test/demo instance with more information is currently available at http://popcorn.mapleoin.eu.
 
 Introduction
 ------------
